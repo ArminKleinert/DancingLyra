@@ -1,4 +1,4 @@
-# Lyea
+# Lyra
 
 A port of https://github.com/ArminKleinert/Lyra from Ruby to D.  
 My hope is that this will make for a big performance improvement and maybe help out with future projects where a statically typed language has to be used for implementing a dynamically typed language.  
