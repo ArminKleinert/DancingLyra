@@ -141,28 +141,28 @@ class LyraObj : ILyraObj {
     private this() {
     }
 
-override string toString() {
-switch (type) {
-case symbol_id:
-  return this.symbol_val;
-  case string_id:
-  return this.string_val;
-  case char_id:
-  return to!string(this.char_val);
-  case fixnum_id:
-  return to!string(this.fixnum_val);
-  case real_id:
-  return to!string(this.real_val);
-  case bool_id:
-  return this.bool_val ? "#t" : "#f";
-  case nil_id:
-  return "()";
-  //case vector_val:
-  //return to!string(this.vector_val());
-  default:
-  return "<LyraObj type=" ~ to!string(type) ~ ">";
-}
-}
+    override string toString() {
+        switch (type) {
+        case symbol_id:
+            return this.symbol_val;
+        case string_id:
+            return "\"" ~ this.string_val ~ "\"";
+        case char_id:
+            return to!string(this.char_val);
+        case fixnum_id:
+            return to!string(this.fixnum_val);
+        case real_id:
+            return to!string(this.real_val);
+        case bool_id:
+            return this.bool_val ? "#t" : "#f";
+        case nil_id:
+            return "()";
+            //case vector_val:
+            //return to!string(this.vector_val());
+        default:
+            return "<LyraObj type=" ~ to!string(type) ~ ">";
+        }
+    }
 }
 
 class Cons : LyraObj {
@@ -209,6 +209,10 @@ class Cons : LyraObj {
     override LyraObj objtype() {
         return LyraObj.makeFixnum(cons_id);
     }
+
+    override string toString() {
+        return listToString(this);
+    }
 }
 
 Symbol symbol_val(LyraObj obj) {
@@ -232,8 +236,7 @@ floating real_val(LyraObj obj) {
 }
 
 Cons cons_val(LyraObj obj) {
-import std.stdio;
-    writeln("Is cons? " ~ to!string(obj.type == cons_id));
+    import std.stdio;
     return cast(Cons) obj;
 }
 
@@ -266,12 +269,29 @@ LyraObj cdr(LyraObj obj) {
 }
 
 LyraObj array_to_list(LyraObj[] arr) {
-  if (arr.length == 0)
-    return Cons.nil();
-  else
-    return Cons.create(arr[0], array_to_list(arr[1 .. $]));
+    if (arr.length == 0)
+        return Cons.nil();
+    else
+        return Cons.create(arr[0], array_to_list(arr[1 .. $]));
 }
 
 bool isNil(LyraObj obj) {
-return obj is Cons.nil();
+    return obj is Cons.nil();
+}
+
+string listToString(Cons cons) {
+    string listToStringHelper(Cons cons) {
+        if (cons.isNil) {
+            return "";
+        }
+        if (cons.cdr.isNil) {
+            return cons.car.toString();
+        }
+        if (cons.cdr.type == cons_id) {
+            return cons.car.toString() ~ " " ~ listToStringHelper(cons.cdr.cons_val);
+        }
+        return cons.car.toString() ~ " . " ~ cons.cdr.toString();
+    }
+
+    return "(" ~ listToStringHelper(cons) ~ ")";
 }
