@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"Armin Kleinert"
+	],
+	"copyright": "Copyright © 2021, Armin Kleinert",
+	"description": "A simple lisp made for fun.",
+	"license": "BSD-2",
+	"name": "lyra"
+}
