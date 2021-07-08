@@ -37,88 +37,97 @@ enum : uint {
 }
 
 class LyraFunc : LyraObj {
-  private string name; private Env definitionEnv; private Cons argNames; private LyraObj bodyExpr;
+  private string name;
+  private Env definitionEnv;
+  private Cons argNames;
+  private LyraObj bodyExpr;
+  private bool _isMacro;
 
-  this(string name, Env definitionEnv, Cons argNames, LyraObj bodyExpr) {
-  this.name = name;
-  this.definitionEnv = definitionEnv;
-  this.argNames = argNames;
-  this.bodyExpr = bodyExpr;
+  this(string name, Env definitionEnv, Cons argNames, LyraObj bodyExpr, bool isMacro) {
+    this.name = name;
+    this.definitionEnv = definitionEnv;
+    this.argNames = argNames;
+    this.bodyExpr = bodyExpr;
+    this._isMacro = isMacro;
   }
-  
+
   LyraObj call(Cons args, Env callEnv) {
-  import lyra.eval;
-  
+    import lyra.eval;
+
     Env env = new Env(definitionEnv, callEnv);
     LyraObj result;
-    
+
     do {
       Cons argNames1 = argNames;
-      while (!argNames1.isNil){
-      if (args.isNil) throw new Exception("Not enough arguments for function "~name~"!");
-      
-      env.set(argNames1.car, args.car);
-      argNames1 = argNames1.next;
-      args = args.next;
+      while (!argNames1.isNil) {
+        if (args.isNil)
+          throw new Exception("Not enough arguments for function " ~ name ~ "!");
+
+        env.set(argNames1.car, args.car);
+        argNames1 = argNames1.next;
+        args = args.next;
       }
-      
+
       try {
-        result =eval(bodyExpr, env);
-      } catch(TailCall tc) {
-      args = tc.args;
-          continue ;
+        result = eval(bodyExpr, env);
+      } catch (TailCall tc) {
+        args = tc.args;
+        continue;
       } catch (Exception ex) {
-      writeln(name ~" failed with error " ~ ex.msg);
-      writeln("Arguments: " ~ args.toString());
-      throw ex;
+        writeln(name ~ " failed with error " ~ ex.msg);
+        writeln("Arguments: " ~ args.toString());
+        throw ex;
       }
-    }while(false);
-    
+    } while (false);
+
     return result;
   }
+  
+  bool isMacro() {return isMacro;}
 
   override uint type() {
     return func_id;
   }
-  
+
   override string toString() {
-  return "<function " ~ name ~ ">";
+    return "<function " ~ name ~ ">";
   }
 }
 
 class TailCall : Exception {
   Cons args;
-      this(Cons args,string msg="", string file = __FILE__, size_t line = __LINE__) {
-        super(msg, file, line);this.args = args;
-    }
+  this(Cons args, string msg = "", string file = __FILE__, size_t line = __LINE__) {
+    super(msg, file, line);
+    this.args = args;
+  }
 }
 
-class Env  {
+class Env {
   private Env[2] parents;
   private LyraObj[Symbol] inner;
 
   alias inner this;
 
   this(Env parent1, Env parent2 = null) {
-    parents[0]=parent1;
-    parents[1]=parent2;
+    parents[0] = parent1;
+    parents[1] = parent2;
   }
 
-   LyraObj find(LyraObj sym) {
+  LyraObj find(LyraObj sym) {
     if (sym.type != symbol_id)
       return null;
 
     auto v = inner.get(sym.symbol_val, null);
-    if (v is null && parents[0] !is null) {
+    if (v is null && parents[0]!is null) {
       return parents[0].find(sym);
     }
-    if (v is null && parents[1] !is null) {
+    if (v is null && parents[1]!is null) {
       return parents[1].find(sym);
     }
     return cast(LyraObj) v;
   }
 
-   void set(LyraObj sym, LyraObj val) {
+  void set(LyraObj sym, LyraObj val) {
     Symbol key = sym.symbol_val;
     writeln("Key: " ~ key ~ " Value: " ~ val.toString());
     this[key] = val;

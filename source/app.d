@@ -18,7 +18,7 @@ void main() {
   writeln(eval(obj(1L), env));
   writeln(evalList(list(obj(1L), obj(2L), obj(3L)), env));
   writeln(evalKeepLast(list(obj(1L), obj(2L), obj(3L)), env));
-  
+
   env.set(symbol("s"), obj(16L));
   writeln(env.toString());
   writeln(env.find(symbol("s")));
@@ -28,6 +28,6 @@ void main() {
   writeln(envChild.find(symbol("s1")));
   writeln(envChild.find(symbol("s")));
   writeln(envChild.find(symbol("a")));
-  
-// auto id = new LyraFunc(name, env, list(symbol("e")), list(symbol("e")));
+
+  // auto id = new LyraFunc(name, env, list(symbol("e")), list(symbol("e")));
 }
