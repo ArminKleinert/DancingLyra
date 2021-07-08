@@ -353,8 +353,16 @@ LyraObj list(Vector e) {
   return result;
 }
 
+LyraObj list(LyraObj[] xs ...) {
+  return list(xs);
+}
+
 LyraObj vector(Vector e) {
   return LyraObj.makeVector(e);
+}
+
+LyraObj vector(LyraObj[] xs ...) {
+  return LyraObj.makeVector(xs);
 }
 
 Cons nil() {

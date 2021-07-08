@@ -8,7 +8,7 @@ import lyra.reader;
 import lyra.types;
 import std.conv;
 
-const auto RE = ctRegex!(r"[\s,]*([()'`]|" ~ `"` ~ `(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`
+const auto RE = ctRegex!(r"[\s,]*([\[\]()'`]|" ~ `"` ~ `(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`
     ~ r"`,;)]*)");
 
 class Reader {
@@ -55,20 +55,29 @@ auto integer_regex = ctRegex!(r"^-?[0-9]+$");
 auto float_regex = ctRegex!(r"^-?[0-9]+\.[0-9]+$");
 auto string_regex = ctRegex!(`^"(?:\\.|[^\\"])*"$`);
 
-LyraObj make_ast(Reader tokens, int level = 0) {
+LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_after_1 = false) {
   LyraObj[] root = [];
   string token;
   while ((token = tokens.next()) !is null) {
     switch (token) {
+    case "'":
+      root ~= list([symbol("quote"), make_ast(tokens, level, "", true)]); break;
     case "(":
-      root ~= make_ast(tokens, level + 1);
+      root ~= make_ast(tokens, level + 1, ")");
+      break;
+    case "[":
+      root ~= make_ast(tokens, level + 1, "]");
       break;
     case ")":
-      if (level == 0) {
+      if (level == 0 || expected != ")") {
         throw new Exception("Unexpected ')'");
-      } else {
-        return list(root);
       }
+      return list(root);
+    case "]":
+      if (level == 0 || expected != "]") {
+        throw new Exception("Unexpected ']'");
+      }
+      return vector(root);
     case "#t":
       root ~= LyraObj.makeBoolean(true);
       break;
@@ -89,56 +98,7 @@ LyraObj make_ast(Reader tokens, int level = 0) {
       }
       break;
     }
+    if (stop_after_1){ return root[0]; }
   }
   return list(root);
 }
-
-/*
-def make_ast(tokens, level=0)
-  root = []
-  while (t = tokens.shift) != nil
-    case t
-    when "("
-      root << make_ast(tokens, level+1)
-    when ")"
-      raise "Unexpected ')'" if level == 0
-      return list(*root)
-    when '"'                    then raise "Unexpected '\"'"
-    when "'()"                  then root << nil
-    when "#t"                   then root << true
-    when "#f"                   then root << false
-    when /^(0b[0-1]+|-?0x[0-9a-fA-F]+|-?[0-9]+)$/
-      mult = 1
-      if t[0] == "-"
-        mult = -1
-        t = t[1..-1]
-      end
-      
-      case t[0..1]
-      when "0x"
-        t = t[2..-1]
-        base = 16
-      when "0b"
-        t = t[2..-1]
-        base = 2
-      else
-        base = 10
-      end
-
-      n = t.to_i(base) * mult
-      root << n
-    when /^-?[0-9]+\.[0-9]+$/
-      root << t.to_f
-    when /^"(?:\\.|[^\\"])*"$/  then root << parse_str(t)
-    else
-      if t.start_with?("'")
-        root << list(:quote, t[1..-1].to_sym)
-      else
-        root << t.to_sym
-      end
-    end
-  end
-  raise "Expected ')', got EOF" if level != 0
-  list(*root)
-end
-*/
