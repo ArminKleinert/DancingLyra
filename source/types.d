@@ -17,7 +17,6 @@ union Val {
     fixnum fixnum_val;
     floating real_val;
     Func func_val;
-    Env env_val;
     bool bool_val;
     Vector vector_val;
 }
@@ -37,13 +36,29 @@ enum : uint {
 }
 
 class Env {
-    const Env parent;
-    LyraObj[Symbol] inner;
+    private Env parent;
+    private LyraObj[Symbol] inner;
 
     alias inner this;
 
     this(Env parent) {
         this.parent = parent;
+    }
+
+    LyraObj find(LyraObj sym) {
+        if (sym.type != symbol_id)
+            return null;
+
+        auto v = inner.get(sym.symbol_val, null);
+        if (v is null && parent !is null) {
+            return parent.find(sym);
+        }
+        return cast(LyraObj) v;
+    }
+
+    void set(LyraObj sym, LyraObj val) {
+        Symbol key = sym.symbol_val;
+        this[key] = val;
     }
 }
 
@@ -79,6 +94,7 @@ class LyraObj : ILyraObj {
         return e ? ly_true : ly_false;
     }
 
+    /*
     public static LyraObj makeEnv(Env parent, Cons pairs) {
         Env envmap = new Env(parent);
         while (pairs !is Cons.nil()) {
@@ -89,6 +105,7 @@ class LyraObj : ILyraObj {
         Val v = {env_val: envmap};
         return new LyraObj(v, fixnum_id);
     }
+    */
 
     public static LyraObj makeFixnum(fixnum e) {
         Val v = {fixnum_val: e};
@@ -211,7 +228,20 @@ class Cons : LyraObj {
     }
 
     override string toString() {
-        return listToString(this);
+        string listToStringHelper(Cons cons) {
+            if (cons.isNil) {
+                return "";
+            }
+            if (cons.cdr.isNil) {
+                return cons.car.toString();
+            }
+            if (cons.cdr.type == cons_id) {
+                return cons.car.toString() ~ " " ~ listToStringHelper(cons.cdr.cons_val);
+            }
+            return cons.car.toString() ~ " . " ~ cons.cdr.toString();
+        }
+
+        return "(" ~ listToStringHelper(this) ~ ")";
     }
 }
 
@@ -237,6 +267,7 @@ floating real_val(LyraObj obj) {
 
 Cons cons_val(LyraObj obj) {
     import std.stdio;
+
     return cast(Cons) obj;
 }
 
@@ -252,8 +283,14 @@ Vector vector_val(LyraObj obj) {
     return obj.vector_val;
 }
 
+/*
 Env env_val(LyraObj obj) {
     return obj.env_val;
+}
+*/
+
+LyraObj cons(LyraObj car, LyraObj cdr) {
+    return Cons.create(car, cdr);
 }
 
 LyraObj car(LyraObj obj) {
@@ -268,30 +305,47 @@ LyraObj cdr(LyraObj obj) {
     return null;
 }
 
-LyraObj array_to_list(LyraObj[] arr) {
-    if (arr.length == 0)
-        return Cons.nil();
-    else
-        return Cons.create(arr[0], array_to_list(arr[1 .. $]));
-}
-
 bool isNil(LyraObj obj) {
     return obj is Cons.nil();
 }
 
-string listToString(Cons cons) {
-    string listToStringHelper(Cons cons) {
-        if (cons.isNil) {
-            return "";
-        }
-        if (cons.cdr.isNil) {
-            return cons.car.toString();
-        }
-        if (cons.cdr.type == cons_id) {
-            return cons.car.toString() ~ " " ~ listToStringHelper(cons.cdr.cons_val);
-        }
-        return cons.car.toString() ~ " . " ~ cons.cdr.toString();
-    }
+LyraObj symbol(Symbol e) {
+    return LyraObj.makeSymbol(e);
+}
 
-    return "(" ~ listToStringHelper(cons) ~ ")";
+LyraObj obj(bool e) {
+    return LyraObj.makeBoolean(e);
+}
+
+LyraObj obj(fixnum e) {
+    return LyraObj.makeFixnum(e);
+}
+
+LyraObj obj(LyraString e) {
+    return LyraObj.makeString(e);
+}
+
+LyraObj obj(char e) {
+    return LyraObj.makeChar(e);
+}
+
+LyraObj obj(floating e) {
+    return LyraObj.makeReal(e);
+}
+
+LyraObj list(Vector e) {
+    LyraObj result = nil();
+    while (e.length > 0) {
+        result = cons(e[$ - 1], result);
+        e = e[0 .. $ - 1];
+    }
+    return result;
+}
+
+LyraObj vector(Vector e) {
+    return LyraObj.makeVector(e);
+}
+
+Cons nil() {
+    return Cons.nil();
 }

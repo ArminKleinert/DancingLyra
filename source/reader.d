@@ -67,7 +67,7 @@ LyraObj make_ast(Reader tokens, int level = 0) {
             if (level == 0) {
                 throw new Exception("Unexpected ')'");
             } else {
-                return array_to_list(root);
+                return list(root);
             }
         case "#t":
             root ~= LyraObj.makeBoolean(true);
@@ -79,18 +79,18 @@ LyraObj make_ast(Reader tokens, int level = 0) {
             //auto captures = matchFirst(token, integer_regex);
             if (!matchFirst(token, integer_regex).empty()) {
                 root ~= LyraObj.makeFixnum(to!fixnum(token));
-            } else if (!matchFirst(token, float_regex).empty()){
-                root ~=  LyraObj.makeReal(to!floating(token));
-            } else
-            if (!matchFirst(token, string_regex).empty()) {
-                root ~=  LyraObj.makeString(parse_string(token));
-            } else{
-            
-            root ~= LyraObj.makeSymbol(token);}
+            } else if (!matchFirst(token, float_regex).empty()) {
+                root ~= LyraObj.makeReal(to!floating(token));
+            } else if (!matchFirst(token, string_regex).empty()) {
+                root ~= LyraObj.makeString(parse_string(token));
+            } else {
+
+                root ~= LyraObj.makeSymbol(token);
+            }
             break;
         }
     }
-    return array_to_list(root);
+    return list(root);
 }
 
 /*

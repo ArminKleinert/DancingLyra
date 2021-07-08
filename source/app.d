@@ -9,5 +9,7 @@ void main() {
     LyraObj o = make_ast(tokens);
     writeln(o.type);
     writeln(cons_id);
-    writeln(o.cons_val.listToString);
+    writeln(o);
+
+    writeln(list([obj(1), obj(0.5), obj("abc")]));
 }
