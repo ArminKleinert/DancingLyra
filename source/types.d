@@ -95,19 +95,6 @@ class LyraObj : ILyraObj {
     return e ? ly_true : ly_false;
   }
 
-  /*
-    public static LyraObj makeEnv(Env parent, Cons pairs) {
-        Env envmap = new Env(parent);
-        while (pairs !is Cons.nil()) {
-            Symbol key = cast(Symbol)((cast(Cons) pairs.car).car).symbol_val;
-            envmap[key] = (cast(Cons) pairs.car).cdr;
-            pairs = pairs.next();
-        }
-        Val v = {env_val: envmap};
-        return new LyraObj(v, fixnum_id);
-    }
-    */
-
   public static LyraObj makeFixnum(fixnum e) {
     Val v = {fixnum_val: e};
     return new LyraObj(v, fixnum_id);
@@ -213,12 +200,6 @@ class Cons : LyraObj {
     return theEmptyList;
   }
 
-  public Cons next() {
-    if (is(typeof(cdr) == Cons))
-      return cast(Cons) getcdr;
-    return theEmptyList;
-  }
-
   public LyraObj getcar() {
     return _car;
   }
@@ -294,12 +275,6 @@ Vector vector_val(LyraObj obj) {
   return obj.vector_val;
 }
 
-/*
-Env env_val(LyraObj obj) {
-    return obj.env_val;
-}
-*/
-
 LyraObj cons(LyraObj car, LyraObj cdr) {
   return Cons.create(car, cdr);
 }
@@ -314,6 +289,12 @@ LyraObj cdr(LyraObj obj) {
   if (obj.type == cons_id)
     return (cast(Cons) obj).getcdr;
   return null;
+}
+
+Cons next(LyraObj obj) {
+  if (obj.type == cons_id)
+    return cast(Cons) obj.cdr;
+  return Cons.nil();
 }
 
 bool isNil(LyraObj obj) {
@@ -353,7 +334,7 @@ LyraObj list(Vector e) {
   return result;
 }
 
-LyraObj list(LyraObj[] xs ...) {
+LyraObj list(LyraObj[] xs...) {
   return list(xs);
 }
 
@@ -361,7 +342,7 @@ LyraObj vector(Vector e) {
   return LyraObj.makeVector(e);
 }
 
-LyraObj vector(LyraObj[] xs ...) {
+LyraObj vector(LyraObj[] xs...) {
   return LyraObj.makeVector(xs);
 }
 

@@ -8,12 +8,12 @@ import lyra.reader;
 import lyra.types;
 import std.conv;
 
-const auto RE = ctRegex!(r"[\s,]*([\[\]()'`]|" ~ `"` ~ `(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`
-    ~ r"`,;)]*)");
+const auto RE = ctRegex!(
+    r"[\s,]*([\[\]()'`]|" ~ `"` ~ `(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"` ~ r"`,;)]*)");
 
 class Reader {
-  int pos = 0;
-  const string[] _tokens;
+  private int pos = 0;
+  private const string[] _tokens;
 
   this(string[] tokens) {
     _tokens = tokens.dup;
@@ -61,7 +61,8 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
   while ((token = tokens.next()) !is null) {
     switch (token) {
     case "'":
-      root ~= list([symbol("quote"), make_ast(tokens, level, "", true)]); break;
+      root ~= list([symbol("quote"), make_ast(tokens, level, "", true)]);
+      break;
     case "(":
       root ~= make_ast(tokens, level + 1, ")");
       break;
@@ -98,7 +99,9 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
       }
       break;
     }
-    if (stop_after_1){ return root[0]; }
+    if (stop_after_1) {
+      return root[0];
+    }
   }
   return list(root);
 }
