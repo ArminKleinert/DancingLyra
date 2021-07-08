@@ -36,8 +36,8 @@ LyraObj evDefine(LyraObj expr, Env env, bool ismacro) {
 
 LyraObj evLambda(LyraObj expr, Env env) {
     // TODO Check type of bindings
-    auto argNames = expr.car;
-    return new LyraFunc("", env, argNames, expr.cdr);
+    auto argNames = expr.car.cons_val;
+    return new LyraFunc("", env, argNames, expr.cdr, false);
 }
 
 LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {

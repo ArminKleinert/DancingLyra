@@ -132,7 +132,6 @@ class Env {
 
     void set(LyraObj sym, LyraObj val) {
         Symbol key = sym.symbol_val;
-        writeln("Key: " ~ key ~ " Value: " ~ val.toString());
         this[key] = val;
     }
 }
