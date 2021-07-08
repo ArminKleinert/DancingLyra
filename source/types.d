@@ -5,7 +5,6 @@ import std.stdio;
 
 alias fixnum = long;
 alias floating = double;
-alias Func = LyraObj delegate(Env, LyraObj o);
 alias Vector = LyraObj[];
 alias Symbol = string;
 alias LyraString = string;
@@ -17,9 +16,9 @@ union Val {
   char char_val;
   fixnum fixnum_val;
   floating real_val;
-  Func func_val;
   bool bool_val;
   Vector vector_val;
+  LyraObj boxed_val;
 }
 
 enum : uint {
@@ -33,42 +32,100 @@ enum : uint {
   func_id,
   env_id,
   bool_id,
-  vector_id
+  vector_id,
+  box_id
 }
 
-class Env {
-  private Env parent;
+class LyraFunc : LyraObj {
+  private string name; private Env definitionEnv; private Cons argNames; private LyraObj bodyExpr;
+
+  this(string name, Env definitionEnv, Cons argNames, LyraObj bodyExpr) {
+  this.name = name;
+  this.definitionEnv = definitionEnv;
+  this.argNames = argNames;
+  this.bodyExpr = bodyExpr;
+  }
+  
+  LyraObj call(Cons args, Env callEnv) {
+  import lyra.eval;
+  
+    Env env = new Env(definitionEnv, callEnv);
+    LyraObj result;
+    
+    do {
+      Cons argNames1 = argNames;
+      while (!argNames1.isNil){
+      if (args.isNil) throw new Exception("Not enough arguments for function "~name~"!");
+      
+      env.set(argNames1.car, args.car);
+      argNames1 = argNames1.next;
+      args = args.next;
+      }
+      
+      try {
+        result =eval(bodyExpr, env);
+      } catch(TailCall tc) {
+      args = tc.args;
+          continue ;
+      } catch (Exception ex) {
+      writeln(name ~" failed with error " ~ ex.msg);
+      writeln("Arguments: " ~ args.toString());
+      throw ex;
+      }
+    }while(false);
+    
+    return result;
+  }
+
+  override uint type() {
+    return func_id;
+  }
+  
+  override string toString() {
+  return "<function " ~ name ~ ">";
+  }
+}
+
+class TailCall : Exception {
+  Cons args;
+      this(Cons args,string msg="", string file = __FILE__, size_t line = __LINE__) {
+        super(msg, file, line);this.args = args;
+    }
+}
+
+class Env  {
+  private Env[2] parents;
   private LyraObj[Symbol] inner;
 
   alias inner this;
 
-  this(Env parent) {
-    this.parent = parent;
+  this(Env parent1, Env parent2 = null) {
+    parents[0]=parent1;
+    parents[1]=parent2;
   }
 
-  LyraObj find(LyraObj sym) {
+   LyraObj find(LyraObj sym) {
     if (sym.type != symbol_id)
       return null;
 
     auto v = inner.get(sym.symbol_val, null);
-    if (v is null && parent !is null) {
-      return parent.find(sym);
+    if (v is null && parents[0] !is null) {
+      return parents[0].find(sym);
+    }
+    if (v is null && parents[1] !is null) {
+      return parents[1].find(sym);
     }
     return cast(LyraObj) v;
   }
 
-  void set(LyraObj sym, LyraObj val) {
+   void set(LyraObj sym, LyraObj val) {
     Symbol key = sym.symbol_val;
+    writeln("Key: " ~ key ~ " Value: " ~ val.toString());
     this[key] = val;
   }
 }
 
-interface ILyraObj {
-  uint type();
-  LyraObj objtype();
-}
-
-class LyraObj : ILyraObj {
+class LyraObj {
   private static LyraObj ly_true = null;
   private static LyraObj ly_false = null;
 
@@ -77,11 +134,11 @@ class LyraObj : ILyraObj {
   uint _type = 0;
   Val value = {bool_val: false};
 
-  public override uint type() {
+  public uint type() {
     return _type;
   }
 
-  public override LyraObj objtype() {
+  public LyraObj objtype() {
     return makeFixnum(_type);
   }
 
@@ -93,6 +150,11 @@ class LyraObj : ILyraObj {
       ly_false = new LyraObj(f, bool_id);
     }
     return e ? ly_true : ly_false;
+  }
+
+  public static LyraObj makeBox(LyraObj e) {
+    Val v = {boxed_val: e};
+    return new LyraObj(v, box_id);
   }
 
   public static LyraObj makeFixnum(fixnum e) {
@@ -122,11 +184,6 @@ class LyraObj : ILyraObj {
 
   public static LyraObj makeCons(LyraObj car, LyraObj cdr) {
     return Cons.create(car, cdr);
-  }
-
-  public static LyraObj makeFunc(Func e) {
-    Val v = {func_val: e};
-    return new LyraObj(v, func_id);
   }
 
   public static LyraObj makeVector(Vector e) {
@@ -218,7 +275,7 @@ class Cons : LyraObj {
   }
 
   override LyraObj objtype() {
-    return LyraObj.makeFixnum(cons_id);
+    return LyraObj.makeFixnum(type());
   }
 
   override string toString() {
@@ -263,8 +320,8 @@ Cons cons_val(LyraObj obj) {
   return cast(Cons) obj;
 }
 
-Func func_val(LyraObj obj) {
-  return obj.func_val;
+LyraFunc func_val(LyraObj obj) {
+  return cast(LyraFunc) obj;
 }
 
 bool bool_val(LyraObj obj) {
@@ -275,7 +332,11 @@ Vector vector_val(LyraObj obj) {
   return obj.vector_val;
 }
 
-LyraObj cons(LyraObj car, LyraObj cdr) {
+LyraObj unbox(LyraObj obj) {
+  return obj.boxed_val;
+}
+
+Cons cons(LyraObj car, LyraObj cdr) {
   return Cons.create(car, cdr);
 }
 
@@ -299,6 +360,15 @@ Cons next(LyraObj obj) {
 
 bool isNil(LyraObj obj) {
   return obj is Cons.nil();
+}
+
+LyraObj box(LyraObj e) {
+  return LyraObj.makeBox(e);
+}
+
+LyraObj boxSet(LyraObj box, LyraObj e) {
+  box.value.boxed_val = e;
+  return box;
 }
 
 LyraObj symbol(Symbol e) {
@@ -325,8 +395,8 @@ LyraObj obj(char e) {
   return LyraObj.makeChar(e);
 }
 
-LyraObj list(Vector e) {
-  LyraObj result = nil();
+Cons list(Vector e) {
+  Cons result = nil();
   while (e.length > 0) {
     result = cons(e[$ - 1], result);
     e = e[0 .. $ - 1];
@@ -334,7 +404,7 @@ LyraObj list(Vector e) {
   return result;
 }
 
-LyraObj list(LyraObj[] xs...) {
+Cons list(LyraObj[] xs...) {
   return list(xs);
 }
 
