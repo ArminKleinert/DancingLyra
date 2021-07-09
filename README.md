@@ -176,4 +176,42 @@ println!       | 1     |
 
 ## Examples
 
+### Macros.
 
+Some instructions like `and`, `or` and `begin` can (and should) be 
+implemented as macros.
+
+```
+; If x and y are true, return true or false otherwise
+(def-macro (and x y) (list 'if x y #f))
+; If x is true, return true, otherwise return y
+(def-macro (or x y) (list 'if x #t y))
+; Run x and ignore the result. Then return y.
+(def-macro (begin x y) (list 'if x y y))
+
+(def-macro (not x) (list 'if x #f #t))
+
+; For nand it is a bit less simple:
+(def-macro (nand x y)
+  (list 'if x (list 'not y) #f))
+```
+
+### Functions.
+
+Here is a sample definition for `load!` and `foldl`.
+
+```
+; Read a file, parse it into lyra-types, evaluate and return the result.
+(define (load! f)
+  (eval! (parse (slurp! f))))
+
+; Iterates a collection using tail-recursion
+(define (foldl f init xs)
+  (if (empty? xs)
+    init
+    (foldl f (f init (first xs)) (rest xs))))
+
+; Example usage of foldl: Sum all the elements of a list.
+(define (sum xs)
+  (foldl + 0 xs))
+```
