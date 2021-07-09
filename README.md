@@ -1,47 +1,55 @@
 # Lyra
 
 A port of https://github.com/ArminKleinert/Lyra from Ruby to D.  
-My hope is that this will make for a big performance improvement and maybe help out with future projects where a statically typed language has to be used for implementing a dynamically typed language.  
+My hope is that this will make for a big performance improvement and maybe 
+help out with future projects where a statically typed language has to be 
+used for implementing a dynamically typed language.  
 
-Luckily, most functions were implemented in Lyra itself, lessening the workload of porting it.  
+Luckily, most functions were implemented in Lyra itself, lessening the 
+workload of porting it.  
 
 Development on this port will be slow because life is a thing.
 
+## Goals and differences to Lyra
+
+- Minimal set of native functions (math, streams, initialization)
+- Having fun
+- No functions that can mutate collections (No `set-car!` or `set-cdr!`)
+- Testing some optimizations
+  - Compilation
+  - Interpretation
+  - Functional collections
+
 ## Base instructions
 
-define
-def-macro
-lambda
-quote
-if
-cond
-let*
-let
-apply
+`(define <name> <value>)` Define a global variable.  
+`(define (<name <&arguments>) <&body>)` Define a new function at the global scope.  
+`(def-macro (<name> <&arguments>) <&body>)` Define a new macro.  
+`(lambda (<&arguments>) <&body>)` Define an anonymous function.   
+`(quote <expression>)`  
+`(if <condition> <then-branch> <else-branch>)` Classic if.  
+`(cond <&condition-expression-pairs>)`   
+`(let (<&bindings>) <&body>)` Create a new environment with 0 or more new variables.  
+`(let* (<name> <value>) <&body>)` Create a new environment with 1 new variable.  
+`(apply <function> <&expressions> <list>)`  
+
+## Base types
+
+- Integer
+- Float
+- String
+- Cons (Also used for lists)
+  - Nil (Empty list)
+- Boolean
+- Function
+- Vector
+- Box (the only type that can be mutated)
 
 ## Native functions
 
 ```
-Math operators for 2 numbers.
-p+  | Addition
-p-  | Subtraction
-p*  | Multiplication
-p/  | Division
-p%  | Modulo
-
-Bit-math operators for 2 integers.
-p&  | Bitwise and
-p|  | Bitwise or
-p<< | Bitwise shift left
-p>> | Bitwise shift right
-
-Comparison operators for 2 atoms.
-p=  | Equality
-p<  | Less than
-p>  | Greater than
-
 Name           | Arity | Description
----------------+-------+---------------------
+---------------+-------+-------------------------------------------------------------
 p+             | 2     | Addition (numbers)
 p-             | 2     | Subtraction (numbers)
 p*             | 2     | Multiplication (numbers)
@@ -96,4 +104,76 @@ pvector        | any   | Creates a new vector but sets its type to the first par
                |       | (int). At least one parameter is required.
 lyra-type-id   | 1     | Returns the type id of its argument.
 ```
+
+## Core library function
+
+```
+Name           | Arity | Description
+---------------+-------+-------------------------------------------------------------
++              | any   | Addition
+-              | any   | Subtraction
+*              | any   | Multiplication
+/              | any   | Division
+%              | any   | Modulo
+inc            | 1     |
+dec            | 1     |
+               |       | 
+&              | 2     | Bitwise and (integers)
+|              | 2     | Bitwise or (integers)
+<<             | 2     | Bitwise shift left (integers)
+>>             | 2     | Bitwise shift right (integers)
+               |       | 
+=              | any   | Equality
+<              | any   | Less than
+<=             | any   | Less than or equal
+>              | any   | Greater than
+>=             | any   | Greater than or equal
+               |       | 
+and            | 2     | Logic and
+or             | 2     | Logic or
+not            | 2     | Logic not
+               |       | 
+nil?           | 1     | Check whether the value is an int.
+atom?          | 1     | Check whether the value is not a cons, not a string and not
+               |       | a vector.
+int?           | 1     | Check whether the value is an int.
+float?         | 1     | Check whether the value is an float.
+bool?          | 1     | Check whether the value is a boolean.
+string?        | 1     | Check whether the value is a string.
+list?          | 1     | Check whether the value is a list.
+cons?          | 1     | Check whether the value is a cons.
+vector?        | 1     | Check whether the value is a vector.
+               |       | 
+nth            | 2     | Get the nth element of a collection.
+first          | 1     | Get the first element of a collection.
+second         | 1     | Get the second element of a collection.
+third          | 1     | Get the third element of a collection.
+rest           | 1     | Get all but the first element of a collection.
+rrest          | 1     | Short for (rest (rest xs))
+ffirst         | 1     | Short for (first (first xs)
+sfirst         | 1     | Short for (second (first xs)
+rfirst         | 1     | Short for (rest (first xs)
+length         | 1     | Get the length of a collection
+               |       | 
+begin          | 2     | Run two expressions and return the result of the second.
+               |       | 
+empty?         | 1     | Check whether a collection is empty.
+               |       | 
+load!          | 1     | Load a Lyra file and execute it.
+require!       | 1     | Alias for load!
+import!        | 1     | Alias for load!
+               |       | 
+map            | 2     | Apply a function to each element of a list and return the new
+               |       | list.
+foldl          | 3     | 
+foldl1         | 2     | 
+foldr          | 3     | 
+filter         | 2     | Filter a collection by predicate.
+               |       | 
+print!         | 1     | 
+println!       | 1     | 
+```
+
+## Examples
+
 
