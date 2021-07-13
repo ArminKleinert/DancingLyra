@@ -1,11 +1,11 @@
-module lyra.reader;
+module reader;
 
 import std.regex;
 import std.stdio;
 import std.string;
 import std.range.primitives;
-import lyra.reader;
-import lyra.types;
+import reader;
+import types;
 import std.conv;
 
 const auto RE = ctRegex!(

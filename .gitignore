@@ -1,4 +1,14 @@
 .dub
+.idea
+dfmt
+reformat.sh
+
+app.o
+app
+
+types.o
+types
+
 docs.json
 __dummy.html
 docs/
