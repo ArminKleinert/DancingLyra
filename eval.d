@@ -58,7 +58,7 @@ start:
         if (expr.car.type == symbol_id) {
             switch (expr.car.symbol_val) {
             case "quote":
-                return expr.cdr;
+                return expr.cdr.car;
             case "define":
                 return evDefine(expr.cdr, env, false);
             case "def-macro":
@@ -113,15 +113,21 @@ start:
         } else if (expr.car.type == func_id) {
             LyraFunc func = expr.car.func_val;
             LyraObj args = expr.cdr;
-            if (!func.isMacro())
+            if (!func.isMacro()){
                 args = evalList(args, env);
-            if (!disableTailCall && (callStack[callStack.length - 1] is func)) {
-                throw new TailCall(args.cons_val());
+                if (!disableTailCall && (callStack[callStack.length - 1] is func)) {
+                    throw new TailCall(args.cons_val());
+                }
+                callStack ~= func;
+                auto res = func.call(args.cons_val, env);
+                callStack = callStack[0 .. $ - 1];
+                return res;
+            } else {
+                callStack ~= func;
+                auto res = func.call(args.cons_val(), env);
+                callStack = callStack[0 .. $ - 1];
+                return eval(res,env);
             }
-            callStack ~= func;
-            auto res = func.call(args.cons_val, env);
-            callStack = callStack[0 .. $ - 1];
-            return res;
         } else {
             throw new Exception("Object not callable: " ~ expr.car.toString());
         }
