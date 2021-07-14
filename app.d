@@ -53,5 +53,4 @@ void main() {
         (println! (measure runs (lambda () (sum range 0)))))
       (println! (measure runs (lambda () (longrange 5000)))))"));
     writeln(evalKeepLast(code, Env.globalEnv));
-
 }
