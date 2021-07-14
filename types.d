@@ -38,13 +38,13 @@ enum : uint {
 }
 
 abstract class LyraFunc : LyraObj {
-    protected const string name;
+    protected const Symbol name;
     private const bool _isMacro;
     protected const int minargs;
     protected const int maxargs;
     protected const bool variadic;
 
-   nothrow this(string name, int minargs, int maxargs, bool variadic, bool isMacro) {
+    nothrow this(Symbol name, int minargs, int maxargs, bool variadic, bool isMacro) {
         this.name = name;
         this.minargs = minargs;
         this.maxargs = maxargs;
@@ -52,7 +52,7 @@ abstract class LyraFunc : LyraObj {
         this._isMacro = isMacro;
     }
 
-   nothrow bool isMacro() {
+    nothrow bool isMacro() {
         return _isMacro;
     }
 
@@ -60,33 +60,41 @@ abstract class LyraFunc : LyraObj {
         return minargs;
     }
 
-   nothrow int maxArgs() {
+    nothrow int maxArgs() {
         return maxargs;
     }
 
     abstract LyraObj call(Cons args, Env callEnv);
 
-   nothrow override uint type() {
+    nothrow override uint type() {
         return func_id;
     }
 
-   nothrow override string toString() {
+    nothrow override string toString() {
         return "<function " ~ name ~ ">";
     }
 }
 
 class Env {
+    private static Env _globalEnv;
+
     private Env[2] parents;
     private LyraObj[Symbol] inner;
 
     alias inner this;
 
-   nothrow this(Env parent1, Env parent2 = null) {
+    nothrow this(Env parent1, Env parent2 = null) {
         parents[0] = parent1;
         parents[1] = parent2;
     }
 
-   LyraObj find(LyraObj sym) {
+    static Env globalEnv() {
+        if (_globalEnv is null)
+            _globalEnv = new Env(null, null);
+        return _globalEnv;
+    }
+
+    LyraObj find(LyraObj sym) {
         if (sym.type != symbol_id)
             return null;
 
@@ -97,12 +105,29 @@ class Env {
         if (v is null && parents[1]!is null) {
             return parents[1].find(sym);
         }
+        if (v is null) {
+            throw new Exception("No value found for symbol " ~ sym.toString());
+        }
         return cast(LyraObj) v;
     }
 
-   nothrow void set(LyraObj sym, LyraObj val) {
+    nothrow void set(LyraObj sym, LyraObj val) {
         Symbol key = sym.symbol_val;
         this[key] = val;
+    }
+
+    override string toString() {
+        auto s = "";
+        foreach (Symbol k; inner.byKey) {
+            s ~= k ~ " : " ~ inner[k].toString() ~ ", ";
+        }
+        s = s[0 .. $ - 2];
+        s = "ENV(Inner: {" ~ s ~ "}";
+        if (parents[0]!is null)
+            s ~= " Parent 1: " ~ parents[0].toString();
+        if (parents[1]!is null)
+            s ~= " Parent 2: " ~ parents[1].toString();
+        return s;
     }
 }
 
@@ -115,7 +140,7 @@ class LyraObj {
     uint _type = 0;
     Val value = {bool_val: false};
 
-   @nogc nothrow public uint type() {
+    @nogc nothrow public uint type() {
         return _type;
     }
 
@@ -123,7 +148,7 @@ class LyraObj {
         return makeFixnum(_type);
     }
 
-   @safe nothrow public static LyraObj makeBoolean(bool e) {
+    @safe nothrow public static LyraObj makeBoolean(bool e) {
         if (ly_true is null) {
             Val t = {bool_val: true};
             ly_true = new LyraObj(t, bool_id);
@@ -133,55 +158,55 @@ class LyraObj {
         return e ? ly_true : ly_false;
     }
 
-  @safe nothrow public static LyraObj makeBox(LyraObj e) {
+    @safe nothrow public static LyraObj makeBox(LyraObj e) {
         Val v = {boxed_val: e};
         return new LyraObj(v, box_id);
     }
 
-   nothrow public static LyraObj makeFixnum(fixnum e) {
+    nothrow public static LyraObj makeFixnum(fixnum e) {
         Val v = {fixnum_val: e};
         return new LyraObj(v, fixnum_id);
     }
 
-   nothrow public static LyraObj makeSymbol(Symbol e) {
+    nothrow public static LyraObj makeSymbol(Symbol e) {
         Val v = {symbol_val: e};
         return new LyraObj(v, symbol_id);
     }
 
-   nothrow public static LyraObj makeString(LyraString e) {
+    nothrow public static LyraObj makeString(LyraString e) {
         Val v = {string_val: e};
         return new LyraObj(v, string_id);
     }
 
-   nothrow public static LyraObj makeChar(char e) {
+    nothrow public static LyraObj makeChar(char e) {
         Val v = {char_val: e};
         return new LyraObj(v, char_id);
     }
 
-   nothrow public static LyraObj makeReal(floating e) {
+    nothrow public static LyraObj makeReal(floating e) {
         Val v = {real_val: e};
         return new LyraObj(v, real_id);
     }
 
-   nothrow public static LyraObj makeCons(LyraObj car, LyraObj cdr) {
+    nothrow public static LyraObj makeCons(LyraObj car, LyraObj cdr) {
         return Cons.create(car, cdr);
     }
 
-   nothrow public static LyraObj makeVector(Vector e) {
+    nothrow public static LyraObj makeVector(Vector e) {
         Val v = {vector_val: e};
         return new LyraObj(v, vector_id);
     }
 
-   nothrow public static LyraObj makeEmpty() {
+    nothrow public static LyraObj makeEmpty() {
         return Cons.nil();
     }
 
-   @safe nothrow private this(Val value, uint type) {
+    @safe nothrow private this(Val value, uint type) {
         this.value = value;
         this._type = type;
     }
 
-   @safe nothrow private this() {
+    @safe nothrow private this() {
     }
 
     override string toString() {
@@ -226,23 +251,23 @@ class Cons : LyraObj {
     private LyraObj _car = null;
     private LyraObj _cdr = null;
 
-     nothrow public static Cons create(LyraObj _car, LyraObj _cdr) {
+    nothrow public static Cons create(LyraObj _car, LyraObj _cdr) {
         auto c = new Cons(_car, _cdr);
         return c;
     }
 
-     nothrow public static Cons nil() {
+    nothrow public static Cons nil() {
         if (theEmptyList is null) {
-            theEmptyList =  Cons.create(null, null);
+            theEmptyList = Cons.create(null, null);
         }
         return theEmptyList;
     }
 
-   @safe @nogc nothrow public LyraObj getcar() {
+    @safe @nogc nothrow public LyraObj getcar() {
         return _car;
     }
 
-   @safe @nogc nothrow public LyraObj getcdr() {
+    @safe @nogc nothrow public LyraObj getcdr() {
         return _cdr;
     }
 
@@ -251,7 +276,7 @@ class Cons : LyraObj {
         this._cdr = _cdr;
     }
 
-   @nogc  nothrow override uint type() {
+    @nogc nothrow override uint type() {
         return (this is theEmptyList) ? nil_id : cons_id;
     }
 
@@ -317,23 +342,23 @@ class Cons : LyraObj {
     return obj.boxed_val;
 }
 
- nothrow Cons cons(LyraObj car, LyraObj cdr) {
+nothrow Cons cons(LyraObj car, LyraObj cdr) {
     return Cons.create(car, cdr);
 }
 
-@nogc  nothrow LyraObj car(LyraObj obj) {
+@nogc nothrow LyraObj car(LyraObj obj) {
     if (obj.type == cons_id)
         return (cast(Cons) obj).getcar;
     return null;
 }
 
-@nogc  nothrow LyraObj cdr(LyraObj obj) {
+@nogc nothrow LyraObj cdr(LyraObj obj) {
     if (obj.type == cons_id)
         return (cast(Cons) obj).getcdr;
     return null;
 }
 
- nothrow Cons next(LyraObj obj) {
+nothrow Cons next(LyraObj obj) {
     if (obj.type == cons_id)
         return cast(Cons) obj.cdr;
     return Cons.nil();
@@ -343,7 +368,7 @@ class Cons : LyraObj {
     return obj.type == nil_id;
 }
 
- nothrow LyraObj box(LyraObj e) {
+nothrow LyraObj box(LyraObj e) {
     return LyraObj.makeBox(e);
 }
 
@@ -352,31 +377,31 @@ class Cons : LyraObj {
     return box;
 }
 
- nothrow LyraObj symbol(Symbol e) {
+nothrow LyraObj symbol(Symbol e) {
     return LyraObj.makeSymbol(e);
 }
 
- nothrow LyraObj obj(fixnum e) {
+nothrow LyraObj obj(fixnum e) {
     return LyraObj.makeFixnum(e);
 }
 
- nothrow LyraObj obj(floating e) {
+nothrow LyraObj obj(floating e) {
     return LyraObj.makeReal(e);
 }
 
- nothrow LyraObj obj(bool e) {
+nothrow LyraObj obj(bool e) {
     return LyraObj.makeBoolean(e);
 }
 
-nothrow  LyraObj obj(LyraString e) {
+nothrow LyraObj obj(LyraString e) {
     return LyraObj.makeString(e);
 }
 
-nothrow  LyraObj obj(char e) {
+nothrow LyraObj obj(char e) {
     return LyraObj.makeChar(e);
 }
 
-nothrow  Cons list(Vector e) {
+nothrow Cons list(Vector e) {
     Cons result = nil();
     while (e.length > 0) {
         result = cons(e[$ - 1], result);
@@ -385,19 +410,28 @@ nothrow  Cons list(Vector e) {
     return result;
 }
 
-nothrow  Cons list(LyraObj[] xs...) {
+nothrow Cons list(LyraObj[] xs...) {
     return list(xs);
 }
 
-nothrow  LyraObj vector(Vector e) {
+nothrow LyraObj vector(Vector e) {
     return LyraObj.makeVector(e);
 }
 
-nothrow  LyraObj vector(LyraObj[] xs...) {
+nothrow LyraObj vector(LyraObj[] xs...) {
     return LyraObj.makeVector(xs);
 }
 
-nothrow  size_t listSize(Cons xs) {
+nothrow Vector listToVector(LyraObj l) {
+    Vector v = [];
+    while (!l.isNil()) {
+        v ~= l.car;
+        l = l.next;
+    }
+    return v;
+}
+
+nothrow size_t listSize(Cons xs) {
     size_t res = 0;
     Cons rest = xs;
     while (!isNil(rest)) {
@@ -407,13 +441,30 @@ nothrow  size_t listSize(Cons xs) {
     return res;
 }
 
-nothrow  Cons nil() {
+nothrow Cons nil() {
     return Cons.nil();
 }
 
- string to_s(fixnum e) { return to!string(e); }
- string to_s(floating e){ return to!string(e); }
- string itos(ulong e) { return to!string(e); }
- string itos(int e) { return to!string(e); }
- string ctos(char e) { return to!string(e); }
- string typetos(uint e) { return to!string(e); }
+string to_s(fixnum e) {
+    return to!string(e);
+}
+
+string to_s(floating e) {
+    return to!string(e);
+}
+
+string itos(ulong e) {
+    return to!string(e);
+}
+
+string itos(int e) {
+    return to!string(e);
+}
+
+string ctos(char e) {
+    return to!string(e);
+}
+
+string typetos(uint e) {
+    return to!string(e);
+}

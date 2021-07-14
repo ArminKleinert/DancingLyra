@@ -17,8 +17,8 @@ class NativeLyraFunc : LyraFunc {
     override LyraObj call(Cons args, Env callEnv) {
         size_t argc = listSize(args);
         if (argc < minargs || argc > maxargs) {
-            throw new Exception("Wrong number of arguments for " ~ this.toString() ~ ". Expected " ~ itos(minargs)
-                    ~ " to " ~ itos(maxargs) ~ " but got " ~ itos(argc));
+            throw new Exception("Wrong number of arguments for " ~ this.toString() ~ ". Expected " ~ itos(
+                    minargs) ~ " to " ~ itos(maxargs) ~ " but got " ~ itos(argc));
         }
         return fnBody(args, callEnv);
     }
@@ -29,9 +29,9 @@ class NonNativeLyraFunc : LyraFunc {
     private Cons argNames;
     private LyraObj bodyExpr;
 
-    this(string name, Env definitionEnv, Cons argNames, LyraObj bodyExpr,
+    this(Symbol name, Env definitionEnv, Cons argNames, LyraObj bodyExpr,
             bool variadic = false, bool isMacro = false) {
-        int argc = cast(int)listSize(argNames);
+        int argc = cast(int) listSize(argNames);
         super(name, argc, variadic ? int.max : argc, variadic, isMacro);
         this.definitionEnv = definitionEnv;
         this.argNames = argNames;
@@ -41,10 +41,13 @@ class NonNativeLyraFunc : LyraFunc {
     override LyraObj call(Cons args, Env callEnv) {
         Env env = new Env(definitionEnv, callEnv);
         LyraObj result;
+        Cons argNames1;
+        int argcGiven;
 
-        do {
-            Cons argNames1 = argNames;
-            int argcGiven = 0;
+        start:
+
+        argNames1 = argNames;argcGiven = 0;
+
             while (!argNames1.isNil) {
                 if (args.isNil)
                     break;
@@ -55,22 +58,20 @@ class NonNativeLyraFunc : LyraFunc {
             }
 
             if (argcGiven < minargs || (!variadic && argcGiven > maxargs)) {
-                throw new Exception("Wrong number of arguments for " ~ this.toString() ~ ". Expected " ~ itos(minargs)
-                        ~ " to " ~ itos(maxargs) ~ " but got " ~ itos(argcGiven));
+                throw new Exception("Wrong number of arguments for " ~ this.toString() ~ ". Expected " ~ itos(
+                        minargs) ~ " to " ~ itos(maxargs) ~ " but got " ~ itos(argcGiven));
             }
 
             try {
-                result = eval(bodyExpr, env);
+                result = evalKeepLast(bodyExpr, env);
             } catch (TailCall tc) {
                 args = tc.args;
-                continue;
+                goto start; // Tail call
             } catch (Exception ex) {
-                writeln(name ~ " failed with error " ~ ex.msg);
-                writeln("Arguments: " ~ args.toString());
+                writeln( name ~ " failed with error " ~ ex.msg);
+                writeln( "Arguments: " ~ args.toString());
                 throw ex;
             }
-        }
-        while (false);
 
         return result;
     }

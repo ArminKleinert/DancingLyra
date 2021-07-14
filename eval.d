@@ -2,6 +2,7 @@ module evaluate;
 
 import std.stdio;
 import types;
+import lyrafunction;
 
 Cons evalList(LyraObj exprList, Env env) {
     Vector v = [];
@@ -22,27 +23,35 @@ LyraObj evalVector(LyraObj expr, Env env) {
 LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
     if (exprList.isNil())
         return exprList;
-    while (!exprList.cdr.isNil) {
+    while (!(exprList.cdr.isNil)) {
         eval(exprList.car, env, true);
         exprList = exprList.next();
     }
     return eval(exprList.car, env, disableTailCall);
 }
 
-LyraObj evDefine(LyraObj expr, Env env, bool ismacro) {
-    // TODO
-    return null;
+LyraObj evDefine(LyraObj expr, Env env, bool isMacro) {
+    auto name = expr.car.car;
+    expr = cons(expr.car.cdr, expr.cdr); // Remove name
+    auto func = evLambda(expr, env, name.symbol_val, isMacro);
+    Env.globalEnv.set(name, func);
+    return func;
 }
 
-LyraObj evLambda(LyraObj expr, Env env) {
+LyraObj evLambda(LyraObj expr, Env env, Symbol name = "", bool isMacro = false) {
     // TODO Check type of bindings
     auto argNames = expr.car.cons_val;
-    return null; //new LyraFunc("", env, argNames, expr.cdr, false);
+    auto bodyExpr = expr.next;
+
+    auto argVector = listToVector(argNames);
+    auto variadic = argVector.length > 1 && argVector[1].symbol_val == "&";
+
+    return new NonNativeLyraFunc(name, env, argNames, bodyExpr, variadic, isMacro);
 }
 
 LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
-    start:
-    
+start:
+
     if (expr.type == cons_id) {
         if (expr.car.type == symbol_id) {
             switch (expr.car.symbol_val) {
@@ -72,7 +81,8 @@ LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
                 LyraObj sym = binding.car;
                 LyraObj val = eval(binding.cdr.car, env, true);
                 env.set(sym, val);
-                return evalKeepLast(expr.cdr, env, disableTailCall);
+                auto res = evalKeepLast(expr.cdr, env, disableTailCall);
+                return res;
             case "lambda":
                 return evLambda(expr.cdr, env);
             case "if":
@@ -97,7 +107,7 @@ LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
             }
         } else if (expr.car.type == cons_id) {
             expr = cons(eval(expr.car, env, disableTailCall), expr.cdr);
-                goto start;
+            goto start;
         } else if (expr.car.type == func_id) {
             LyraFunc func = expr.car.func_val;
             LyraObj args = expr.cdr;
@@ -109,6 +119,8 @@ LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
         }
     } else if (expr.type == vector_id) {
         return evalVector(expr, env);
+    } else if (expr.type == symbol_id) {
+        return env.find(expr);
     } else {
         return expr;
     }

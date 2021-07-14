@@ -4,7 +4,6 @@ import std.regex;
 import std.stdio;
 import std.string;
 import std.range.primitives;
-import reader;
 import types;
 import std.conv;
 

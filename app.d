@@ -35,15 +35,9 @@ void main() {
 
     // auto id = new LyraFunc(name, env, list(symbol("e")), list(symbol("e")));
 
-    writeln(LyraObj.makeFixnum(obj(1L).fixnum_val + obj(2L).fixnum_val));
-    
-    Env env = new Env(null);
-    initializeGlobalEnv(env);
+    initializeGlobalEnv(Env.globalEnv);
 
-    auto code = make_ast(tokenize("15"));
-    writeln(evalKeepLast(code, env));
-     
-    code = make_ast(tokenize("(+ 3 5)"));
-    writeln(evalKeepLast(code, env));
+    auto code = make_ast(tokenize("(define (add n m) (+ n m)) (let ((a 3) (b 6)) (add a b))"));
+    writeln(evalKeepLast(code, Env.globalEnv));
 
 }
