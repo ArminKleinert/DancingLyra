@@ -39,6 +39,7 @@ A script `compile.sh` is provided for compiling. For compiling and running, do
 If you want to compile the files yourself, the order is the following:  
 ```dmd -O app.d types.d eval.d function.d reader.d buildins.d```  
 If you are using a different compiler, just replace `dmd` with it.  
+In my tests, ldc with -O3 was 30% faster, but took 50% longer to compile.
 
 ## Base instructions
 

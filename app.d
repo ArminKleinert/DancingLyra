@@ -28,11 +28,10 @@ void main() {
     (define (longrange n)
       (if (= n 0) (list 0) (cons n (longrange (- n 1)))))
 
-    (let* (runs 50)
-      (let* (range (longrange 5950))
+    (let* (runs 1000)
+      (let* (range (longrange 5000))
         (println! (sum range 0))
-        (println! (measure runs (lambda () (sum range 0)))))
-      ;(println! (measure runs (lambda () (longrange 5000))))
-    )"));
+        (println! (measure runs (lambda () (sum range 0))))
+        ))"));
     writeln(evalKeepLast(code, Env.globalEnv));
 }
