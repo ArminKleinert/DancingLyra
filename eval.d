@@ -16,7 +16,7 @@ class LyraStackOverflow : Exception {
 }
 
 void pushOnCallStack(LyraFunc fn) {
-    const auto CALLSTACK_MAX_HEIGHT = 15001;
+    const auto CALLSTACK_MAX_HEIGHT = 12001;
     if (callStack.length + 1 > CALLSTACK_MAX_HEIGHT) {
         import std.string;
 

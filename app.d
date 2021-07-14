@@ -29,7 +29,7 @@ void main() {
       (if (= n 0) (list 0) (cons n (longrange (- n 1)))))
 
     (let* (runs 50)
-      (let* (range (longrange 7400))
+      (let* (range (longrange 5950))
         (println! (sum range 0))
         (println! (measure runs (lambda () (sum range 0)))))
       ;(println! (measure runs (lambda () (longrange 5000))))
