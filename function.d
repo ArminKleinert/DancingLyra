@@ -44,34 +44,35 @@ class NonNativeLyraFunc : LyraFunc {
         Cons argNames1;
         int argcGiven;
 
-        start:
+    start:
 
-        argNames1 = argNames;argcGiven = 0;
+        argNames1 = argNames;
+        argcGiven = 0;
 
-            while (!argNames1.isNil) {
-                if (args.isNil)
-                    break;
-                argcGiven++;
-                env.set(argNames1.car, args.car);
-                argNames1 = argNames1.next;
-                args = args.next;
-            }
+        while (!argNames1.isNil) {
+            if (args.isNil)
+                break;
+            argcGiven++;
+            env.set(argNames1.car, args.car);
+            argNames1 = argNames1.next;
+            args = args.next;
+        }
 
-            if (argcGiven < minargs || (!variadic && argcGiven > maxargs)) {
-                throw new Exception("Wrong number of arguments for " ~ this.toString() ~ ". Expected " ~ itos(
-                        minargs) ~ " to " ~ itos(maxargs) ~ " but got " ~ itos(argcGiven));
-            }
+        if (argcGiven < minargs || (!variadic && argcGiven > maxargs)) {
+            throw new Exception("Wrong number of arguments for " ~ this.toString() ~ ". Expected " ~ itos(
+                    minargs) ~ " to " ~ itos(maxargs) ~ " but got " ~ itos(argcGiven));
+        }
 
-            try {
-                result = evalKeepLast(bodyExpr, env);
-            } catch (TailCall tc) {
-                args = tc.args;
-                goto start; // Tail call
-            } catch (Exception ex) {
-                writeln( name ~ " failed with error " ~ ex.msg);
-                writeln( "Arguments: " ~ args.toString());
-                throw ex;
-            }
+        try {
+            result = evalKeepLast(bodyExpr, env);
+        } catch (TailCall tc) {
+            args = tc.args;
+            goto start; // Tail call
+        } catch (Exception ex) {
+            writeln(name ~ " failed with error " ~ ex.msg);
+            writeln("Arguments: " ~ args.toString());
+            throw ex;
+        }
 
         return result;
     }

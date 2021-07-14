@@ -120,7 +120,7 @@ start:
             }
             callStack ~= func;
             auto res = func.call(args.cons_val, env);
-            callStack = callStack[0 .. $-1];
+            callStack = callStack[0 .. $ - 1];
             return res;
         } else {
             throw new Exception("Object not callable: " ~ expr.car.toString());
