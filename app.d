@@ -18,15 +18,15 @@ void main() {
     (def-macro (begin x y) (list 'if x y y))
 
     (define (sum xs acc)
-    (if (empty? xs)
-      acc
-      (begin 5 (sum (cdr xs) (+ acc (car xs))))))
+      (if (empty? xs)
+        acc
+        (sum (cdr xs) (+ acc (car xs)))))
 
     (define (longrange n)
       (if (= n 0) (list 0) (cons n (longrange (- n 1)))))
 
     (let* (runs 50)
-      (let* (range (longrange 5000))
+      (let* (range (longrange 9400))
         (println! (sum range 0))
         (println! (measure runs (lambda () (sum range 0)))))
       ;(println! (measure runs (lambda () (longrange 5000))))

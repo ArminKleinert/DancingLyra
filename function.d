@@ -68,6 +68,8 @@ class NonNativeLyraFunc : LyraFunc {
         } catch (TailCall tc) {
             args = tc.args;
             goto start; // Tail call
+        } catch (LyraStackOverflow lso) {
+            throw lso;
         } catch (Exception ex) {
             writeln(name ~ " failed with error " ~ ex.msg);
             writeln("Arguments: " ~ args.toString());

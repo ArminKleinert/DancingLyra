@@ -1,10 +1,26 @@
 module evaluate;
 
+import std.string;
 import std.stdio;
 import types;
 import lyrafunction;
 
-private LyraFunc[] callStack = [null];
+alias CallStack = LyraFunc[];
+private CallStack callStack = [null];
+
+class LyraStackOverflow : Exception {
+    this(CallStack callStack, string file = __FILE__, size_t line = __LINE__) {
+        super(format( "StackOverflow! Internal callstack: %s", callStack),file,line);
+    }
+}
+
+void pushOnCallStack(LyraFunc fn) {
+    if (callStack.length + 1 > 9500){
+        import std.string;
+        throw new LyraStackOverflow(callStack);
+    }
+    callStack ~= fn;
+}
 
 Cons evalList(LyraObj exprList, Env env) {
     Vector v = [];
@@ -118,12 +134,12 @@ start:
                 if (!disableTailCall && (callStack[callStack.length - 1] is func)) {
                     throw new TailCall(args.cons_val());
                 }
-                callStack ~= func;
+                pushOnCallStack(func);
                 auto res = func.call(args.cons_val, env);
                 callStack = callStack[0 .. $ - 1];
                 return res;
             } else {
-                callStack ~= func;
+                pushOnCallStack( func);
                 auto res = func.call(args.cons_val(), env);
                 callStack = callStack[0 .. $ - 1];
                 return eval(res, env);
