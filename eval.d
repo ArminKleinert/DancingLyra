@@ -113,7 +113,7 @@ start:
         } else if (expr.car.type == func_id) {
             LyraFunc func = expr.car.func_val;
             LyraObj args = expr.cdr;
-            if (!func.isMacro()){
+            if (!func.isMacro()) {
                 args = evalList(args, env);
                 if (!disableTailCall && (callStack[callStack.length - 1] is func)) {
                     throw new TailCall(args.cons_val());
@@ -126,7 +126,7 @@ start:
                 callStack ~= func;
                 auto res = func.call(args.cons_val(), env);
                 callStack = callStack[0 .. $ - 1];
-                return eval(res,env);
+                return eval(res, env);
             }
         } else {
             throw new Exception("Object not callable: " ~ expr.car.toString());
