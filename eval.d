@@ -1,6 +1,5 @@
 module evaluate;
 
-import std.string;
 import std.stdio;
 import types;
 import lyrafunction;
@@ -10,13 +9,17 @@ private CallStack callStack = [null];
 
 class LyraStackOverflow : Exception {
     this(CallStack callStack, string file = __FILE__, size_t line = __LINE__) {
-        super(format( "StackOverflow! Internal callstack: %s", callStack),file,line);
+        import std.string;
+
+        super(format("StackOverflow! Internal callstack: %s", callStack), file, line);
     }
 }
 
 void pushOnCallStack(LyraFunc fn) {
-    if (callStack.length + 1 > 9500){
+    const auto CALLSTACK_MAX_HEIGHT = 15001;
+    if (callStack.length + 1 > CALLSTACK_MAX_HEIGHT) {
         import std.string;
+
         throw new LyraStackOverflow(callStack);
     }
     callStack ~= fn;
@@ -130,16 +133,17 @@ start:
             LyraFunc func = expr.car.func_val;
             LyraObj args = expr.cdr;
             if (!func.isMacro()) {
-                args = evalList(args, env);
                 if (!disableTailCall && (callStack[callStack.length - 1] is func)) {
+                    args = evalList(args, env);
                     throw new TailCall(args.cons_val());
                 }
                 pushOnCallStack(func);
+                args = evalList(args, env);
                 auto res = func.call(args.cons_val, env);
                 callStack = callStack[0 .. $ - 1];
                 return res;
             } else {
-                pushOnCallStack( func);
+                pushOnCallStack(func);
                 auto res = func.call(args.cons_val(), env);
                 callStack = callStack[0 .. $ - 1];
                 return eval(res, env);

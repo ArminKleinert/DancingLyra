@@ -16,6 +16,9 @@ void main() {
 
     code = make_ast(tokenize("
     (def-macro (begin x y) (list 'if x y y))
+    ;(define (begin x y) (if x y y))
+
+    (define (id e) e)
 
     (define (sum xs acc)
       (if (empty? xs)
@@ -26,7 +29,7 @@ void main() {
       (if (= n 0) (list 0) (cons n (longrange (- n 1)))))
 
     (let* (runs 50)
-      (let* (range (longrange 9400))
+      (let* (range (longrange 7400))
         (println! (sum range 0))
         (println! (measure runs (lambda () (sum range 0)))))
       ;(println! (measure runs (lambda () (longrange 5000))))
