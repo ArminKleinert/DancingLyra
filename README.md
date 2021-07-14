@@ -20,6 +20,26 @@ Development on this port will be slow because life is a thing.
   - Interpretation
   - Functional collections
 
+## Progress 
+- 0.0.01
+  - Implemented most needed types (fixnums, reals, strings, vectors, conses, functions, boxes)
+  - Implemented some basic functions
+  - Evaluation and definition of functions work now
+  - Tail recursion works
+  - Macros work now
+  - Build in a stack limit which can be adjusted in the future
+
+## Usage
+
+Currently, there is not much to run here, but if you want to play with it, try the following.  
+
+A script `compile.sh` is provided for compiling. For compiling and running, do  
+```./compile.sh && ./app```  
+
+If you want to compile the files yourself, the order is the following:  
+```dmd -O app.d types.d eval.d function.d reader.d buildins.d```  
+If you are using a different compiler, just replace `dmd` with it.  
+
 ## Base instructions
 
 `(define <name> <value>)` Define a global variable.  
