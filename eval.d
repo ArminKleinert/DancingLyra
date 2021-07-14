@@ -4,6 +4,8 @@ import std.stdio;
 import types;
 import lyrafunction;
 
+private LyraFunc[] callStack = [null];
+
 Cons evalList(LyraObj exprList, Env env) {
     Vector v = [];
     while (!exprList.isNil) {
@@ -90,7 +92,7 @@ start:
                 expr = expr.cdr;
                 LyraObj condition = eval(expr.car, env, true);
                 expr = expr.cdr;
-                if (condition.isNil || (condition.type == bool_id && condition.bool_val == false)) {
+                if (condition.isNil || (condition.type == bool_id && condition.bool_val == true)) {
                     return eval(expr.car, env, disableTailCall);
                 } else {
                     return eval(expr.cdr.car, env, disableTailCall);
@@ -113,7 +115,13 @@ start:
             LyraObj args = expr.cdr;
             if (!func.isMacro())
                 args = evalList(args, env);
-            return func.call(args.cons_val, env);
+            if (!disableTailCall && (callStack[callStack.length - 1] is func)) {
+                throw new TailCall(args.cons_val());
+            }
+            callStack ~= func;
+            auto res = func.call(args.cons_val, env);
+            callStack = callStack[0 .. $-1];
+            return res;
         } else {
             throw new Exception("Object not callable: " ~ expr.car.toString());
         }
