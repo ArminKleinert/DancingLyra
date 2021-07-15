@@ -518,7 +518,9 @@ nothrow bool isFalsy(LyraObj o) {
     return o.type == cons_id || (o.type == bool_id && !o.bool_val);
 }
 
-nothrow bool evaluatesToSelf(LyraObj o) { return o.type != cons_id; }
+nothrow bool evaluatesToSelf(LyraObj o) {
+    return o.type != cons_id;
+}
 
 string to_s(fixnum e) {
     return to!string(e);

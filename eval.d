@@ -20,7 +20,7 @@ void eval_DisallowTailRecursion() {
 }
 
 void eval_DoOptimize() {
-optimize = true;
+    optimize = true;
 }
 
 class LyraStackOverflow : Exception {
@@ -87,7 +87,7 @@ LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
     if (exprList.isNil()) {
         return exprList;
     }
-    
+
     //FIXME This deletes the definition of macros for some reason...
     if (optimize) {
         while (!exprList.cdr.isNil && !exprList.cdr.cdr.isNil) {
@@ -101,18 +101,18 @@ LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
             exprList = exprList.cdr;
         }
     }
-    
+
     while (!(exprList.cdr.isNil)) {
         auto temp = exprList.car;
         eval(temp, env, true);
         exprList = exprList.cdr;
     }
-    
+
     auto temp = eval(exprList.car, env, disableTailCall);
     if (checkFulfillsPredsForValueInline(exprList.car)) {
         internalSetCar(exprList, temp);
     }
-    
+
     return temp;
 }
 
