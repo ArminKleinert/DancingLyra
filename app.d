@@ -6,11 +6,21 @@ import evaluate;
 import buildins;
 import lyrafunction;
 
-void main() {
+void main(string[] args) {
     import std.conv : to;
-
+    import std.file : readText;
+    
     initializeGlobalEnv(Env.globalEnv);
+    
+    auto code = make_ast(tokenize(readText("core.lyra")));
+    writeln(evalKeepLast(code , Env.globalEnv));
+    foreach(fname;args[1..$]) {
+    writeln("NOT HERE");
+    code = make_ast(tokenize(readText(fname)));
+    evalKeepLast(code , Env.globalEnv);
+    }
 
+    /*
     auto code = make_ast(tokenize("(define (add n m) (+ n m)) (let ((a 3) (b 6)) (add a b))"));
     //writeln(evalKeepLast(code, Env.globalEnv));
 
@@ -40,4 +50,5 @@ void main() {
 
     code = make_ast(tokenize("'()"));
     writeln(evalKeepLast(code, Env.globalEnv));
+*/
 }
