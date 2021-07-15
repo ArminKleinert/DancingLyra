@@ -65,27 +65,35 @@ void initializeGlobalEnv(Env env) {
     addFn(">", 2, false, (xs, env) { mixin(comparator(">")); });
     addFn("<=", 2, false, (xs, env) { mixin(comparator("<=")); });
     addFn(">=", 2, false, (xs, env) { mixin(comparator(">=")); });
-    
+
     addFn("cons", 2, false, (xs, env) { return cons(xs.car, xs.cdr.car); });
     addFn("_car", 1, false, (xs, env) { return xs.car.car; });
     addFn("_cdr", 1, false, (xs, env) { return xs.car.cdr; });
     addFn("list", 0, true, (xs, env) { return xs; });
-    
-    addFn("vector",0,true, (xs,env) {return vector(listToVector(xs));});
-    
-    addFn("_vector-append",2,false, (xs,env) {
-    if (xs.car.type != vector_id) {throw new Exception("Expected vector.");}
-    return vector(xs.car.vector_val ~ xs.cdr.car);});
-    
-    addFn("_vector-get",2,false, (xs,env) {
-    if (xs.car.type != vector_id || xs.cdr.car.type != fixnum_id) {throw new Exception("Expected vector and fixnum.");}
-    return xs.car.vector_val [xs.cdr.car.fixnum_val];});
-    
-    addFn("_vector-size",1,false, (xs,env) {
-    if (xs.car.type != vector_id) {throw new Exception("Expected vector.");}
-    return LyraObj.makeFixnum(xs.car.vector_val.length);
+
+    addFn("vector", 0, true, (xs, env) { return vector(listToVector(xs)); });
+
+    addFn("_vector-append", 2, false, (xs, env) {
+        if (xs.car.type != vector_id) {
+            throw new Exception("Expected vector.");
+        }
+        return vector(xs.car.vector_val ~ xs.cdr.car);
     });
-    
+
+    addFn("_vector-get", 2, false, (xs, env) {
+        if (xs.car.type != vector_id || xs.cdr.car.type != fixnum_id) {
+            throw new Exception("Expected vector and fixnum.");
+        }
+        return xs.car.vector_val[xs.cdr.car.fixnum_val];
+    });
+
+    addFn("_vector-size", 1, false, (xs, env) {
+        if (xs.car.type != vector_id) {
+            throw new Exception("Expected vector.");
+        }
+        return LyraObj.makeFixnum(xs.car.vector_val.length);
+    });
+
     addFn("println!", 1, false, (xs, env) { writeln(xs.car); return Cons.nil(); });
     addFn("measure", 2, false, (xs, env) {
         auto median(long[] arr) {

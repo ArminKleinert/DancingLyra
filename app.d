@@ -37,7 +37,7 @@ void main() {
         (println! (measure runs (lambda () (sum range 0))))
         ))"));
     //writeln(evalKeepLast(code, Env.globalEnv));
-    
+
     code = make_ast(tokenize("'()"));
-    writeln(evalKeepLast(code,Env.globalEnv));
+    writeln(evalKeepLast(code, Env.globalEnv));
 }

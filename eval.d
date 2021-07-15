@@ -15,11 +15,11 @@ class LyraStackOverflow : Exception {
     }
 }
 
-class LyraSyntaxError: Exception {
+class LyraSyntaxError : Exception {
     this(string msg, CallStack callStack, string file = __FILE__, size_t line = __LINE__) {
         import std.string;
 
-        super(format("SyntaxError! "~msg~ "\nInternal callstack: %s", callStack), file, line);
+        super(format("SyntaxError! " ~ msg ~ "\nInternal callstack: %s", callStack), file, line);
     }
 }
 
@@ -61,29 +61,40 @@ LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
 
 LyraObj evDefine(LyraObj expr, Env env, bool isMacro) {
     if (expr.car.type == symbol_id) {
-    auto name = expr.car;
-    expr = expr.cdr;
-    if (!expr.cdr.isNil()) throw new LyraSyntaxError("define with name can take only 2 arguments (name and single expression).",callStack);
-    auto variable = eval(expr.car,env);
-    Env.globalEnv.set(name, variable);
-    return variable;
-    }else if (expr.car.type == cons_id) {auto name = expr.car.car;
-    expr = cons(expr.car.cdr, expr.cdr); // Remove name
-    auto func = evLambda(expr, env, name.symbol_val, isMacro);
-    Env.globalEnv.set(name, func);
-    return func;
-    }else {throw new LyraSyntaxError ("Illegal expression form for define. First argument must be symbol or cons: " ~ expr.car.toString(),callStack);}
+        auto name = expr.car;
+        expr = expr.cdr;
+        if (!expr.cdr.isNil())
+            throw new LyraSyntaxError("define with name can take only 2 arguments (name and single expression).",
+                    callStack);
+        auto variable = eval(expr.car, env);
+        Env.globalEnv.set(name, variable);
+        return variable;
+    } else if (expr.car.type == cons_id) {
+        auto name = expr.car.car;
+        expr = cons(expr.car.cdr, expr.cdr); // Remove name
+        auto func = evLambda(expr, env, name.symbol_val, isMacro);
+        Env.globalEnv.set(name, func);
+        return func;
+    } else {
+        throw new LyraSyntaxError(
+                "Illegal expression form for define. First argument must be symbol or cons: " ~ expr.car.toString(),
+                callStack);
+    }
 }
 
 LyraObj evLambda(LyraObj expr, Env env, Symbol name = "", bool isMacro = false) {
-    if (!isConsOrNil(expr.car))  throw new LyraSyntaxError("Arguments for lambda must be a cons.",callStack);
+    if (!isConsOrNil(expr.car))
+        throw new LyraSyntaxError("Arguments for lambda must be a cons.", callStack);
     auto argNames = expr.car.cons_val;
     auto bodyExpr = expr.next;
-    if (bodyExpr.type != cons_id)  throw new LyraSyntaxError("Empty lambda body.",callStack);
-    
+    if (bodyExpr.type != cons_id)
+        throw new LyraSyntaxError("Empty lambda body.", callStack);
+
     auto argVector = listToVector(argNames);
     foreach (a; argVector) {
-    if (a.type() != symbol_id) throw new LyraSyntaxError("Argument names for lambda must be symbols.",callStack);}
+        if (a.type() != symbol_id)
+            throw new LyraSyntaxError("Argument names for lambda must be symbols.", callStack);
+    }
     auto variadic = argVector.length > 1 && argVector[1].symbol_val == "&";
 
     return new NonNativeLyraFunc(name, env, argNames, bodyExpr, variadic, isMacro);
@@ -106,9 +117,14 @@ start:
                 LyraObj bindings = expr.car;
                 env = new Env(env);
                 while (!bindings.isNil) {
-                    if (bindings.car.type() != symbol_id) {throw new  LyraSyntaxError("Invalid form for bindings for let. Name must be symbol.",callStack);}
+                    if (bindings.car.type() != symbol_id) {
+                        throw new LyraSyntaxError("Invalid form for bindings for let. Name must be symbol.",
+                                callStack);
+                    }
                     LyraObj sym = bindings.car.car;
-                    if (bindings.car.cdr.type() != cons_id) {throw new  LyraSyntaxError("Invalid form for bindings for let.",callStack);}
+                    if (bindings.car.cdr.type() != cons_id) {
+                        throw new LyraSyntaxError("Invalid form for bindings for let.", callStack);
+                    }
                     LyraObj val = bindings.car.cdr.car;
                     env.set(sym, val);
                     bindings = bindings.cdr;
@@ -118,9 +134,14 @@ start:
                 expr = expr.cdr;
                 LyraObj binding = expr.car;
                 env = new Env(env);
-                if (binding.car.type() != symbol_id) {throw new LyraSyntaxError("Invalid form for bindings for let. Name must be symbol.",callStack);}
+                if (binding.car.type() != symbol_id) {
+                    throw new LyraSyntaxError("Invalid form for bindings for let. Name must be symbol.",
+                            callStack);
+                }
                 LyraObj sym = binding.car;
-                if (binding.cdr.type() != cons_id) {throw new LyraSyntaxError("Invalid form for bindings for let.",callStack);}
+                if (binding.cdr.type() != cons_id) {
+                    throw new LyraSyntaxError("Invalid form for bindings for let.", callStack);
+                }
                 LyraObj val = eval(binding.cdr.car, env, true);
                 env.set(sym, val);
                 auto res = evalKeepLast(expr.cdr, env, disableTailCall);
@@ -128,14 +149,18 @@ start:
             case "lambda":
                 return evLambda(expr.cdr, env);
             case "if":
-                  if (expr.cdr.type() != cons_id) throw new LyraSyntaxError("Empty if.",callStack);
+                if (expr.cdr.type() != cons_id)
+                    throw new LyraSyntaxError("Empty if.", callStack);
                 expr = expr.cdr;
                 LyraObj condition = eval(expr.car, env, true);
                 expr = expr.cdr;
-                  if (expr.type() != cons_id) throw new LyraSyntaxError("Empty cases for if.",callStack);if (condition.isNil || (condition.type == bool_id && condition.bool_val == true)) {
+                if (expr.type() != cons_id)
+                    throw new LyraSyntaxError("Empty cases for if.", callStack);
+                if (condition.isNil || (condition.type == bool_id && condition.bool_val == true)) {
                     return eval(expr.car, env, disableTailCall);
                 } else {
-                if (expr.cdr.isNil()) return nil(); // If else-branch is empty, return nil
+                    if (expr.cdr.isNil())
+                        return nil(); // If else-branch is empty, return nil
                     return eval(expr.cdr.car, env, disableTailCall);
                 }
             case "cond":
@@ -171,7 +196,7 @@ start:
                 return eval(res, env);
             }
         } else {
-            throw new LyraSyntaxError("Object not callable: " ~ expr.car.toString(),callStack);
+            throw new LyraSyntaxError("Object not callable: " ~ expr.car.toString(), callStack);
         }
     } else if (expr.type == vector_id) {
         return evalVector(expr, env);
