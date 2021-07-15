@@ -15,7 +15,6 @@ void main(string[] args) {
     auto code = make_ast(tokenize(readText("core.lyra")));
     writeln(evalKeepLast(code, Env.globalEnv));
     foreach (fname; args[1 .. $]) {
-        writeln("NOT HERE");
         code = make_ast(tokenize(readText(fname)));
         evalKeepLast(code, Env.globalEnv);
     }

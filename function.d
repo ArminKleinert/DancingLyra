@@ -29,9 +29,8 @@ class NonNativeLyraFunc : LyraFunc {
     private Cons argNames;
     private LyraObj bodyExpr;
 
-    this(Symbol name, Env definitionEnv, Cons argNames, LyraObj bodyExpr,
+    this(Symbol name, Env definitionEnv, int argc, Cons argNames, LyraObj bodyExpr,
             bool variadic = false, bool isMacro = false) {
-        int argc = cast(int) listSize(argNames);
         super(name, argc, variadic ? int.max : argc, variadic, isMacro);
         this.definitionEnv = definitionEnv;
         this.argNames = argNames;
@@ -52,11 +51,16 @@ class NonNativeLyraFunc : LyraFunc {
         while (!argNames1.isNil) {
             if (args.isNil)
                 break;
+            if (variadic&&argNames1.cdr.isNil()) {
+            env.set(argNames1.car, args);
+            argcGiven+=listSize(args);
+            break;
+            }else{
             argcGiven++;
             env.set(argNames1.car, args.car);
             argNames1 = argNames1.next;
             args = args.next;
-        }
+        }}
 
         if (argcGiven < minargs || (!variadic && argcGiven > maxargs)) {
             throw new Exception("Wrong number of arguments for " ~ this.toString() ~ ". Expected " ~ itos(

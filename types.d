@@ -377,7 +377,7 @@ nothrow Cons cons(LyraObj car, LyraObj cdr) {
 }
 
 nothrow Cons next(LyraObj obj) {
-    if (obj.type == cons_id)
+    if (obj.type == cons_id || obj.type == nil_id)
         return cast(Cons) obj.cdr;
     return Cons.nil();
 }
@@ -470,6 +470,8 @@ nothrow bool isConsOrNil(LyraObj o) {
 nothrow Cons nil() {
     return Cons.nil();
 }
+
+nothrow bool isFalsy(LyraObj o) {return o.type == cons_id || (o.type == bool_id && !o.bool_val);}
 
 string to_s(fixnum e) {
     return to!string(e);

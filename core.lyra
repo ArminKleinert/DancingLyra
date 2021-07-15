@@ -1,13 +1,28 @@
 
+(def-macro (begin x y) (list 'if x y y))
+
+(define (list & xs) xs)
+
 (define car _car)
+
 (define cdr _cdr)
+
 (define vector-append _vector-append)
+
 (define vector-get _vector-get)
+
 (define vector-size _vector-size)
+
 (define (empty? xs)
   (if (vector? xs)
     (= (vector-size xs) 0)
     (if (nil? xs) #t #f)))
 
+(define (id e) e)
+
+(define (println2! e) (println! e))
+(println2! (vector-size [1 2 4 3]))
 
 #t
+
+(list 1 2 3 4 5 6 7 8 9)

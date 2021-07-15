@@ -69,7 +69,7 @@ void initializeGlobalEnv(Env env) {
     addFn("cons", 2, false, (xs, env) { return cons(xs.car, xs.cdr.car); });
     addFn("_car", 1, false, (xs, env) { return xs.car.car; });
     addFn("_cdr", 1, false, (xs, env) { return xs.car.cdr; });
-    addFn("list", 0, true, (xs, env) { return xs; });
+    //addFn("list", 0, true, (xs, env) { return xs; });
 
     addFn("vector", 0, true, (xs, env) { return vector(listToVector(xs)); });
 
