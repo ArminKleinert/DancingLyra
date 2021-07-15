@@ -95,15 +95,19 @@ LyraObj evLambda(LyraObj expr, Env env, Symbol name = "", bool isMacro = false) 
         if (a.type() != symbol_id)
             throw new LyraSyntaxError("Argument names for lambda must be symbols.", callStack);
     }
-    auto variadic = argVector.length > 1 && argVector[argVector.length - 2 ].symbol_val == "&";
+    auto variadic = argVector.length > 1 && argVector[argVector.length - 2].symbol_val == "&";
     int arity = cast(int) argVector.length;
-    
+
     if (variadic) {
-    arity-=2;
-      Cons temp = nil();
-      for (auto i = argVector.length - 1; i>0; i--) {
-     if (i != argVector.length - 2){ temp = cons(argVector[i],temp);}
-    argNames = temp;}}
+        arity -= 2;
+        Cons temp = nil();
+        for (auto i = argVector.length - 1; i > 0; i--) {
+            if (i != argVector.length - 2) {
+                temp = cons(argVector[i], temp);
+            }
+            argNames = temp;
+        }
+    }
 
     return new NonNativeLyraFunc(name, env, arity, argNames, bodyExpr, variadic, isMacro);
 }
@@ -164,7 +168,7 @@ start:
                 expr = expr.cdr;
                 if (expr.type() != cons_id)
                     throw new LyraSyntaxError("Empty cases for if.", callStack);
-                  auto evaluatedCondition = eval(condition, env, true);
+                auto evaluatedCondition = eval(condition, env, true);
                 if (!evaluatedCondition.isFalsy()) {
                     return eval(expr.car, env, disableTailCall);
                 } else {
@@ -174,17 +178,21 @@ start:
                 }
             case "cond":
                 auto cases = expr.cdr;
-                if (cases.car.type != cons_id) throw new LyraSyntaxError("cond: List expected.",callStack);
+                if (cases.car.type != cons_id)
+                    throw new LyraSyntaxError("cond: List expected.", callStack);
                 LyraObj res = nil();
                 while (!cases.isNil()) {
-                if (cases.car.type != cons_id) throw new LyraSyntaxError("cond: List expected.",callStack);
-                auto case0 = cases.car;
-                auto condition = case0.car;
-                if (case0.cdr.isNil()) throw new LyraSyntaxError("cond: Invalid branch for condition " ~ condition.toString(),callStack);
-                auto evaluatedCondition = eval(condition,env, true);
-                if (!evaluatedCondition.isFalsy()) {
-                return eval(case0.cdr.car(),env);
-                }
+                    if (cases.car.type != cons_id)
+                        throw new LyraSyntaxError("cond: List expected.", callStack);
+                    auto case0 = cases.car;
+                    auto condition = case0.car;
+                    if (case0.cdr.isNil())
+                        throw new LyraSyntaxError("cond: Invalid branch for condition " ~ condition.toString(),
+                                callStack);
+                    auto evaluatedCondition = eval(condition, env, true);
+                    if (!evaluatedCondition.isFalsy()) {
+                        return eval(case0.cdr.car(), env);
+                    }
                 }
                 // No true case found, default to nil
                 return nil();

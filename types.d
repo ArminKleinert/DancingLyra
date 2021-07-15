@@ -471,7 +471,9 @@ nothrow Cons nil() {
     return Cons.nil();
 }
 
-nothrow bool isFalsy(LyraObj o) {return o.type == cons_id || (o.type == bool_id && !o.bool_val);}
+nothrow bool isFalsy(LyraObj o) {
+    return o.type == cons_id || (o.type == bool_id && !o.bool_val);
+}
 
 string to_s(fixnum e) {
     return to!string(e);
