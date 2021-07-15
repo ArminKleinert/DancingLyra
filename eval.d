@@ -9,6 +9,7 @@ private CallStack callStack = [null];
 
 private bool allowRedefine = false;
 private bool globalDisallowTailRecursion = false;
+private bool optimize = false;
 
 void eval_AllowRedefine() {
     allowRedefine = true;
@@ -16,6 +17,10 @@ void eval_AllowRedefine() {
 
 void eval_DisallowTailRecursion() {
     globalDisallowTailRecursion = true;
+}
+
+void eval_DoOptimize() {
+optimize = true;
 }
 
 class LyraStackOverflow : Exception {
@@ -79,19 +84,35 @@ LyraObj evalVector(LyraObj expr, Env env) {
 }
 
 LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
-    if (exprList.isNil())
+    if (exprList.isNil()) {
         return exprList;
-    while (!(exprList.cdr.isNil)) {
-        auto temp = eval(exprList.car, env, true);
-        if (checkFulfillsPredsForValueInline(exprList.car)) {
-            internalSetCar(exprList, temp);
-        }
-        exprList = exprList.next();
     }
+    
+    //FIXME This deletes the definition of macros for some reason...
+    if (optimize) {
+        while (!exprList.cdr.isNil && !exprList.cdr.cdr.isNil) {
+            // If optimizations are on and the expression is trivial, evaluate it once
+            // to make sure that evaluation is possible. Then delete it from the AST.
+            if (evaluatesToSelf(exprList.cdr.car)) {
+                eval(exprList.cdr.car, env);
+                internalSetCdr(exprList, exprList.cdr.cdr);
+                continue;
+            }
+            exprList = exprList.cdr;
+        }
+    }
+    
+    while (!(exprList.cdr.isNil)) {
+        auto temp = exprList.car;
+        eval(temp, env, true);
+        exprList = exprList.cdr;
+    }
+    
     auto temp = eval(exprList.car, env, disableTailCall);
     if (checkFulfillsPredsForValueInline(exprList.car)) {
         internalSetCar(exprList, temp);
     }
+    
     return temp;
 }
 

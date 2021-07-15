@@ -347,11 +347,20 @@ class Cons : LyraObj {
     nothrow void internalSetCar(LyraObj v) {
         _car = v;
     }
+
+    nothrow void internalSetCdr(LyraObj v) {
+        _cdr = v;
+    }
 }
 
 nothrow void internalSetCar(LyraObj c, LyraObj val) {
     if (c.type == cons_id)
         c.cons_val.internalSetCar(val);
+}
+
+nothrow void internalSetCdr(LyraObj c, LyraObj val) {
+    if (c.type == cons_id)
+        c.cons_val.internalSetCdr(val);
 }
 
 @nogc nothrow Symbol symbol_val(LyraObj obj) {
@@ -508,6 +517,8 @@ nothrow Cons nil() {
 nothrow bool isFalsy(LyraObj o) {
     return o.type == cons_id || (o.type == bool_id && !o.bool_val);
 }
+
+nothrow bool evaluatesToSelf(LyraObj o) { return o.type != cons_id; }
 
 string to_s(fixnum e) {
     return to!string(e);

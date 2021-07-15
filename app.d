@@ -13,6 +13,10 @@ void main(string[] args) {
 
     for (auto i = 1; i < args.length; i++) {
         switch (args[i]) {
+        case "-O":
+            eval_DoOptimize();
+            args[i] = null;
+            break;
         case "-AllowRedefine":
             eval_AllowRedefine();
             args[i] = null;
