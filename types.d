@@ -94,6 +94,13 @@ class Env {
         return _globalEnv;
     }
 
+    static void clearGlobalEnv() {
+        if (_globalEnv is null)
+            return;
+            // Does not really make the map null, but clears it.
+        globalEnv().inner = null; 
+    }
+
     LyraObj find(LyraObj sym) {
         if (sym.type != symbol_id)
             return null;
@@ -141,10 +148,12 @@ class LyraObj {
     Val value = {bool_val: false};
 
     @nogc nothrow public uint type() {
+    if (_type >= 1000) return _type - 1000;
         return _type;
     }
 
     nothrow public LyraObj objtype() {
+        if (_type >= 1000)return makeFixnum(_type-1000);
         return makeFixnum(_type);
     }
 
@@ -195,6 +204,12 @@ class LyraObj {
     nothrow public static LyraObj makeVector(Vector e) {
         Val v = {vector_val: e};
         return new LyraObj(v, vector_id);
+    }
+    
+    nothrow public static LyraObj makeWithSpecialType (uint type,LyraObj obj) {
+    Val v = {boxed_val: obj};
+    if (type < 0) type = 0;
+    return new LyraObj(v,type + 1000);
     }
 
     nothrow public static LyraObj makeEmpty() {
@@ -401,6 +416,10 @@ nothrow LyraObj obj(char e) {
     return LyraObj.makeChar(e);
 }
 
+nothrow LyraObj newWithType(uint type,LyraObj obj) {
+return LyraObj.makeWithSpecialType(type,obj);
+}
+
 nothrow Cons list(Vector e) {
     Cons result = nil();
     while (e.length > 0) {
@@ -440,6 +459,8 @@ nothrow size_t listSize(Cons xs) {
     }
     return res;
 }
+
+nothrow bool isConsOrNil(LyraObj o){return (o.type == cons_id) || (o.type == nil_id);}
 
 nothrow Cons nil() {
     return Cons.nil();

@@ -1,0 +1,12 @@
+
+(define car _car)
+(define cdr _cdr)
+(define vector-append _vector-append)
+(define vector-get _vector-get)
+(define vector-size _vector-size)
+(define (empty? xs)
+  (if (vector? xs)
+    (= (vector-size xs) 0)
+    (if (nil? xs) #t #f)))
+
+

@@ -24,14 +24,20 @@ void main() {
       (if (empty? xs)
         acc
         (sum (cdr xs) (+ acc (car xs)))))
-
+    
     (define (longrange n)
       (if (= n 0) (list 0) (cons n (longrange (- n 1)))))
-
-    (let* (runs 1000)
+      
+    (define abc 88)
+    (println! abc)
+    
+    (let* (runs 1)
       (let* (range (longrange 5000))
         (println! (sum range 0))
         (println! (measure runs (lambda () (sum range 0))))
         ))"));
-    writeln(evalKeepLast(code, Env.globalEnv));
+    //writeln(evalKeepLast(code, Env.globalEnv));
+    
+    code = make_ast(tokenize("'()"));
+    writeln(evalKeepLast(code,Env.globalEnv));
 }
