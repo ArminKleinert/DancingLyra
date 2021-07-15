@@ -89,52 +89,69 @@ class Env {
     }
 
     static Env globalEnv() {
-        if (_globalEnv is null)
-            _globalEnv = new Env(null, null);
+        if (_globalEnv is null){
+            _globalEnv = new Env(null, null);}
         return _globalEnv;
     }
 
     static void clearGlobalEnv() {
-        if (_globalEnv is null)
-            return;
+        if (_globalEnv is null){
+            return;}
         // Does not really make the map null, but clears it.
         globalEnv().inner = null;
     }
 
-    LyraObj find(LyraObj sym) {
-        if (sym.type != symbol_id)
-            return null;
-
-        auto v = inner.get(sym.symbol_val, null);
+    LyraObj safeFind(Symbol sym) {
+        auto v = inner.get(sym, null);
         if (v is null && parents[0]!is null) {
-            return parents[0].find(sym);
+            v =  parents[0].safeFind(sym);}
+        if (v is null && parents[1]!is null) {
+            v =  parents[1].safeFind(sym);
+        }
+        if (v is null) return null;
+        return cast(LyraObj) v;
+    }
+
+    Env getContainingEnv(Symbol sym) {
+        auto v = inner.get(sym, null);
+        if (v !is null) return this;
+        if (parents[0]!is null) {
+            auto temp = parents[0].getContainingEnv(sym);
+            if (temp !is null) return temp ;
+        }else if (parents[1]!is null) {
+            return parents[1].getContainingEnv(sym);
+        }
+        return null;
+    }
+
+    LyraObj find(LyraObj sym) {
+        if (sym.type != symbol_id){
+            throw new Exception("Env.find expected a symbol, but got " ~ sym.toString());}
+        return find(sym.symbol_val);
+    }
+
+    LyraObj find(Symbol sym) {
+        auto v = inner.get(sym, null);
+        if (v is null && parents[0]!is null) {
+            v = parents[0].safeFind(sym);
         }
         if (v is null && parents[1]!is null) {
-            return parents[1].find(sym);
+            v= parents[1].safeFind(sym);
         }
         if (v is null) {
-            throw new Exception("No value found for symbol " ~ sym.toString());
+            throw new Exception("No value found for symbol " ~ sym);
         }
         return cast(LyraObj) v;
     }
 
-    nothrow void set(LyraObj sym, LyraObj val) {
-        Symbol key = sym.symbol_val;
-        this[key] = val;
+     void set(LyraObj sym, LyraObj val) {
+        if (sym.type != symbol_id){
+            throw new Exception("Env.set expected a symbol, but got " ~ sym.toString());}
+        set(sym.symbol_val,val);
     }
 
-    override string toString() {
-        auto s = "";
-        foreach (Symbol k; inner.byKey) {
-            s ~= k ~ " : " ~ inner[k].toString() ~ ", ";
-        }
-        s = s[0 .. $ - 2];
-        s = "ENV(Inner: {" ~ s ~ "}";
-        if (parents[0]!is null)
-            s ~= " Parent 1: " ~ parents[0].toString();
-        if (parents[1]!is null)
-            s ~= " Parent 2: " ~ parents[1].toString();
-        return s;
+    nothrow void set(Symbol sym, LyraObj val) {
+        this[sym] = val;
     }
 }
 
@@ -318,7 +335,11 @@ class Cons : LyraObj {
 
         return "(" ~ listToStringHelper(this) ~ ")";
     }
+    
+    nothrow void internalSetCar(LyraObj v){_car = v;}
 }
+
+nothrow void internalSetCar(LyraObj c, LyraObj val) {if (c.type == cons_id) c.cons_val.internalSetCar(val);}
 
 @nogc nothrow Symbol symbol_val(LyraObj obj) {
     return obj.symbol_val;
