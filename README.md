@@ -28,6 +28,8 @@ Development on this port will be slow because life is a thing.
   - Tail recursion works
   - Macros work now
   - Build in a stack limit which can be adjusted in the future
+  - define for variables works
+  - eval function gives warnings for invalid forms.
 
 ## Usage
 
