@@ -89,14 +89,16 @@ class Env {
     }
 
     static Env globalEnv() {
-        if (_globalEnv is null){
-            _globalEnv = new Env(null, null);}
+        if (_globalEnv is null) {
+            _globalEnv = new Env(null, null);
+        }
         return _globalEnv;
     }
 
     static void clearGlobalEnv() {
-        if (_globalEnv is null){
-            return;}
+        if (_globalEnv is null) {
+            return;
+        }
         // Does not really make the map null, but clears it.
         globalEnv().inner = null;
     }
@@ -104,29 +106,34 @@ class Env {
     LyraObj safeFind(Symbol sym) {
         auto v = inner.get(sym, null);
         if (v is null && parents[0]!is null) {
-            v =  parents[0].safeFind(sym);}
-        if (v is null && parents[1]!is null) {
-            v =  parents[1].safeFind(sym);
+            v = parents[0].safeFind(sym);
         }
-        if (v is null) return null;
+        if (v is null && parents[1]!is null) {
+            v = parents[1].safeFind(sym);
+        }
+        if (v is null)
+            return null;
         return cast(LyraObj) v;
     }
 
     Env getContainingEnv(Symbol sym) {
         auto v = inner.get(sym, null);
-        if (v !is null) return this;
+        if (v !is null)
+            return this;
         if (parents[0]!is null) {
             auto temp = parents[0].getContainingEnv(sym);
-            if (temp !is null) return temp ;
-        }else if (parents[1]!is null) {
+            if (temp !is null)
+                return temp;
+        } else if (parents[1]!is null) {
             return parents[1].getContainingEnv(sym);
         }
         return null;
     }
 
     LyraObj find(LyraObj sym) {
-        if (sym.type != symbol_id){
-            throw new Exception("Env.find expected a symbol, but got " ~ sym.toString());}
+        if (sym.type != symbol_id) {
+            throw new Exception("Env.find expected a symbol, but got " ~ sym.toString());
+        }
         return find(sym.symbol_val);
     }
 
@@ -136,7 +143,7 @@ class Env {
             v = parents[0].safeFind(sym);
         }
         if (v is null && parents[1]!is null) {
-            v= parents[1].safeFind(sym);
+            v = parents[1].safeFind(sym);
         }
         if (v is null) {
             throw new Exception("No value found for symbol " ~ sym);
@@ -144,10 +151,11 @@ class Env {
         return cast(LyraObj) v;
     }
 
-     void set(LyraObj sym, LyraObj val) {
-        if (sym.type != symbol_id){
-            throw new Exception("Env.set expected a symbol, but got " ~ sym.toString());}
-        set(sym.symbol_val,val);
+    void set(LyraObj sym, LyraObj val) {
+        if (sym.type != symbol_id) {
+            throw new Exception("Env.set expected a symbol, but got " ~ sym.toString());
+        }
+        set(sym.symbol_val, val);
     }
 
     nothrow void set(Symbol sym, LyraObj val) {
@@ -335,11 +343,16 @@ class Cons : LyraObj {
 
         return "(" ~ listToStringHelper(this) ~ ")";
     }
-    
-    nothrow void internalSetCar(LyraObj v){_car = v;}
+
+    nothrow void internalSetCar(LyraObj v) {
+        _car = v;
+    }
 }
 
-nothrow void internalSetCar(LyraObj c, LyraObj val) {if (c.type == cons_id) c.cons_val.internalSetCar(val);}
+nothrow void internalSetCar(LyraObj c, LyraObj val) {
+    if (c.type == cons_id)
+        c.cons_val.internalSetCar(val);
+}
 
 @nogc nothrow Symbol symbol_val(LyraObj obj) {
     return obj.symbol_val;

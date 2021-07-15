@@ -10,8 +10,13 @@ private CallStack callStack = [null];
 private bool allowRedefine = false;
 private bool globalDisallowTailRecursion = false;
 
-void eval_AllowRedefine() {allowRedefine = true;}
-void eval_DisallowTailRecursion() {globalDisallowTailRecursion = true;}
+void eval_AllowRedefine() {
+    allowRedefine = true;
+}
+
+void eval_DisallowTailRecursion() {
+    globalDisallowTailRecursion = true;
+}
 
 class LyraStackOverflow : Exception {
     this(CallStack callStack, string file = __FILE__, size_t line = __LINE__) {
@@ -30,12 +35,17 @@ class LyraSyntaxError : Exception {
 }
 
 void checkForGlobalRedefinition(Symbol sym) {
-if (allowRedefine) {return;}
-if (Env.globalEnv.safeFind(sym) !is null) {throw new Exception ("Redifinition of symbol is not allowed! " ~ sym);}
+    if (allowRedefine) {
+        return;
+    }
+    if (Env.globalEnv.safeFind(sym) !is null) {
+        throw new Exception("Redifinition of symbol is not allowed! " ~ sym);
+    }
 }
 
 bool checkFulfillsPredsForValueInline(LyraObj sym) {
-return !allowRedefine && (sym.type == symbol_id) && (Env.globalEnv.safeFind(sym.symbol_val) !is null);
+    return !allowRedefine && (sym.type == symbol_id)
+        && (Env.globalEnv.safeFind(sym.symbol_val) !is null);
 }
 
 void pushOnCallStack(LyraFunc fn) {
@@ -51,9 +61,11 @@ void pushOnCallStack(LyraFunc fn) {
 Cons evalList(LyraObj exprList, Env env) {
     Vector v = [];
     while (!exprList.isNil) {
-    auto temp = eval(exprList.car, env, true);
+        auto temp = eval(exprList.car, env, true);
         v ~= temp;
-        if (checkFulfillsPredsForValueInline(exprList.car)) {internalSetCar(exprList,temp);}
+        if (checkFulfillsPredsForValueInline(exprList.car)) {
+            internalSetCar(exprList, temp);
+        }
         exprList = exprList.next();
     }
     return list(v);
@@ -71,11 +83,15 @@ LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
         return exprList;
     while (!(exprList.cdr.isNil)) {
         auto temp = eval(exprList.car, env, true);
-        if (checkFulfillsPredsForValueInline(exprList.car)) {internalSetCar(exprList,temp);}
+        if (checkFulfillsPredsForValueInline(exprList.car)) {
+            internalSetCar(exprList, temp);
+        }
         exprList = exprList.next();
     }
     auto temp = eval(exprList.car, env, disableTailCall);
-        if (checkFulfillsPredsForValueInline(exprList.car)) {internalSetCar(exprList,temp);}
+    if (checkFulfillsPredsForValueInline(exprList.car)) {
+        internalSetCar(exprList, temp);
+    }
     return temp;
 }
 
@@ -92,11 +108,14 @@ LyraObj evDefine(LyraObj expr, Env env, bool isMacro) {
         return variable;
     } else if (expr.car.type == cons_id) {
         auto name = expr.car.car;
-        
-        if (name.type != symbol_id) {throw new LyraSyntaxError("Name in function definition must be a symbol. " ~ name.toString(),callStack);}
-        
+
+        if (name.type != symbol_id) {
+            throw new LyraSyntaxError("Name in function definition must be a symbol. " ~ name.toString(),
+                    callStack);
+        }
+
         checkForGlobalRedefinition(name.symbol_val);
-        
+
         expr = cons(expr.car.cdr, expr.cdr); // Remove name
         auto func = evLambda(expr, env, name.symbol_val, isMacro);
         Env.globalEnv.set(name, func);
@@ -159,19 +178,19 @@ start:
                         throw new LyraSyntaxError("Invalid form for bindings for let. Name must be symbol.",
                                 callStack);
                     }
-                    
+
                     LyraObj sym = bindings.car.car;
                     if (bindings.car.cdr.type() != cons_id) {
                         throw new LyraSyntaxError("Invalid form for bindings for let.", callStack);
                     }
-                    
+
                     LyraObj valExpr = bindings.car.cdr.car;
-                    LyraObj val = eval(valExpr,env);
-                    
+                    LyraObj val = eval(valExpr, env);
+
                     if (checkFulfillsPredsForValueInline(valExpr)) {
-                    internalSetCar(bindings.car.cdr,val);
+                        internalSetCar(bindings.car.cdr, val);
                     }
-                    
+
                     env.set(sym, val);
                     bindings = bindings.cdr;
                 }
@@ -184,34 +203,36 @@ start:
                     throw new LyraSyntaxError("Invalid form for bindings for let. Name must be symbol.",
                             callStack);
                 }
-                
+
                 LyraObj sym = binding.car;
                 if (binding.cdr.type() != cons_id) {
                     throw new LyraSyntaxError("Invalid form for bindings for let.", callStack);
                 }
-                
+
                 LyraObj valExpr = binding.cdr.car;
-                LyraObj                 val = eval(valExpr,env,true);
+                LyraObj val = eval(valExpr, env, true);
                 if (checkFulfillsPredsForValueInline(valExpr)) {
-                binding.cdr.internalSetCar(val);
+                    binding.cdr.internalSetCar(val);
                 }
-                
+
                 env.set(sym, val);
                 auto res = evalKeepLast(expr.cdr, env, disableTailCall);
                 return res;
             case "lambda":
                 return evLambda(expr.cdr, env);
             case "if":
-                if (expr.cdr.type() != cons_id){
-                    throw new LyraSyntaxError("Empty if.", callStack);}
-                    
+                if (expr.cdr.type() != cons_id) {
+                    throw new LyraSyntaxError("Empty if.", callStack);
+                }
+
                 expr = expr.cdr;
                 LyraObj condition = expr.car;
                 expr = expr.cdr;
-                
-                if (expr.type() != cons_id){
-                    throw new LyraSyntaxError("Empty cases for if.", callStack);}
-                    
+
+                if (expr.type() != cons_id) {
+                    throw new LyraSyntaxError("Empty cases for if.", callStack);
+                }
+
                 auto evaluatedCondition = eval(condition, env, true);
                 if (!evaluatedCondition.isFalsy()) {
                     return eval(expr.car, env, disableTailCall);
@@ -222,29 +243,32 @@ start:
                 }
             case "cond":
                 auto cases = expr.cdr;
-                if (cases.car.type != cons_id){
-                    throw new LyraSyntaxError("cond: List expected.", callStack);}
+                if (cases.car.type != cons_id) {
+                    throw new LyraSyntaxError("cond: List expected.", callStack);
+                }
                 LyraObj res = nil();
-                
+
                 while (!cases.isNil()) {
                     if (cases.car.type != cons_id)
                         throw new LyraSyntaxError("cond: List expected.", callStack);
-                        
+
                     auto case0 = cases.car;
                     auto condition = case0.car;
-                    
-                    if (case0.cdr.isNil()){
-                        throw new LyraSyntaxError("cond: Invalid branch for condition " ~ condition.toString(),                                callStack);}
-                                
+
+                    if (case0.cdr.isNil()) {
+                        throw new LyraSyntaxError("cond: Invalid branch for condition " ~ condition.toString(),
+                                callStack);
+                    }
+
                     auto evaluatedCondition = eval(condition, env, true);
                     if (checkFulfillsPredsForValueInline(condition)) {
-                    internalSetCar(case0,evaluatedCondition);
+                        internalSetCar(case0, evaluatedCondition);
                     }
                     if (!evaluatedCondition.isFalsy()) {
-                    auto temp = eval(case0.cdr.car, env);
-                    if (checkFulfillsPredsForValueInline(case0.cdr.car) ){
-                    internalSetCar(case0.cdr, temp);
-                    }
+                        auto temp = eval(case0.cdr.car, env);
+                        if (checkFulfillsPredsForValueInline(case0.cdr.car)) {
+                            internalSetCar(case0.cdr, temp);
+                        }
                         return eval(temp, env);
                     }
                 }
@@ -264,7 +288,8 @@ start:
             LyraFunc func = expr.car.func_val;
             LyraObj args = expr.cdr;
             if (!func.isMacro()) {
-                if (!globalDisallowTailRecursion && !disableTailCall && (callStack[callStack.length - 1] is func)) {
+                if (!globalDisallowTailRecursion && !disableTailCall
+                        && (callStack[callStack.length - 1] is func)) {
                     args = evalList(args, env);
                     throw new TailCall(args.cons_val());
                 }
