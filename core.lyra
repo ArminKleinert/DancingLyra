@@ -23,5 +23,6 @@
 (define (id e) e)
 
 ;(println! (begin 1 (id (list 1 2 3))))
+(println! (id (list 1 2 3)))
 
 #t

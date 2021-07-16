@@ -88,17 +88,19 @@ LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
         return exprList;
     }
 
-    //FIXME This deletes the definition of macros for some reason...
-    if (optimize) {
-        while (!exprList.cdr.isNil && !exprList.cdr.cdr.isNil) {
+    if (optimize && !allowRedefine) {
+        auto exprList1 = exprList;
+        while (!exprList1.cdr.isNil && !exprList1.cdr.cdr.isNil) {
             // If optimizations are on and the expression is trivial, evaluate it once
             // to make sure that evaluation is possible. Then delete it from the AST.
-            if (evaluatesToSelf(exprList.cdr.car)) {
-                eval(exprList.cdr.car, env);
-                internalSetCdr(exprList, exprList.cdr.cdr);
+            if (evaluatesToSelf(exprList1.car)) {
+                writeln(exprList1.car);
+                eval(exprList1.car, env);
+                internalSetCar(exprList1, exprList1.cdr.car);
+                internalSetCdr(exprList1, exprList1.cdr.cdr);
                 continue;
             }
-            exprList = exprList.cdr;
+            exprList1 = exprList1.cdr;
         }
     }
 
