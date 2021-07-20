@@ -88,13 +88,12 @@ LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
         return exprList;
     }
 
-    if (optimize && !allowRedefine) {
+    if (optimize) {
         auto exprList1 = exprList;
         while (!exprList1.cdr.isNil && !exprList1.cdr.cdr.isNil) {
             // If optimizations are on and the expression is trivial, evaluate it once
             // to make sure that evaluation is possible. Then delete it from the AST.
             if (evaluatesToSelf(exprList1.car)) {
-                writeln(exprList1.car);
                 eval(exprList1.car, env);
                 internalSetCar(exprList1, exprList1.cdr.car);
                 internalSetCdr(exprList1, exprList1.cdr.cdr);
@@ -176,8 +175,10 @@ LyraObj evLambda(LyraObj expr, Env env, Symbol name = "", bool isMacro = false) 
             argNames = temp;
         }
     }
+    
+    auto ispure = false;
 
-    return new NonNativeLyraFunc(name, env, arity, argNames, bodyExpr, variadic, isMacro);
+    return new NonNativeLyraFunc(name, env, arity, argNames, bodyExpr, variadic, ispure, isMacro);
 }
 
 LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {

@@ -9,9 +9,10 @@ import evaluate;
 class NativeLyraFunc : LyraFunc {
     private const LyraObj delegate(Cons, Env) fnBody;
 
-    this(string name, int minargs, int maxargs, bool variadic, LyraObj delegate(Cons, Env) fnBody) {
-        super(name, minargs, maxargs, variadic, false);
+    this(string name, int minargs, int maxargs, bool variadic, bool ispure, LyraObj delegate(Cons, Env) fnBody) {
+        super(name, minargs, maxargs, variadic, ispure, false);
         this.fnBody = fnBody;
+        
     }
 
     override LyraObj call(Cons args, Env callEnv) {
@@ -30,8 +31,8 @@ class NonNativeLyraFunc : LyraFunc {
     private LyraObj bodyExpr;
 
     this(Symbol name, Env definitionEnv, int argc, Cons argNames, LyraObj bodyExpr,
-            bool variadic = false, bool isMacro = false) {
-        super(name, argc, variadic ? int.max : argc, variadic, isMacro);
+            bool variadic , bool ispure, bool isMacro ) {
+        super(name, argc, variadic ? int.max : argc, variadic, ispure, isMacro);
         this.definitionEnv = definitionEnv;
         this.argNames = argNames;
         this.bodyExpr = bodyExpr;

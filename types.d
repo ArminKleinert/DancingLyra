@@ -43,13 +43,19 @@ abstract class LyraFunc : LyraObj {
     protected const int minargs;
     protected const int maxargs;
     protected const bool variadic;
+    private const bool _ispure;
 
-    nothrow this(Symbol name, int minargs, int maxargs, bool variadic, bool isMacro) {
+    nothrow this(Symbol name, int minargs, int maxargs, bool variadic, bool isMacro, bool ispure) {
         this.name = name;
         this.minargs = minargs;
         this.maxargs = maxargs;
         this.variadic = variadic;
         this._isMacro = isMacro;
+        this._ispure = ispure;
+    }
+
+    nothrow bool ispure() {
+        return ispure;
     }
 
     nothrow bool isMacro() {
