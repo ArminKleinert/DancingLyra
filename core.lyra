@@ -3,23 +3,47 @@
 (def-macro (begin x y) (list 'if x y y))
 
 (def-macro (comment & e) '())
+(define (id e) e)
 
 (define (list & xs) xs)
-
 (define car _car)
-
 (define cdr _cdr)
 
 (define vector-append _vector-append)
-
 (define vector-get _vector-get)
-
 (define vector-size _vector-size)
+(define vector-iterate _vector-iterate)
+(define (vector-set v idx xyz)
+  (vector-iterate v []
+    (lambda (acc e i)
+      (if (= i idx) (vector-append acc xyz) (vector-append acc e)))))
 
 (define _types (box []))
 (define (box-swap! b f)(box-set! b (f (unbox b))))
 
-(define (add-type!) (box-swap! _types (lambda (x) (vector-append x '()))) (- (vector-size (unbox _types)) 1))
+(define (add-type!)
+  (box-swap! _types (lambda (x) (vector-append x '())))
+  (- (vector-size (unbox _types)) 1))
+
+(define (associated xs sym)
+  (if (nil? xs)
+    '()
+    (if (= (car (car xs)) sym) (cdr (car xs)) (associated (cdr xs) sym))))
+
+(define (find-type-fn x sym)
+  (associated
+    (vector-get (unbox _types) (lyra-type-id x))
+    sym))
+
+(define (add-type-fn! type sym f)
+  (let* (v (unbox _types))
+    (box-set! _types
+      (vector-set
+        v type
+        (cons
+          (cons sym f)
+          (vector-get v type))))
+    (unbox _types)))
 
 (define nil-id    (add-type!))
 (define symbol-id (add-type!))
@@ -33,14 +57,44 @@
 (define vector-id (add-type!))
 (define box-id    (add-type!))
 
+(define (nil? x) (= (lyra-type-id x) nil-id))
+
 (define (empty? xs)
   (if (vector? xs)
     (= (vector-size xs) 0)
     (if (nil? xs) #t #f)))
 
-(define (id e) e)
 
-(println! (lyra-type-id 1))
-(println! fixnum-id)
+(println! (lyra-type-id '()))
+(println! nil-id)
+
+(println! (vector-set [1 2 3] 1 5)) ; Expected: [1 5 3]
+(println! (vector-set [9 9 9] 2 4)) ; Expected: [9 9 4]
+(println! (vector-set [1 1 1 1 1 1 1 1] 6 17)) ; Expected: [1 1 1 1 1 1 17 1]
+
+(println! (cdr (list 9 8 7 6)))
+;(println! (associated (list (cons 1 2) (cons 3 4) (cons 5 6) (cons 7 8) (cons 9 10)) 1))
+;(println! (associated (list (cons 1 2) (cons 3 4) (cons 5 6) (cons 7 8) (cons 9 10)) 3))
+;(println! '((1 2) (3 4) (5 6) (7 8) (9 10)))
+
+(println! "")
+
+(println! (add-type-fn! nil-id 'a (lambda (x) 67890)))
+(println! (find-type-fn '() 'a))
+(println! (unbox _types))
+
+(println! "")
+
+(println! (comment e a b))
+
+(comment
+(println! add-type-fn!)
+(println! (add-type-fn! nil-id 'a (lambda (x) 67890)))
+(println! (find-type-fn '() 'true?))
+(println! (find-type-fn '() 'a))
+(println! ((find-type-fn '() 'a) '()))
+
+(println! (string "abc " 'def " " 1 " " 0.5 " " begin " " id " " '() " " (list 1 2 3) " " [1 2 3] " " #t " " #f)) 
+)
 
 #t

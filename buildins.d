@@ -108,27 +108,48 @@ void initializeGlobalEnv(Env env) {
         }
         return LyraObj.makeFixnum(xs.car.vector_val.length);
     });
-    
-    addFn("_vector-iterate", 3, false, true, (xs,env) {
-    if (xs.car.type != vector_id || xs.cdr.cdr.car.type != func_id) {
-    throw new Exception ("Expected vector, then any, then function.");
-    }
-    auto vec = xs.car.vector_val;auto accumulator = xs.cdr.car;
-    auto fn = xs.cdr.cdr.car.func_val;
-    for (fixnum i = 0; i < vec.length; i++) {
-           accumulator = fn.call(list(accumulator, vec[i], LyraObj.makeFixnum(i)), env);
-    }
-    return accumulator;
+
+    import std.conv : to;
+
+    addFn("_vector-iterate", 3, false, true, (xs, env) {
+        if (xs.car.type != vector_id || xs.cdr.cdr.car.type != func_id) {
+            throw new Exception("Expected vector, then any, then function.");
+        }
+        auto vec = xs.car.vector_val;
+        auto accumulator = xs.cdr.car;
+        auto fn = xs.cdr.cdr.car.func_val;
+        for (fixnum i = 0; i < vec.length; i++) {
+            accumulator = fn.call(list(accumulator, vec[i], LyraObj.makeFixnum(i)), env);
+        }
+        return accumulator;
+    });
+
+    addFn("string", 0, true, true, (xs, env) {
+        auto s = "";
+        while (!xs.isNil()) {
+            if (xs.car.type == string_id)
+                s ~= xs.car.string_val;
+            else
+                s ~= xs.car.toString();
+            xs = xs.next();
+        }
+        return LyraObj.makeString(s);
     });
 
     addFn("println!", 1, false, false, (xs, env) {
-        writeln(xs.car);
+        if (xs.car.type == string_id)
+            writeln(xs.car.string_val);
+        else
+            writeln(xs.car.toString());
         return Cons.nil();
     });
 
     addFn("box", 1, false, false, (xs, env) { return box(xs.car); });
     addFn("unbox", 1, false, false, (xs, env) { return unbox(xs.car); });
-    addFn("box-set!", 2, false, false, (xs, env) { boxSet(xs.car, xs.cdr.car); return xs.cdr.car; });
+    addFn("box-set!", 2, false, false, (xs, env) {
+        boxSet(xs.car, xs.cdr.car);
+        return xs.cdr.car;
+    });
 
     addFn("measure", 2, false, false, (xs, env) {
         auto median(long[] arr) {

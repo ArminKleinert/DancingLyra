@@ -50,11 +50,12 @@ class NonNativeLyraFunc : LyraFunc {
         argcGiven = 0;
 
         while (!argNames1.isNil) {
-            if (args.isNil)
-                break;
+
             if (variadic && argNames1.cdr.isNil()) {
                 env.set(argNames1.car, args);
                 argcGiven += listSize(args);
+                break;
+            } else if (args.isNil) {
                 break;
             } else {
                 argcGiven++;

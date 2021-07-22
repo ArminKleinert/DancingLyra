@@ -44,13 +44,31 @@ void checkForGlobalRedefinition(Symbol sym) {
         return;
     }
     if (Env.globalEnv.safeFind(sym) !is null) {
-        throw new Exception("Redifinition of symbol is not allowed! " ~ sym);
+        throw new Exception("Redefinition of symbol is not allowed! " ~ sym);
     }
 }
 
-bool checkFulfillsPredsForValueInline(LyraObj sym) {
-    return !allowRedefine && (sym.type == symbol_id)
-        && (Env.globalEnv.safeFind(sym.symbol_val) !is null);
+bool checkFulfillsPredsForValueInline(LyraObj sym, Env env) {
+    if (!allowRedefine && (sym.type == symbol_id)) {
+        //&& (Env.globalEnv.safeFind(sym.symbol_val) !is null)
+        auto containingEnvs = env.getContainingEnvs(sym);
+        auto onlyInGlobal = true;
+
+        foreach (found; containingEnvs) {
+            //writeln(found.toStringWithoutParents);
+            onlyInGlobal = onlyInGlobal && (found == Env.globalEnv);
+        }
+
+        return onlyInGlobal;
+    } else {
+        return false;
+    }
+}
+
+void inlineValueIntoCarIfPossible(LyraObj checkValue, LyraObj exprList, LyraObj val, Env env) {
+    if (checkFulfillsPredsForValueInline(checkValue, env)) {
+        internalSetCar(exprList, val);
+    }
 }
 
 void pushOnCallStack(LyraFunc fn) {
@@ -68,9 +86,7 @@ Cons evalList(LyraObj exprList, Env env) {
     while (!exprList.isNil) {
         auto temp = eval(exprList.car, env, true);
         v ~= temp;
-        if (checkFulfillsPredsForValueInline(exprList.car)) {
-            internalSetCar(exprList, temp);
-        }
+        inlineValueIntoCarIfPossible(exprList.car, exprList, temp, env);
         exprList = exprList.next();
     }
     return list(v);
@@ -110,9 +126,7 @@ LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
     }
 
     auto temp = eval(exprList.car, env, disableTailCall);
-    if (checkFulfillsPredsForValueInline(exprList.car)) {
-        internalSetCar(exprList, temp);
-    }
+    inlineValueIntoCarIfPossible(exprList.car, exprList, temp, env);
 
     return temp;
 }
@@ -211,9 +225,7 @@ start:
                     LyraObj valExpr = bindings.car.cdr.car;
                     LyraObj val = eval(valExpr, env);
 
-                    if (checkFulfillsPredsForValueInline(valExpr)) {
-                        internalSetCar(bindings.car.cdr, val);
-                    }
+                    inlineValueIntoCarIfPossible(valExpr, bindings.car.cdr, val, env);
 
                     env.set(sym, val);
                     bindings = bindings.cdr;
@@ -235,20 +247,18 @@ start:
 
                 LyraObj valExpr = binding.cdr.car;
                 LyraObj val = eval(valExpr, env, true);
-                if (checkFulfillsPredsForValueInline(valExpr)) {
-                    binding.cdr.internalSetCar(val);
-                }
+                inlineValueIntoCarIfPossible(valExpr, binding.cdr, val, env);
 
                 env.set(sym, val);
                 auto res = evalKeepLast(expr.cdr, env, disableTailCall);
                 return res;
             case "lambda":
-                // Create the anonymous function only once.
                 auto f = evLambda(expr.cdr, env, "", false);
-                if (optimize) {
-                    expr.internalSetCar(symbol(" "));
-                    expr.internalSetCdr(list(f));
-                }
+                // TODO: This optimization is supposed to make it so the function is only created once but it does not work at all...
+                //if (optimize) {
+                //    expr.internalSetCar(symbol(" "));
+                //    expr.internalSetCdr(list(f));
+                //}
                 return f;
             case " ":
                 // Special operation which returns its input. This is not valid user code!
@@ -275,6 +285,7 @@ start:
                     return eval(expr.cdr.car, env, disableTailCall);
                 }
             case "cond":
+
                 auto cases = expr.cdr;
                 if (cases.car.type != cons_id) {
                     throw new LyraSyntaxError("cond: List expected.", callStack);
@@ -294,16 +305,15 @@ start:
                     }
 
                     auto evaluatedCondition = eval(condition, env, true);
-                    if (checkFulfillsPredsForValueInline(condition)) {
-                        internalSetCar(case0, evaluatedCondition);
-                    }
+                    inlineValueIntoCarIfPossible(condition, case0, evaluatedCondition, env);
+
                     if (!evaluatedCondition.isFalsy()) {
                         auto temp = eval(case0.cdr.car, env);
-                        if (checkFulfillsPredsForValueInline(case0.cdr.car)) {
-                            internalSetCar(case0.cdr, temp);
-                        }
+                        inlineValueIntoCarIfPossible(case0.cdr.car, case0.cdr, temp, env);
                         return eval(temp, env);
                     }
+
+                    cases = cases.cdr;
                 }
                 // No true case found, default to nil
                 return nil();

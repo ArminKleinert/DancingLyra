@@ -76,7 +76,7 @@ abstract class LyraFunc : LyraObj {
     }
 
     nothrow override string toString() {
-        return "<function " ~ name ~ ">";
+        return (_isMacro ? "<macro " : "<function ") ~ name ~ ">";
     }
 }
 
@@ -93,14 +93,14 @@ class Env {
         parents[1] = parent2;
     }
 
-   nothrow static Env globalEnv() {
+    nothrow static Env globalEnv() {
         if (_globalEnv is null) {
             _globalEnv = new Env(null, null);
         }
         return _globalEnv;
     }
 
-   nothrow static void clearGlobalEnv() {
+    nothrow static void clearGlobalEnv() {
         if (_globalEnv is null) {
             return;
         }
@@ -121,18 +121,24 @@ class Env {
         return cast(LyraObj) v;
     }
 
-    Env getContainingEnv(Symbol sym) {
-        auto v = inner.get(sym, null);
-        if (v !is null)
-            return this;
-        if (parents[0]!is null) {
-            auto temp = parents[0].getContainingEnv(sym);
-            if (temp !is null)
-                return temp;
-        } else if (parents[1]!is null) {
-            return parents[1].getContainingEnv(sym);
+    Env[] getContainingEnvs(LyraObj sym) {
+        if (sym.type != symbol_id) {
+            throw new Exception("Env.getContainingEnvs expected a symbol, but got " ~ sym.toString());
         }
-        return null;
+        return getContainingEnvs(sym.symbol_val, []);
+    }
+
+    private Env[] getContainingEnvs(Symbol sym, Env[] envs) {
+        auto v = inner.get(sym, null);
+
+        if (v !is null)
+            envs ~= this;
+        if (parents[0]!is null)
+            envs = parents[0].getContainingEnvs(sym, envs);
+        if (parents[1]!is null)
+            envs = parents[1].getContainingEnvs(sym, envs);
+
+        return envs;
     }
 
     LyraObj find(LyraObj sym) {
@@ -165,6 +171,13 @@ class Env {
 
     nothrow void set(Symbol sym, LyraObj val) {
         this[sym] = val;
+    }
+
+    string toStringWithoutParents() {
+        string s = "";
+        foreach (k; inner.byKey())
+            s ~= k ~ ":" ~ inner[k].toString() ~ ";";
+        return s;
     }
 }
 
@@ -520,7 +533,7 @@ nothrow Cons nil() {
 }
 
 nothrow bool isFalsy(LyraObj o) {
-    return o.type == cons_id || (o.type == bool_id && !o.bool_val);
+    return o.type == nil_id || (o.type == bool_id && !o.bool_val);
 }
 
 nothrow bool evaluatesToSelf(LyraObj o) {
