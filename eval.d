@@ -97,9 +97,9 @@ LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
                 eval(exprList1.car, env);
                 internalSetCar(exprList1, exprList1.cdr.car);
                 internalSetCdr(exprList1, exprList1.cdr.cdr);
-                continue;
+            } else {
+                exprList1 = exprList1.cdr;
             }
-            exprList1 = exprList1.cdr;
         }
     }
 
@@ -175,8 +175,8 @@ LyraObj evLambda(LyraObj expr, Env env, Symbol name = "", bool isMacro = false) 
             argNames = temp;
         }
     }
-    
-    auto ispure = false;
+
+    auto ispure = false; // TODO
 
     return new NonNativeLyraFunc(name, env, arity, argNames, bodyExpr, variadic, ispure, isMacro);
 }
