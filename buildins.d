@@ -90,6 +90,8 @@ void initializeGlobalEnv(Env env) {
 
     addFn("_vector-append", 2, false, true, (xs, env) {
         if (xs.car.type != vector_id) {
+            writeln(xs.car.type == symbol_id);
+            writeln(xs.car.toString());
             throw new Exception("Expected vector.");
         }
         return vector(xs.car.vector_val ~ xs.cdr.car);
@@ -113,6 +115,11 @@ void initializeGlobalEnv(Env env) {
         writeln(xs.car);
         return Cons.nil();
     });
+
+    addFn("box", 1, false, false, (xs, env) { return box(xs.car); });
+    addFn("unbox", 1, false, false, (xs, env) { return unbox(xs.car); });
+    addFn("box-set!", 2, false, false, (xs, env) { return box(xs.car); });
+
     addFn("measure", 2, false, false, (xs, env) {
         auto median(long[] arr) {
             import std.algorithm.sorting;
@@ -142,6 +149,6 @@ void initializeGlobalEnv(Env env) {
 
         return LyraObj.makeReal(median(drs) / 1000000000.0);
     });
-    
-    addFn("lyra-type-id", 1, false, true, (xs,env) { return xs.car.objtype(); });
+
+    addFn("lyra-type-id", 1, false, true, (xs, env) { return xs.car.objtype(); });
 }

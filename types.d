@@ -27,12 +27,12 @@ enum : uint {
     symbol_id = 1,
     string_id = 2,
     char_id = 3,
-    fixnum_id=4,
-    real_id=5,
-    cons_id=6,
-    func_id=7,
-    bool_id=8,
-    vector_id=9,
+    fixnum_id = 4,
+    real_id = 5,
+    cons_id = 6,
+    func_id = 7,
+    bool_id = 8,
+    vector_id = 9,
     box_id = 10
 }
 

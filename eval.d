@@ -243,7 +243,16 @@ start:
                 auto res = evalKeepLast(expr.cdr, env, disableTailCall);
                 return res;
             case "lambda":
-                return evLambda(expr.cdr, env);
+                // Create the anonymous function only once.
+                auto f = evLambda(expr.cdr, env, "", false);
+                if (optimize) {
+                    expr.internalSetCar(symbol(" "));
+                    expr.internalSetCdr(list(f));
+                }
+                return f;
+            case " ":
+                // Special operation which returns its input. This is not valid user code!
+                return expr.cdr.car;
             case "if":
                 if (expr.cdr.type() != cons_id) {
                     throw new LyraSyntaxError("Empty if.", callStack);

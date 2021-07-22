@@ -1,4 +1,5 @@
 
+
 (def-macro (begin x y) (list 'if x y y))
 
 (def-macro (comment & e) '())
@@ -14,6 +15,23 @@
 (define vector-get _vector-get)
 
 (define vector-size _vector-size)
+
+(define types (box []))
+(define (box-swap! b f) (box-set! b (f (unbox b))))
+
+(define (add-type!) (box-swap! types (lambda (x) (vector-append x '()))) (vector-size (unbox types)))
+
+(define nil-id (add-type!))
+(define symbol-id (add-type!))
+(define string-id (add-type!))
+(define char-id (add-type!))
+(define fixnum-id (add-type!))
+(define real-id (add-type!))
+(define cons-id (add-type!))
+(define func-id (add-type!))
+(define bool-id (add-type!))
+(define vector-id (add-type!))
+(define box-id (add-type!))
 
 (define (empty? xs)
   (if (vector? xs)
