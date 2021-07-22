@@ -39,7 +39,7 @@ void initializeGlobalEnv(Env env) {
     }
 
     auto comparator(string op) {
-        return "        auto arg0 = xs.car;
+        return "auto arg0 = xs.car;
         auto arg1 = xs.cdr.car;
         if (arg0.type == fixnum_id) {
             if (arg1.type == fixnum_id) {
@@ -142,4 +142,6 @@ void initializeGlobalEnv(Env env) {
 
         return LyraObj.makeReal(median(drs) / 1000000000.0);
     });
+    
+    addFn("lyra-type-id", 1, false, true, (xs,env) { return xs.car.objtype(); });
 }

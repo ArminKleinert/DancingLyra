@@ -23,18 +23,17 @@ union Val {
 }
 
 enum : uint {
-    nil_id,
-    symbol_id,
-    string_id,
-    char_id,
-    fixnum_id,
-    real_id,
-    cons_id,
-    func_id,
-    env_id,
-    bool_id,
-    vector_id,
-    box_id
+    nil_id = 0,
+    symbol_id = 1,
+    string_id = 2,
+    char_id = 3,
+    fixnum_id=4,
+    real_id=5,
+    cons_id=6,
+    func_id=7,
+    bool_id=8,
+    vector_id=9,
+    box_id = 10
 }
 
 abstract class LyraFunc : LyraObj {
