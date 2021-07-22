@@ -93,14 +93,14 @@ class Env {
         parents[1] = parent2;
     }
 
-    static Env globalEnv() {
+   nothrow static Env globalEnv() {
         if (_globalEnv is null) {
             _globalEnv = new Env(null, null);
         }
         return _globalEnv;
     }
 
-    static void clearGlobalEnv() {
+   nothrow static void clearGlobalEnv() {
         if (_globalEnv is null) {
             return;
         }

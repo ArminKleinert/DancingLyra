@@ -16,22 +16,22 @@
 
 (define vector-size _vector-size)
 
-(define types (box []))
-(define (box-swap! b f) (box-set! b (f (unbox b))))
+(define _types (box []))
+(define (box-swap! b f)(box-set! b (f (unbox b))))
 
-(define (add-type!) (box-swap! types (lambda (x) (vector-append x '()))) (vector-size (unbox types)))
+(define (add-type!) (box-swap! _types (lambda (x) (vector-append x '()))) (- (vector-size (unbox _types)) 1))
 
-(define nil-id (add-type!))
+(define nil-id    (add-type!))
 (define symbol-id (add-type!))
 (define string-id (add-type!))
-(define char-id (add-type!))
+(define char-id   (add-type!))
 (define fixnum-id (add-type!))
-(define real-id (add-type!))
-(define cons-id (add-type!))
-(define func-id (add-type!))
-(define bool-id (add-type!))
+(define real-id   (add-type!))
+(define cons-id   (add-type!))
+(define func-id   (add-type!))
+(define bool-id   (add-type!))
 (define vector-id (add-type!))
-(define box-id (add-type!))
+(define box-id    (add-type!))
 
 (define (empty? xs)
   (if (vector? xs)
@@ -41,5 +41,6 @@
 (define (id e) e)
 
 (println! (lyra-type-id 1))
+(println! fixnum-id)
 
 #t

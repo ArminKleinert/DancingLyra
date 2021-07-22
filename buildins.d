@@ -90,8 +90,6 @@ void initializeGlobalEnv(Env env) {
 
     addFn("_vector-append", 2, false, true, (xs, env) {
         if (xs.car.type != vector_id) {
-            writeln(xs.car.type == symbol_id);
-            writeln(xs.car.toString());
             throw new Exception("Expected vector.");
         }
         return vector(xs.car.vector_val ~ xs.cdr.car);
@@ -110,6 +108,18 @@ void initializeGlobalEnv(Env env) {
         }
         return LyraObj.makeFixnum(xs.car.vector_val.length);
     });
+    
+    addFn("_vector-iterate", 3, false, true, (xs,env) {
+    if (xs.car.type != vector_id || xs.cdr.cdr.car.type != func_id) {
+    throw new Exception ("Expected vector, then any, then function.");
+    }
+    auto vec = xs.car.vector_val;auto accumulator = xs.cdr.car;
+    auto fn = xs.cdr.cdr.car.func_val;
+    for (fixnum i = 0; i < vec.length; i++) {
+           accumulator = fn.call(list(accumulator, vec[i], LyraObj.makeFixnum(i)), env);
+    }
+    return accumulator;
+    });
 
     addFn("println!", 1, false, false, (xs, env) {
         writeln(xs.car);
@@ -118,7 +128,7 @@ void initializeGlobalEnv(Env env) {
 
     addFn("box", 1, false, false, (xs, env) { return box(xs.car); });
     addFn("unbox", 1, false, false, (xs, env) { return unbox(xs.car); });
-    addFn("box-set!", 2, false, false, (xs, env) { return box(xs.car); });
+    addFn("box-set!", 2, false, false, (xs, env) { boxSet(xs.car, xs.cdr.car); return xs.cdr.car; });
 
     addFn("measure", 2, false, false, (xs, env) {
         auto median(long[] arr) {
