@@ -82,9 +82,12 @@ void initializeGlobalEnv(Env env) {
     addFn(">=", 2, false, true, (xs, env) { mixin(comparator(">=")); });
 
     addFn("cons", 2, false, true, (xs, env) { return cons(xs.car, xs.cdr.car); });
-    addFn("_car", 1, false, true, (xs, env) { return xs.car.car; });
-    addFn("_cdr", 1, false, true, (xs, env) { return xs.car.cdr; });
-    //addFn("list", 0, true, (xs, env) { return xs; });
+    addFn("_car", 1, false, true, (xs, env) { if (xs.car.type != cons_id) {
+        throw new Exception("Expected Cons.");
+    }return xs.car.car; });
+    addFn("_cdr", 1, false, true, (xs, env) { if (xs.car.type != cons_id) {
+        throw new Exception("Expected Cons.");
+    }return xs.car.cdr; });
 
     addFn("vector", 0, true, true, (xs, env) { return vector(listToVector(xs)); });
 

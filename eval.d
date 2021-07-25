@@ -67,7 +67,7 @@ bool checkFulfillsPredsForValueInline(LyraObj sym, Env env) {
 
 void inlineValueIntoCarIfPossible(LyraObj checkValue, LyraObj exprList, LyraObj val, Env env) {
     if (checkFulfillsPredsForValueInline(checkValue, env)) {
-        internalSetCar(exprList, val);
+        (cast(Cons) exprList).internalSetCar( val);
     }
 }
 
@@ -111,8 +111,8 @@ LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
             // to make sure that evaluation is possible. Then delete it from the AST.
             if (evaluatesToSelf(exprList1.car)) {
                 eval(exprList1.car, env);
-                internalSetCar(exprList1, exprList1.cdr.car);
-                internalSetCdr(exprList1, exprList1.cdr.cdr);
+                (cast(Cons) exprList).internalSetCar( exprList1.cdr.car);
+                (cast(Cons) exprList).internalSetCdr( exprList1.cdr.cdr);
             } else {
                 exprList1 = exprList1.cdr;
             }
@@ -285,7 +285,6 @@ start:
                     return eval(expr.cdr.car, env, disableTailCall);
                 }
             case "cond":
-
                 auto cases = expr.cdr;
                 if (cases.car.type != cons_id) {
                     throw new LyraSyntaxError("cond: List expected.", callStack);

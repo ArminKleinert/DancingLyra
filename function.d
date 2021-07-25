@@ -10,7 +10,7 @@ class NativeLyraFunc : LyraFunc {
     private const LyraObj delegate(Cons, Env) fnBody;
     this(string name, int minargs, int maxargs, bool variadic, bool ispure,
             LyraObj delegate(Cons, Env) fnBody) {
-        super(name, minargs, maxargs, variadic, false, ispure);
+        super(name, minargs, maxargs, variadic, false, ispure, unknown_id);
         this.fnBody = fnBody;
 
     }
@@ -32,7 +32,7 @@ class NonNativeLyraFunc : LyraFunc {
 
     this(Symbol name, Env definitionEnv, int argc, Cons argNames, LyraObj bodyExpr,
             bool variadic, bool ispure, bool isMacro) {
-        super(name, argc, variadic ? int.max : argc, variadic, isMacro, ispure);
+        super(name, argc, variadic ? int.max : argc, variadic, isMacro, ispure, unknown_id);
         this.definitionEnv = definitionEnv;
         this.argNames = argNames;
         this.bodyExpr = bodyExpr;

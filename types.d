@@ -20,6 +20,7 @@ union Val {
     bool bool_val;
     Vector vector_val;
     LyraObj boxed_val;
+    Cons lazy_args_val;
 }
 
 enum : uint {
@@ -33,7 +34,10 @@ enum : uint {
     func_id = 7,
     bool_id = 8,
     vector_id = 9,
-    box_id = 10
+    box_id = 10,
+lazy_id = 11,
+
+unknown_id = uint.max
 }
 
 abstract class LyraFunc : LyraObj {
@@ -43,14 +47,16 @@ abstract class LyraFunc : LyraObj {
     protected const int maxargs;
     protected const bool variadic;
     private const bool _ispure;
+    private const uint _expectedType;
 
-    nothrow this(Symbol name, int minargs, int maxargs, bool variadic, bool isMacro, bool ispure) {
+    nothrow this(Symbol name, int minargs, int maxargs, bool variadic, bool isMacro, bool ispure, uint _expectedType) {
         this.name = name;
         this.minargs = minargs;
         this.maxargs = maxargs;
         this.variadic = variadic;
         this._isMacro = isMacro;
         this._ispure = ispure;
+        this._expectedType = _expectedType;
     }
 
     nothrow bool ispure() {
@@ -68,6 +74,8 @@ abstract class LyraFunc : LyraObj {
     nothrow int maxArgs() {
         return maxargs;
     }
+
+    nothrow uint expectedType() {return _expectedType;}
 
     abstract LyraObj call(Cons args, Env callEnv);
 
@@ -185,20 +193,14 @@ class LyraObj {
     private static LyraObj ly_true = null;
     private static LyraObj ly_false = null;
 
-    alias value this;
-
-    uint _type = 0;
+    private uint _type = 0;
     Val value = {bool_val: false};
 
     @nogc nothrow public uint type() {
-        if (_type >= 1000)
-            return _type - 1000;
         return _type;
     }
 
     nothrow public LyraObj objtype() {
-        if (_type >= 1000)
-            return makeFixnum(_type - 1000);
         return makeFixnum(_type);
     }
 
@@ -255,7 +257,7 @@ class LyraObj {
         Val v = {boxed_val: obj};
         if (type < 0)
             type = 0;
-        return new LyraObj(v, type + 1000);
+        return new LyraObj(v, type);
     }
 
     nothrow public static LyraObj makeEmpty() {
@@ -362,43 +364,68 @@ class Cons : LyraObj {
         return "(" ~ listToStringHelper(this) ~ ")";
     }
 
-    nothrow void internalSetCar(LyraObj v) {
+    @safe nothrow void internalSetCar(LyraObj v) {
         _car = v;
     }
 
-    nothrow void internalSetCdr(LyraObj v) {
+    @safe nothrow void internalSetCdr(LyraObj v) {
         _cdr = v;
     }
 }
+/*
+class LazyObj : LyraObj {
+    private LyraObj fn;
+    private bool _isEvaluated;
 
-nothrow void internalSetCar(LyraObj c, LyraObj val) {
-    if (c.type == cons_id)
-        c.cons_val.internalSetCar(val);
-}
+    nothrow public static LazyObj create(LyraFunc fn, Cons arguments) {
+        return new LazyObj (fn,arguments);
+    }
 
-nothrow void internalSetCdr(LyraObj c, LyraObj val) {
-    if (c.type == cons_id)
-        c.cons_val.internalSetCdr(val);
+     @nogc nothrow LyraObj getValue() {
+        return value.boxed_val;
+    }
+
+    @safe @nogc nothrow public bool isEvaluated() {
+        return _isEvaluated;
+    }
+
+     nothrow LazyObj evaluated(LyraObj o){value.boxed_val = o; return this;}
+
+    @safe nothrow private this(LyraFunc fn, Cons arguments) {
+        this.fn = fn;
+        Val v = {boxed_val : arguments};
+        this.value = v;
+        this._isEvaluated = false;
+    }
+
+    override uint type() {
+        return _isEvaluated ? value.boxed_val.type() : lazy_id;
+    }
+
+    nothrow override LyraObj objtype() {
+        return LyraObj.makeFixnum(type());
+    }
 }
+*/
 
 @nogc nothrow Symbol symbol_val(LyraObj obj) {
-    return obj.symbol_val;
+    return obj.value.symbol_val;
 }
 
 @nogc nothrow LyraString string_val(LyraObj obj) {
-    return obj.string_val;
+    return obj.value.string_val;
 }
 
 @nogc nothrow char char_val(LyraObj obj) {
-    return obj.char_val;
+    return obj.value.char_val;
 }
 
 @nogc nothrow fixnum fixnum_val(LyraObj obj) {
-    return obj.fixnum_val;
+    return obj.value.fixnum_val;
 }
 
 @nogc nothrow floating real_val(LyraObj obj) {
-    return obj.real_val;
+    return obj.value.real_val;
 }
 
 @nogc nothrow Cons cons_val(LyraObj obj) {
@@ -410,15 +437,15 @@ nothrow void internalSetCdr(LyraObj c, LyraObj val) {
 }
 
 @nogc nothrow bool bool_val(LyraObj obj) {
-    return obj.bool_val;
+    return obj.value.bool_val;
 }
 
 @nogc nothrow Vector vector_val(LyraObj obj) {
-    return obj.vector_val;
+    return obj.value.vector_val;
 }
 
 @nogc nothrow LyraObj unbox(LyraObj obj) {
-    return obj.boxed_val;
+    return obj.value.boxed_val;
 }
 
 nothrow Cons cons(LyraObj car, LyraObj cdr) {
