@@ -6,11 +6,22 @@ import std.stdio;
 import types;
 import evaluate;
 
+private string itos(ulong e) {
+    import std.conv;
+
+    return to!string(e);
+}
+
+private string itos(int e) {
+    import std.conv;
+
+    return to!string(e);
+}
+
 class NativeLyraFunc : LyraFunc {
     private const LyraObj delegate(Cons, Env) fnBody;
-    this(string name, int minargs, int maxargs, bool variadic, bool ispure,
-            LyraObj delegate(Cons, Env) fnBody) {
-        super(name, minargs, maxargs, variadic, false, ispure, unknown_id);
+    this(string name, int minargs, int maxargs, bool variadic, bool ispure, bool isMacro, LyraObj delegate(Cons, Env) fnBody) {
+        super(name, minargs, maxargs, variadic, isMacro, ispure, unknown_id);
         this.fnBody = fnBody;
 
     }

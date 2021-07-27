@@ -1,0 +1,207 @@
+(define (caar x)    (car (car x)))
+(define (cadr x)    (car (cdr x)))
+(define (cdar x)    (cdr (car x)))
+(define (cddr x)    (cdr (cdr x)))
+(define (caaar x)   (car (car (car x))))
+(define (caadr x)   (car (car (cdr x))))
+(define (cadar x)   (car (cdr (car x))))
+(define (caddr x)   (car (cdr (cdr x))))
+(define (cdaar x)   (cdr (car (car x))))
+(define (cdadr x)   (cdr (car (cdr x))))
+(define (cddar x)   (cdr (cdr (car x))))
+(define (cdddr x)   (cdr (cdr (cdr x))))
+(define (caaaar x)  (car (car (car (car x)))))
+(define (caaadr x)  (car (car (car (cdr x)))))
+(define (caadar x)  (car (car (cdr (car x)))))
+(define (caaddr x)  (car (car (cdr (cdr x)))))
+(define (cadaar x)  (car (cdr (car (car x)))))
+(define (cadadr x)  (car (cdr (car (cdr x)))))
+(define (caddar x)  (car (cdr (cdr (car x)))))
+(define (cadddr x)  (car (cdr (cdr (cdr x)))))
+(define (cdaaar x)  (cdr (car (car (car x)))))
+(define (cdaadr x)  (cdr (car (car (cdr x)))))
+(define (cdadar x)  (cdr (car (cdr (car x)))))
+(define (cdaddr x)  (cdr (car (cdr (cdr x)))))
+(define (cddaar x)  (cdr (cdr (car (car x)))))
+(define (cddadr x)  (cdr (cdr (car (cdr x)))))
+(define (cdddar x)  (cdr (cdr (cdr (car x)))))
+(define (cddddr x)  (cdr (cdr (cdr (cdr x)))))
+
+(define (list-empty? l) (null? l))
+
+(define (list-eql? x y)
+  (if (list? y)
+    (let* (list-eql1?
+            (lambda (l0 l1) (if (list-empty? l0)
+              (list-empty? l1)
+              (and (eql? (car l0) (car l1)) (list-eql1? (cdr l0) (cdr l1))))))
+      (list-eql1? x y))
+    #f))
+
+(define (list-nth xs index)
+  (if xs
+    (if (= index 0)
+      (car xs)
+      (list-nth (cdr xs) (- index 1)))
+    '()))
+
+(define (list-foldl f start coll)
+  (if (list-empty? coll)
+    start
+    (list-foldl f (f start (car coll)) (cdr coll))))
+
+(define (list-map f xs)
+  (if (list-empty? xs)
+    '()
+    (cons (f (car xs)) (list-map f (cdr xs)))))
+
+(define (list-filter f xs)
+  (if (list-empty? xs)
+    '()
+    (if (f (car xs))
+      (cons (car xs) (list-filter f (cdr xs)))
+      (list-filter f (cdr xs)))))
+
+(define (list-append c0 c1)
+  (if (null? c0)
+    c1
+    (cons (car c0) (list-append (cdr c0) c1))))
+
+(define (list-find-first f l)
+  (cond ((list-empty? l) '())
+        ((f (car l)) (car l))
+        (#t (list-find-first f (cdr l)))))
+
+(define (list->vector ls)
+  (foldl (lambda (v x) (_vector-append v x))
+         (vector) ls))
+
+(define (list-copy c)
+  c)
+
+(define (list-but-last c0)
+  (cond ((null? c0) '())
+        ((null? (cdr c0)) '())
+        (#t (cons (car c0) (list-but-last (cdr c0))))))
+
+(define (list-reverse xs)
+  (foldl
+    (lambda (res e) (cons e res))
+    '() xs))
+
+(define (list-map-while f p c)
+  (cond ((list-empty? c) c)
+        ((p (car c)) (cons c (list-map-while f p (cdr c))))
+        #t '()))
+
+(define (list-map-until f p c)
+  (cond ((list-empty? c) c)
+        ((p (car c)) '())
+        #t (cons c (list-map-until f p (cdr c)))))
+
+(define (list-take-while p c)
+  (if (or (list-empty? c) (not (p (car c))))
+    '()
+    (cons (car c) (list-take-while p (cdr c)))))
+
+(define (list-take-until p c)
+  (if (or (list-empty? c) (p (car c)))
+    '()
+    (cons (car c) (list-take-until p (cdr c)))))
+
+(define (list-drop-while p c)
+  (if (or (list-empty? c) (not (p (car c))))
+    c
+    (list-drop-while p (cdr c))))
+
+(define (list-drop-until p c)
+  (if (or (list-empty? c) (not (p (car c))))
+    c
+    (list-drop-until p (cdr c))))
+
+(define (list-zip c0 c1)
+  (cond ((list-empty? c0) '())
+        ((list-empty? c1) '())
+        (#t (cons (cons (car c0) (car c1)) (list-zip c0 c1)))))
+
+(add-type-fns! cons-id
+  (list
+    (cons 'empty? always-false)
+    (cons 'eql? list-eql?)
+    (cons 'nth list-nth)
+    (cons 'foldl list-foldl)
+    (cons 'map list-map)
+    (cons 'filter list-filter)
+    (cons 'append list-append)
+    (cons 'find-first list-find-first)
+    (cons '->vector list->vector)
+    (cons '->list id)
+    (cons 'copy list-copy)
+    (cons 'but-last list-but-last)
+    (cons 'reverse list-reverse)
+    (cons 'map-while list-map-while)
+    (cons 'map-until list-map-until)
+    (cons 'take-while list-take-while)
+    (cons 'take-until list-take-until)
+    (cons 'drop-while list-drop-while)
+    (cons 'drop-until list-drop-until)
+    (cons 'zip list-zip)
+    (cons 'list? always-true)
+    (cons 'vector? always-false)))
+  
+(add-type-fns! nil-id
+  (list
+    (cons 'empty? always-true)
+    (cons 'eql? (lambda (l0 l1) (= (lyra-type-id l0) (lyra-type-id l1))))
+    (cons 'nth list-nth)
+    (cons 'foldl list-foldl)
+    (cons 'map list-map)
+    (cons 'filter list-filter)
+    (cons 'append list-append)
+    (cons 'find-first list-find-first)
+    (cons '->vector list->vector)
+    (cons '->list id)
+    (cons 'copy list-copy)
+    (cons 'but-last list-but-last)
+    (cons 'reverse list-reverse)
+    (cons 'map-while list-map-while)
+    (cons 'map-until list-map-until)
+    (cons 'take-while list-take-while)
+    (cons 'take-until list-take-until)
+    (cons 'drop-while list-drop-while)
+    (cons 'drop-until list-drop-until)
+    (cons 'zip list-zip)
+    (cons 'list? always-false)
+    (cons 'vector? always-false)))
+
+#t
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -67,7 +67,7 @@ bool checkFulfillsPredsForValueInline(LyraObj sym, Env env) {
 
 void inlineValueIntoCarIfPossible(LyraObj checkValue, LyraObj exprList, LyraObj val, Env env) {
     if (checkFulfillsPredsForValueInline(checkValue, env)) {
-        (cast(Cons) exprList).internalSetCar( val);
+        (cast(Cons) exprList).internalSetCar(val);
     }
 }
 
@@ -111,8 +111,8 @@ LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
             // to make sure that evaluation is possible. Then delete it from the AST.
             if (evaluatesToSelf(exprList1.car)) {
                 eval(exprList1.car, env);
-                (cast(Cons) exprList).internalSetCar( exprList1.cdr.car);
-                (cast(Cons) exprList).internalSetCdr( exprList1.cdr.cdr);
+                (cast(Cons) exprList).internalSetCar(exprList1.cdr.car);
+                (cast(Cons) exprList).internalSetCdr(exprList1.cdr.cdr);
             } else {
                 exprList1 = exprList1.cdr;
             }
@@ -212,12 +212,12 @@ start:
                 LyraObj bindings = expr.car;
                 env = new Env(env);
                 while (!bindings.isNil) {
-                    if (bindings.car.type() != symbol_id) {
+                    LyraObj sym = bindings.car.car;
+                    if (sym.type() != symbol_id) {
                         throw new LyraSyntaxError("Invalid form for bindings for let. Name must be symbol.",
                                 callStack);
                     }
 
-                    LyraObj sym = bindings.car.car;
                     if (bindings.car.cdr.type() != cons_id) {
                         throw new LyraSyntaxError("Invalid form for bindings for let.", callStack);
                     }
@@ -256,13 +256,10 @@ start:
                 auto f = evLambda(expr.cdr, env, "", false);
                 // TODO: This optimization is supposed to make it so the function is only created once but it does not work at all...
                 //if (optimize) {
-                //    expr.internalSetCar(symbol(" "));
+                //    expr.internalSetCar(symbol("quote"));
                 //    expr.internalSetCdr(list(f));
                 //}
                 return f;
-            case " ":
-                // Special operation which returns its input. This is not valid user code!
-                return expr.cdr.car;
             case "if":
                 if (expr.cdr.type() != cons_id) {
                     throw new LyraSyntaxError("Empty if.", callStack);
@@ -317,10 +314,23 @@ start:
                 // No true case found, default to nil
                 return nil();
             case "apply":
-                // TODO
-                return nil();
+                auto fn = car(cdr(expr));
+                auto args = cdr(expr).next();
+                Vector args1 = [];
+                while (!cdr(args).isNil()) {
+                  args1 ~= args.car;
+                  args = args.next();
+                }
+                auto lastArg = eval(list(symbol("->list"), args.car),env);
+                args1 ~= listToVector(lastArg);
+                expr = cons(fn, list(args1));
+                return eval(expr, env);
             default:
-                expr = cons(env.find(expr.car), expr.cdr);
+                auto found = env.safeFind(expr.car.value.symbol_val);
+                if (found is null){
+                  throw new LyraSyntaxError("Unresolved symbol: " ~ expr.car.toString(), callStack);
+                }
+                expr = cons(found, expr.cdr);
                 goto start;
             }
         } else if (expr.car.type == cons_id) {
@@ -352,7 +362,11 @@ start:
     } else if (expr.type == vector_id) {
         return evalVector(expr, env);
     } else if (expr.type == symbol_id) {
-        return env.find(expr);
+            auto found = env.safeFind(expr.value.symbol_val);
+            if (found is null){
+            throw new LyraSyntaxError("Unresolved symbol: " ~ expr.toString(), callStack);
+            }
+        return found;
     } else {
         return expr;
     }

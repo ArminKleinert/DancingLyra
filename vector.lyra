@@ -1,0 +1,115 @@
+
+(add-type-fn! vector-id 'set-at
+  (lambda (v idx element)
+    (vector-iterate v []
+      (lambda (acc e i)
+        (if (= i idx) (vector-append acc element) (vector-append acc e))))))
+
+(add-type-fn! vector-id 'eql?
+  (lambda (v0 v1)
+    (if (vector? v1)
+      (if (&& (vector? v1) (= (vector-size v0) (vector-size v1)))
+        (vector-iterate v0 []
+          (lambda (acc e i)
+            (if (&& acc (= e (vector-get v1 i))) #t #f)))
+        #f)
+      #f)))
+
+(add-type-fn! vector-id 'foldl
+  (lambda (f x v)
+    (vector-iterate v x
+      (lambda (acc e i)
+        (f acc e)))))
+
+(add-type-fn! vector-id 'map
+  (lambda (f v) 
+    (vector-iterate v []
+      (lambda (acc e i) (_vector-append acc (f e))))))
+
+(add-type-fn! vector-id 'filter
+  (lambda (p v) 
+    (vector-iterate v []
+      (lambda (acc e i)
+        (if (p e) (_vector-append acc [e]) acc)))))
+
+(add-type-fn! vector-id 'append
+  (lambda (v v1) 
+    (vector-iterate v1 v
+      (lambda (acc e i) (_vector-append acc e)))))
+
+(add-type-fn! vector-id 'find-first
+  (lambda (p v) 
+    (vector-iterate v (cons #f '())
+      (lambda (acc e i)
+        (cond ((car acc) acc)
+              ((p e) (cons #t e))
+              (#t acc))))))
+
+(add-type-fn! vector-id '->list
+  (lambda (v)
+    (let* (iter (lambda (i nl)
+            (if (< i 0)
+              nl
+              (iter (dec i)
+                (cons (vector-get v i) nl)))))
+      (iter (dec (vector-size v)) '()))))
+
+(add-type-fn! vector-id 'but-last
+  (lambda (v)
+    (let* (last-idx (- (_vector-size v) 2))
+      (vector-iterate v []
+        (lambda (acc e i) (if (<= last-idx i) acc (_vector-append acc e)))))))
+
+(add-type-fn! vector-id 'reverse
+  (lambda (v) 
+    (let* (vlen (- (_vector-size v) 1))
+      (vector-iterate v []
+        (lambda (acc e i)
+          (vector-append acc (_vector_get v (- vlen i))))))))
+
+(add-type-fn! vector-id 'map-while
+  (lambda (f p v) 
+    ; TODO
+    '()))
+
+(add-type-fn! vector-id 'map-until
+  (lambda (f p v) 
+    ; TODO
+    '()))
+
+(add-type-fn! vector-id 'take-while
+  (lambda (p v) 
+    ; TODO
+    '()))
+
+(add-type-fn! vector-id 'take-until
+  (lambda (p v) 
+    ; TODO
+    '()))
+
+(add-type-fn! vector-id 'drop-while
+  (lambda (p v) 
+    ; TODO
+    '()))
+
+(add-type-fn! vector-id 'drop-until
+  (lambda (p v) 
+    ; TODO
+    '()))
+
+(add-type-fn! vector-id 'zip
+  (lambda (v0 v1) 
+    ; TODO
+    '()))
+
+(add-type-fns! vector-id
+  (list
+    (cons 'empty? (lambda (v) (= (vector-size v) 0)))
+    (cons 'nth (lambda (v idx) (vector-get v idx)))
+    (cons 'empty? (lambda (v) (= (vector-size v) 0)))
+    (cons '->vector id)
+    (cons 'copy id)
+    (cons 'list? always-false)
+    (cons 'vector? always-true)))
+
+#t

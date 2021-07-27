@@ -35,9 +35,9 @@ enum : uint {
     bool_id = 8,
     vector_id = 9,
     box_id = 10,
-lazy_id = 11,
+    lazy_id = 11,
 
-unknown_id = uint.max
+    unknown_id = uint.max
 }
 
 abstract class LyraFunc : LyraObj {
@@ -49,7 +49,8 @@ abstract class LyraFunc : LyraObj {
     private const bool _ispure;
     private const uint _expectedType;
 
-    nothrow this(Symbol name, int minargs, int maxargs, bool variadic, bool isMacro, bool ispure, uint _expectedType) {
+    nothrow this(Symbol name, int minargs, int maxargs, bool variadic, bool isMacro,
+            bool ispure, uint _expectedType) {
         this.name = name;
         this.minargs = minargs;
         this.maxargs = maxargs;
@@ -58,6 +59,8 @@ abstract class LyraFunc : LyraObj {
         this._ispure = ispure;
         this._expectedType = _expectedType;
     }
+    
+    nothrow Symbol getName() {return name;}
 
     nothrow bool ispure() {
         return ispure;
@@ -75,7 +78,9 @@ abstract class LyraFunc : LyraObj {
         return maxargs;
     }
 
-    nothrow uint expectedType() {return _expectedType;}
+    nothrow uint expectedType() {
+        return _expectedType;
+    }
 
     abstract LyraObj call(Cons args, Env callEnv);
 
@@ -201,7 +206,7 @@ class LyraObj {
     }
 
     nothrow public LyraObj objtype() {
-        return makeFixnum(_type);
+        return makeFixnum(type());
     }
 
     @safe nothrow public static LyraObj makeBoolean(bool e) {
@@ -275,23 +280,23 @@ class LyraObj {
     override string toString() {
         switch (type) {
         case symbol_id:
-            return this.symbol_val;
+            return this.value.symbol_val;
         case string_id:
-            return "\"" ~ this.string_val ~ "\"";
+            return "\"" ~ this.value.string_val ~ "\"";
         case char_id:
-            return ctos(this.char_val);
+            return "" ~ this.value.char_val;
         case fixnum_id:
-            return to_s(this.fixnum_val);
+            return to!string(this.value.fixnum_val);
         case real_id:
-            return to_s(this.real_val);
+            return to!string(this.value.real_val);
         case bool_id:
-            return this.bool_val ? "#t" : "#f";
+            return this.value.bool_val ? "#t" : "#f";
         case nil_id:
             return "()";
         case vector_id:
             import std.stdio;
 
-            Vector v = this.vector_val;
+            Vector v = this.value.vector_val;
             if (v.length == 0)
                 return "[]";
             string res = "[";
@@ -303,7 +308,7 @@ class LyraObj {
             res ~= "]";
             return res;
         default:
-            return "<LyraObj type=" ~ typetos(type) ~ ">";
+            return "<LyraObj type=" ~ to!string(type) ~ ">";
         }
     }
 }
@@ -524,10 +529,6 @@ nothrow Cons list(LyraObj[] xs...) {
     return list(xs);
 }
 
-nothrow LyraObj vector(Vector e) {
-    return LyraObj.makeVector(e);
-}
-
 nothrow LyraObj vector(LyraObj[] xs...) {
     return LyraObj.makeVector(xs);
 }
@@ -566,7 +567,7 @@ nothrow bool isFalsy(LyraObj o) {
 nothrow bool evaluatesToSelf(LyraObj o) {
     return o.type != cons_id;
 }
-
+/*
 string to_s(fixnum e) {
     return to!string(e);
 }
@@ -575,17 +576,10 @@ string to_s(floating e) {
     return to!string(e);
 }
 
-string itos(ulong e) {
-    return to!string(e);
-}
-
-string itos(int e) {
-    return to!string(e);
-}
-
 string ctos(char e) {
     return to!string(e);
 }
+*/
 
 string typetos(uint e) {
     return to!string(e);
