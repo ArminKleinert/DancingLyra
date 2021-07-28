@@ -21,6 +21,7 @@ union Val {
     Vector vector_val;
     LyraObj boxed_val;
     Cons lazy_args_val;
+    LyraObj[Symbol] record_val;
 }
 
 enum : uint {
@@ -311,6 +312,46 @@ class LyraObj {
             return "<LyraObj type=" ~ to!string(type) ~ ">";
         }
     }
+}
+
+// TODO Temporary code. Integration and heavy testing have to be done!
+class LyraRecord : LyraObj{
+import lyrafunction;
+
+private const LyraObj delegate(Cons, Env) constructor, typeChecker;
+
+public static void create(uint type_id, Symbol name, Env env, bool createTypeChecker,Symbol[] members...) {
+foreach (member; members){
+// Create getters
+  string getterName = name ~ "-" ~ member;
+  auto getter = new NativeLyraFunc(getterName, 1, 1, false, true, false, (xs, env) {
+  if (xs.car.type != type_id) {throw new Exception (getterName ~ " Invalid input.");}
+  return xs.car.value.record_val[member];});
+  env.set(getterName, getter);}
+
+  // The typechecker might not be necessary for types that just abstract a different
+  // type, like offset-vectors. Those can still be created the conventional way 
+  // using = and the type-id.
+  if (createTypeChecker) {
+  symbol typeCheckerName = name ~ "?";
+auto typeChecker = new NativeLyraFunc(typeCheckerName, 1, 1, false, true, false, (xs, env) {
+  return LyraObj.makeBoolean(xs.car.type != type_id) ;});
+  env.set(typeCheckerName, typeChecker);
+  }
+  
+  // Create constructor
+  auto constructor = new NativeLyraFunc(name, members.length, members.length,false,true,false,(xs,env) {
+  LyraObj[Symbol] inner;
+  foreach (m; members) {
+  inner[m] = xs.car;
+  xs = xs.cdr;
+  }
+  Val v = {record_val: inner};
+  auto obj = new LyraObj(v,type_id);
+  return obj;
+  });
+  env.set(name,constructor);
+}
 }
 
 class Cons : LyraObj {
