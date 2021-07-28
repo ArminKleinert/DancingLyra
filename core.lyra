@@ -51,17 +51,12 @@
 (define (associated xs sym)
   (if (null? xs)
     '()
-    (if (= (car (car xs)) sym) (cdr (car xs)) (associated (cdr xs) sym))))
+    (if (= (car (car xs)) sym) (car (cdr (car xs))) (associated (cdr xs) sym))))
 
 (define (find-type-fn x sym)
   (associated
     (_vector-get (unbox _types) (lyra-type-id x))
     sym))
-
-(comment define (list-append l0 l1)
-  (if l0
-    l1
-    (cons (car l1) (list-append (cdr l0) l1))))
 
 (define (add-type-fn! type sym f)
   (let* (v (unbox _types))
@@ -69,7 +64,7 @@
       (vector-set
         v type
         (cons
-          (cons sym f)
+          (list sym f)
           (_vector-get v type))))
     (unbox _types)))
 

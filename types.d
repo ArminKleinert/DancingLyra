@@ -249,7 +249,7 @@ class LyraObj {
         return new LyraObj(v, real_id);
     }
 
-    nothrow public static LyraObj makeCons(LyraObj car, LyraObj cdr) {
+    nothrow public static LyraObj makeCons(LyraObj car, Cons cdr) {
         return Cons.create(car, cdr);
     }
 
@@ -317,9 +317,9 @@ class Cons : LyraObj {
     private static Cons theEmptyList = null;
 
     private LyraObj _car = null;
-    private LyraObj _cdr = null;
+    private Cons _cdr = null;
 
-    nothrow public static Cons create(LyraObj _car, LyraObj _cdr) {
+    nothrow public static Cons create(LyraObj _car, Cons _cdr) {
         auto c = new Cons(_car, _cdr);
         return c;
     }
@@ -335,11 +335,11 @@ class Cons : LyraObj {
         return _car;
     }
 
-    @safe @nogc nothrow public LyraObj getcdr() {
+    @safe @nogc nothrow public Cons getcdr() {
         return _cdr;
     }
 
-    @safe nothrow private this(LyraObj _car, LyraObj _cdr) {
+    @safe nothrow private this(LyraObj _car, Cons _cdr) {
         this._car = _car;
         this._cdr = _cdr;
     }
@@ -373,7 +373,7 @@ class Cons : LyraObj {
         _car = v;
     }
 
-    @safe nothrow void internalSetCdr(LyraObj v) {
+    @safe nothrow void internalSetCdr(Cons v) {
         _cdr = v;
     }
 }
@@ -453,7 +453,7 @@ class LazyObj : LyraObj {
     return obj.value.boxed_val;
 }
 
-nothrow Cons cons(LyraObj car, LyraObj cdr) {
+nothrow Cons cons(LyraObj car, Cons cdr) {
     return Cons.create(car, cdr);
 }
 
@@ -463,16 +463,17 @@ nothrow Cons cons(LyraObj car, LyraObj cdr) {
     return null;
 }
 
-@nogc nothrow LyraObj cdr(LyraObj obj) {
+@nogc nothrow Cons cdr(LyraObj obj) {
     if (obj.type == cons_id)
         return (cast(Cons) obj).getcdr;
     return null;
 }
 
 nothrow Cons next(LyraObj obj) {
-    if (obj.type == cons_id || obj.type == nil_id)
-        return cast(Cons) obj.cdr;
-    return Cons.nil();
+    //if (obj.type == cons_id || obj.type == nil_id)
+    //    return cast(Cons) obj.cdr;
+    //return Cons.nil();
+    return cdr(obj);
 }
 
 @nogc nothrow bool isNil(LyraObj obj) {
