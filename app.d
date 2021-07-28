@@ -31,7 +31,7 @@ void main(string[] args) {
     }
 
     auto code = make_ast(tokenize(readText("core.lyra")));
-    writeln(evalKeepLast(code, Env.globalEnv));
+    evalKeepLast(code, Env.globalEnv);
     foreach (fname; args[1 .. $]) {
         if (fname is null)
             continue;

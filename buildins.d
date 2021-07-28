@@ -64,9 +64,8 @@ void initializeGlobalEnv(Env env) {
             ~ op ~ " arg1.string_val);
         } else if (arg0.type == symbol_id && arg1.type == symbol_id) {
             return LyraObj.makeBoolean(arg0.symbol_val " ~ op ~ " arg1.symbol_val);
-        } else if (arg0.type == vector_id && arg1.type == vector_id) {
-            return LyraObj.makeBoolean(arg0.vector_val " ~ op
-            ~ " arg1.vector_val);
+        } else if (arg0.type == char_id && arg1.type == char_id) {
+            return LyraObj.makeBoolean(arg0.char_val " ~ op ~ " arg1.char_val);
         } else {
             return LyraObj.makeBoolean(arg0 " ~ op ~ " arg1);
         }";
@@ -138,8 +137,6 @@ void initializeGlobalEnv(Env env) {
         }
         return LyraObj.makeFixnum(xs.car.vector_val.length);
     });
-
-    import std.conv : to;
 
     addFn("_vector-iterate", 3, false, true, false,(xs, env) {
         if (xs.car.type != vector_id || xs.cdr.cdr.car.type != func_id) {

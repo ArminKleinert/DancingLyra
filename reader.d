@@ -50,6 +50,20 @@ string parse_string(string token) {
     return unescaped;
 }
 
+char parse_char(string token) {
+    switch (token) {
+    case "space":
+      return ' ';
+    case "newline":
+      return '\n';
+    case "tab":
+      return '\t';
+    // TODO ...
+    default:
+      return token[0];
+    }
+}
+
 auto integer_regex = ctRegex!(r"^-?[0-9]+$");
 auto float_regex = ctRegex!(r"^-?[0-9]+\.[0-9]+$");
 auto string_regex = ctRegex!(`^"(?:\\.|[^\\"])*"$`);
@@ -92,8 +106,9 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
                 root ~= LyraObj.makeReal(to!floating(token));
             } else if (!matchFirst(token, string_regex).empty()) {
                 root ~= LyraObj.makeString(parse_string(token));
+            }else if (token.length > 2 && token[0 .. 2] == "#\\") {
+              root ~= LyraObj.makeChar(parse_char(token[2 .. $]));
             } else {
-
                 root ~= LyraObj.makeSymbol(token);
             }
             break;
