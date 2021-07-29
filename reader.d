@@ -53,14 +53,14 @@ string parse_string(string token) {
 char parse_char(string token) {
     switch (token) {
     case "space":
-      return ' ';
+        return ' ';
     case "newline":
-      return '\n';
+        return '\n';
     case "tab":
-      return '\t';
-    // TODO ...
+        return '\t';
+        // TODO ...
     default:
-      return token[0];
+        return token[0];
     }
 }
 
@@ -106,8 +106,8 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
                 root ~= LyraObj.makeReal(to!floating(token));
             } else if (!matchFirst(token, string_regex).empty()) {
                 root ~= LyraObj.makeString(parse_string(token));
-            }else if (token.length > 2 && token[0 .. 2] == "#\\") {
-              root ~= LyraObj.makeChar(parse_char(token[2 .. $]));
+            } else if (token.length > 2 && token[0 .. 2] == "#\\") {
+                root ~= LyraObj.makeChar(parse_char(token[2 .. $]));
             } else {
                 root ~= LyraObj.makeSymbol(token);
             }

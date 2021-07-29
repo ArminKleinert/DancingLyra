@@ -44,13 +44,13 @@ enum : uint {
 abstract class LyraFunc : LyraObj {
     protected const Symbol name;
     private const bool _isMacro;
-    protected const int minargs;
-    protected const int maxargs;
+    protected const uint minargs;
+    protected const uint maxargs;
     protected const bool variadic;
     private const bool _ispure;
     private const uint _expectedType;
 
-    nothrow this(Symbol name, int minargs, int maxargs, bool variadic, bool isMacro,
+    nothrow this(Symbol name, uint minargs, uint maxargs, bool variadic, bool isMacro,
             bool ispure, uint _expectedType) {
         this.name = name;
         this.minargs = minargs;
@@ -60,8 +60,10 @@ abstract class LyraFunc : LyraObj {
         this._ispure = ispure;
         this._expectedType = _expectedType;
     }
-    
-    nothrow Symbol getName() {return name;}
+
+    nothrow Symbol getName() {
+        return name;
+    }
 
     nothrow bool ispure() {
         return ispure;
@@ -71,11 +73,11 @@ abstract class LyraFunc : LyraObj {
         return _isMacro;
     }
 
-    nothrow int minArgs() {
+    nothrow uint minArgs() {
         return minargs;
     }
 
-    nothrow int maxArgs() {
+    nothrow uint maxArgs() {
         return maxargs;
     }
 
@@ -315,43 +317,49 @@ class LyraObj {
 }
 
 // TODO Temporary code. Integration and heavy testing have to be done!
-class LyraRecord : LyraObj{
-import lyrafunction;
+class LyraRecord : LyraObj {
+    import lyrafunction;
 
-private const LyraObj delegate(Cons, Env) constructor, typeChecker;
+    public static void create(uint type_id, Symbol name, Env env,
+            bool createTypeChecker, Symbol[] members...) {
+        foreach (member; members) {
+            // Create getters
+            string getterName = name ~ "-" ~ member;
+            auto getter = new NativeLyraFunc(getterName, 1, 1, false, true, false, (xs, env) {
+                if (xs.car.type != type_id) {
+                    throw new Exception(getterName ~ " Invalid input.");
+                }
+                return xs.car.value.record_val[member];
+            });
+            env.set(getterName, getter);
+        }
 
-public static void create(uint type_id, Symbol name, Env env, bool createTypeChecker,Symbol[] members...) {
-foreach (member; members){
-// Create getters
-  string getterName = name ~ "-" ~ member;
-  auto getter = new NativeLyraFunc(getterName, 1, 1, false, true, false, (xs, env) {
-  if (xs.car.type != type_id) {throw new Exception (getterName ~ " Invalid input.");}
-  return xs.car.value.record_val[member];});
-  env.set(getterName, getter);}
+        // The typechecker might not be necessary for types that just abstract a different
+        // type, like offset-vectors. Those can still be created the conventional way 
+        // using = and the type-id.
+        if (createTypeChecker) {
+            Symbol typeCheckerName = name ~ "?";
+            auto typeChecker = new NativeLyraFunc(typeCheckerName, 1, 1, false,
+                    true, false, (xs, env) {
+                return LyraObj.makeBoolean(xs.car.type != type_id);
+            });
+            env.set(typeCheckerName, typeChecker);
+        }
 
-  // The typechecker might not be necessary for types that just abstract a different
-  // type, like offset-vectors. Those can still be created the conventional way 
-  // using = and the type-id.
-  if (createTypeChecker) {
-  symbol typeCheckerName = name ~ "?";
-auto typeChecker = new NativeLyraFunc(typeCheckerName, 1, 1, false, true, false, (xs, env) {
-  return LyraObj.makeBoolean(xs.car.type != type_id) ;});
-  env.set(typeCheckerName, typeChecker);
-  }
-  
-  // Create constructor
-  auto constructor = new NativeLyraFunc(name, members.length, members.length,false,true,false,(xs,env) {
-  LyraObj[Symbol] inner;
-  foreach (m; members) {
-  inner[m] = xs.car;
-  xs = xs.cdr;
-  }
-  Val v = {record_val: inner};
-  auto obj = new LyraObj(v,type_id);
-  return obj;
-  });
-  env.set(name,constructor);
-}
+        // Create constructor
+        auto constructor = new NativeLyraFunc(name, members.length % 0xFFFFFFFF,
+                members.length % 0xFFFFFFFF, false, true, false, (xs, env) {
+            LyraObj[Symbol] inner;
+            foreach (m; members) {
+                inner[m] = xs.car;
+                xs = xs.cdr;
+            }
+            Val v = {record_val: inner};
+            auto obj = new LyraObj(v, type_id);
+            return obj;
+        });
+        env.set(name, constructor);
+    }
 }
 
 class Cons : LyraObj {

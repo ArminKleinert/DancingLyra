@@ -20,7 +20,8 @@ private string itos(int e) {
 
 class NativeLyraFunc : LyraFunc {
     private const LyraObj delegate(Cons, Env) fnBody;
-    this(string name, int minargs, int maxargs, bool variadic, bool ispure, bool isMacro, LyraObj delegate(Cons, Env) fnBody) {
+    this(string name, uint minargs, uint maxargs, bool variadic, bool ispure,
+            bool isMacro, LyraObj delegate(Cons, Env) fnBody) {
         super(name, minargs, maxargs, variadic, isMacro, ispure, unknown_id);
         this.fnBody = fnBody;
 
@@ -41,9 +42,9 @@ class NonNativeLyraFunc : LyraFunc {
     private Cons argNames;
     private LyraObj bodyExpr;
 
-    this(Symbol name, Env definitionEnv, int argc, Cons argNames, LyraObj bodyExpr,
+    this(Symbol name, Env definitionEnv, uint argc, Cons argNames, LyraObj bodyExpr,
             bool variadic, bool ispure, bool isMacro) {
-        super(name, argc, variadic ? int.max : argc, variadic, isMacro, ispure, unknown_id);
+        super(name, argc, variadic ? uint.max : argc, variadic, isMacro, ispure, unknown_id);
         this.definitionEnv = definitionEnv;
         this.argNames = argNames;
         this.bodyExpr = bodyExpr;
@@ -53,7 +54,7 @@ class NonNativeLyraFunc : LyraFunc {
         Env env = new Env(definitionEnv, callEnv);
         LyraObj result;
         Cons argNames1;
-        int argcGiven;
+        uint argcGiven;
 
     start:
 

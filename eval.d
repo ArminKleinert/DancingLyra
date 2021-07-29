@@ -318,17 +318,18 @@ start:
                 auto args = cdr(expr).next();
                 Vector args1 = [];
                 while (!cdr(args).isNil()) {
-                  args1 ~= args.car;
-                  args = args.next();
+                    args1 ~= args.car;
+                    args = args.next();
                 }
-                auto lastArg = eval(list(symbol("->list"), args.car),env);
+                auto lastArg = eval(list(symbol("->list"), args.car), env);
                 args1 ~= listToVector(lastArg);
                 expr = cons(fn, list(args1));
                 return eval(expr, env);
             default:
                 auto found = env.safeFind(expr.car.value.symbol_val);
-                if (found is null){
-                  throw new LyraSyntaxError("Unresolved symbol: " ~ expr.car.toString(), callStack);
+                if (found is null) {
+                    throw new LyraSyntaxError("Unresolved symbol: " ~ expr.car.toString(),
+                            callStack);
                 }
                 expr = cons(found, expr.cdr);
                 goto start;
@@ -362,10 +363,10 @@ start:
     } else if (expr.type == vector_id) {
         return evalVector(expr, env);
     } else if (expr.type == symbol_id) {
-            auto found = env.safeFind(expr.value.symbol_val);
-            if (found is null){
+        auto found = env.safeFind(expr.value.symbol_val);
+        if (found is null) {
             throw new LyraSyntaxError("Unresolved symbol: " ~ expr.toString(), callStack);
-            }
+        }
         return found;
     } else {
         return expr;
