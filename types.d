@@ -50,8 +50,8 @@ abstract class LyraFunc : LyraObj {
     private const bool _ispure;
     private const uint _expectedType;
 
-    nothrow this(Symbol name, uint minargs, uint maxargs, bool variadic, bool isMacro,
-            bool ispure, uint _expectedType) {
+    nothrow this(Symbol name, uint minargs, uint maxargs, bool variadic,
+            bool isMacro, bool ispure, uint _expectedType) {
         this.name = name;
         this.minargs = minargs;
         this.maxargs = maxargs;
