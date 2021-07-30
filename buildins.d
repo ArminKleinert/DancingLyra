@@ -78,6 +78,7 @@ void initializeGlobalEnv(Env env) {
     addFn("-", 2, false, true, false, (xs, env) { mixin(numbercode("-")); });
     addFn("*", 2, false, true, false, (xs, env) { mixin(numbercode("*")); });
     addFn("/", 2, false, true, false, (xs, env) { mixin(numbercode("/")); });
+    addFn("%", 2, false, true, false, (xs, env) { mixin(numbercode("%")); });
     addFn("=", 2, false, true, false, (xs, env) { mixin(comparator("==")); });
     addFn("<", 2, false, true, false, (xs, env) { mixin(comparator("<")); });
     addFn(">", 2, false, true, false, (xs, env) { mixin(comparator(">")); });
