@@ -245,28 +245,36 @@ void initializeGlobalEnv(Env env) {
     addFn("lyra-type-id", 1, false, true, false, (xs, env) {
         return xs.car.objtype();
     });
-    
+
     addFn("define-record", 2, true, false, true, (xs, env) {
         auto type_id = eval(xs.car, env);
         auto typename = xs.cdr.car;
-        
-        if (type_id.type != fixnum_id) { throw new Exception("define-record: First argument must be a type-id."); }
-        if (typename.type != symbol_id) { throw new Exception("define-record: Second argument must be a symbol."); }
-        
+
+        if (type_id.type != fixnum_id) {
+            throw new Exception("define-record: First argument must be a type-id.");
+        }
+        if (typename.type != symbol_id) {
+            throw new Exception("define-record: Second argument must be a symbol.");
+        }
+
         xs = xs.cdr.cdr;
-        
+
         Symbol[] members = [];
         while (!xs.isNil()) {
-        if (xs.car.type != symbol_id) { throw new Exception ("define-record: Name of member must be a symbol."); }
-        members ~= xs.car.symbol_val;
-        xs = xs.cdr;
+            if (xs.car.type != symbol_id) {
+                throw new Exception("define-record: Name of member must be a symbol.");
+            }
+            members ~= xs.car.symbol_val;
+            xs = xs.cdr;
         }
-        
+
         auto type = type_id.fixnum_val;
-        if (type < 0 || type > uint.max) { throw new Exception ("define-record: type id not in range 0 .. 2**32-1"); }
-        
-        LyraRecord.create(cast(uint) type, typename.symbol_val, env, members);  
-        
+        if (type < 0 || type > uint.max) {
+            throw new Exception("define-record: type id not in range 0 .. 2**32-1");
+        }
+
+        LyraRecord.create(cast(uint) type, typename.symbol_val, env, members);
+
         return Cons.nil();
     });
 }
