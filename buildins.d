@@ -189,6 +189,12 @@ void initializeGlobalEnv(Env env) {
         boxSet(xs.car, xs.cdr.car);
         return xs.cdr.car;
     });
+    
+    addFn("defined?", 1, false, false, false, (xs, env) {
+    if (xs.car.type != symbol_id) return LyraObj.makeBoolean(false);
+        auto res = env.safeFind(xs.car.symbol_val);
+        return LyraObj.makeBoolean(res !is null);
+    });
 
     addFn("measure", 2, false, false, false, (xs, env) {
         auto median(long[] arr) {

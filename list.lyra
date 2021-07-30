@@ -1,3 +1,7 @@
+(when (not (defined? 'lyra-core-list-loaded))
+
+(define lyra-core-list-loaded #t)
+
 (define (caar x)    (car (car x)))
 (define (cadr x)    (car (cdr x)))
 (define (cdar x)    (cdr (car x)))
@@ -196,34 +200,6 @@
     (list 'list? always-false)
     (list 'vector? always-false)))
 
-#t
+)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+'lyra-core-list-loaded

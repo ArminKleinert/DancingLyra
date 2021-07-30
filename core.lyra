@@ -1,3 +1,4 @@
+(define lyra-core-loaded #t)
 
 (define (load! f)
   (eval! (parse (slurp! f))))
@@ -197,5 +198,3 @@
 
 (println! (string "abc " 'def " " 1 " " 0.5 " " begin " " id " " '() " " (list 1 2 3) " " [1 2 3] " " #t " " #f))
 )
-
-#t

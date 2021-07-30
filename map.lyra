@@ -1,3 +1,8 @@
+(when (not (defined? 'lyra-core-map-loaded))
+
+(define lyra-core-map-loaded #t)
+
+
 (define seq-map-id (add-type!))
 (define-record seq-map-id seq-map keys vals)
 
@@ -51,3 +56,7 @@
   (append (seq-map (list 'a 'd) (list 1 2))
           (seq-map (list 'b 'c) (list 3 5)))))
 )
+
+)
+
+'lyra-core-map-loaded

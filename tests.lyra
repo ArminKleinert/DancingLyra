@@ -1,3 +1,8 @@
+
+(when (not (defined? 'lyra-core-tests-loaded))
+
+(define lyra-core-tests-loaded #t)
+
 ; Type-checkers
 
 (define (null?-test)
@@ -486,6 +491,8 @@
     #t #t
   ))
 
+)
+
 (println! (string "(null?-test): ............... " (null?-test)))
 (println! (string "(symbol?-test): ............. " (symbol?-test)))
 (println! (string "(string?-test): ............. " (string?-test)))
@@ -517,4 +524,5 @@
 (println! (string "(map-test): ................. " (map-test)))
 (println! "")
 
-#t
+'lyra-core-tests-loaded
+

@@ -1,4 +1,6 @@
+(when (not (defined? 'lyra-core-vector-loaded))
 
+(define lyra-core-vector-loaded #t)
 
 (define (vector-size v)
   (let* (f (find-type-fn v 'vector-size)) (if f (f v) (_vector-size v))))
@@ -281,4 +283,5 @@
     (list 'list? always-false)
     (list 'vector? always-true)))
 
-#t
+'lyra-core-vector-loaded
+)
