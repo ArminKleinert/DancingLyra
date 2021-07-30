@@ -2,22 +2,13 @@
 (define (load! f)
   (eval! (parse (slurp! f))))
 
-
-
-(def-macro (begin x y) (list 'if x y y))
-
 (def-macro (comment & e) '())
+
 (define (id e) e)
 
 (def-macro (or x y) (list 'if x #t y))
 (def-macro (and x y) (list 'if x y #f))
 (def-macro (not x) (list 'if x #f #t))
-
-
-(comment def-macro (&& & xs)
-  (if (null? xs)
-    #t
-    (list 'if (car xs) (list 'apply && (cdr xs)) #f)))
 
 (define (inc x) (+ x 1))
 (define (dec x) (- x 1))
@@ -131,6 +122,17 @@
 (define (drop-until f p x) ((find-type-fn x 'drop-until) f p x))
 (define (zip x y) ((find-type-fn x 'zip) x y))
 
+(def-macro (begin & xs)
+  (if (null? (cdr xs))
+    (car xs)
+    (list
+      'if (car xs)
+        (cons begin (cdr xs))
+        (cons begin (cdr xs)))))
+
+(def-macro (when p & xs)
+  (list 'if p (cons begin xs) '()))
+
 (define (string & xs)
   (if (empty? xs)
     ""
@@ -143,6 +145,11 @@
 (load! "vector.lyra")
 
 (comment
+
+(when #t (println! 1))
+(when #t (println! 1) (println! 2))
+(when #t (println! 1) (println! 2) (println! 3) (println! 4))
+(when #f (println! 1) (println! 2))
 
 (println! (apply vector 1 2 3 '(3 4 5)))
 (println! (apply string '(3 4 5)))

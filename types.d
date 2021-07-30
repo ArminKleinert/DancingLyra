@@ -262,6 +262,11 @@ class LyraObj {
         Val v = {vector_val: e};
         return new LyraObj(v, vector_id);
     }
+    
+    nothrow public static LyraObj makeBuffer (byte[] e){
+        Val v = {buffer_val : e};
+        return new LyraObj(v, buffer_id);
+    }
 
     nothrow public static LyraObj makeEmpty() {
         return Cons.nil();
@@ -311,7 +316,6 @@ class LyraObj {
     }
 }
 
-// TODO Temporary code. Integration and heavy testing have to be done!
 class LyraRecord : LyraObj {
     import lyrafunction;
 

@@ -167,6 +167,7 @@ LyraObj evLambda(LyraObj expr, Env env, Symbol name = "", bool isMacro = false) 
     if (!isConsOrNil(expr.car))
         throw new LyraSyntaxError("Arguments for lambda must be a cons.", callStack);
     auto argNames = expr.car.cons_val;
+    
     auto bodyExpr = expr.next;
     if (bodyExpr.type != cons_id)
         throw new LyraSyntaxError("Empty lambda body.", callStack);
@@ -188,7 +189,9 @@ LyraObj evLambda(LyraObj expr, Env env, Symbol name = "", bool isMacro = false) 
             }
             argNames = temp;
         }
+        if (argVector.length > 2) argNames = cons(argVector[0], argNames);
     }
+    
 
     auto ispure = false; // TODO
 
