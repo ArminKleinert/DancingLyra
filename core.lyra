@@ -142,10 +142,10 @@
 (load! "list.lyra")
 (load! "vector.lyra")
 
+(comment
+
 (println! (apply vector 1 2 3 '(3 4 5)))
 (println! (apply string '(3 4 5)))
-
-(comment
 
 (println! (string "(&& #t #t #t)" (&& #t #t #t)))
 (println! (string "(&& #t #t #f)" (&& #t #t #f)))
