@@ -21,6 +21,7 @@ union Val {
     Vector vector_val;
     LyraObj boxed_val;
     Cons lazy_args_val;
+    byte[] buffer_val;
     LyraObj[Symbol] record_val;
 }
 
@@ -37,6 +38,7 @@ enum : uint {
     vector_id = 9,
     box_id = 10,
     lazy_id = 11,
+    buffer_id = 12,
 
     unknown_id = uint.max
 }
@@ -259,13 +261,6 @@ class LyraObj {
     nothrow public static LyraObj makeVector(Vector e) {
         Val v = {vector_val: e};
         return new LyraObj(v, vector_id);
-    }
-
-    nothrow public static LyraObj makeWithSpecialType(uint type, LyraObj obj) {
-        Val v = {boxed_val: obj};
-        if (type < 0)
-            type = 0;
-        return new LyraObj(v, type);
     }
 
     nothrow public static LyraObj makeEmpty() {
@@ -559,10 +554,6 @@ nothrow LyraObj obj(LyraString e) {
 
 nothrow LyraObj obj(char e) {
     return LyraObj.makeChar(e);
-}
-
-nothrow LyraObj newWithType(uint type, LyraObj obj) {
-    return LyraObj.makeWithSpecialType(type, obj);
 }
 
 nothrow Cons list(Vector e) {
