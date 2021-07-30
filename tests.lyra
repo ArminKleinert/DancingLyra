@@ -215,18 +215,6 @@
     (not (vector? #f))
     #t #t
   ))
-  
-; Test empty? function
-
-(define (empty?-test)
-  (&&
-    (not (empty? '(1 2 3))) ; Expected: #f
-    (empty? '()) ; Expected: #f
-    (not (empty? [1 2 3])) ; Expected: #t
-    (empty? []) ; Expected: #t
-    ; (empty? "629") ; Expected: #f ; TODO: Test string
-    #t #t
-  ))
 
 ; Test eql? function
   
@@ -456,6 +444,16 @@
 
 ; Test collection functions
 
+(define (empty?-test)
+  (&&
+    (not (empty? '(1 2 3))) ; Expected: #f
+    (empty? '()) ; Expected: #t
+    (not (empty? [1 2 3])) ; Expected: #t
+    (empty? []) ; Expected: #t
+    ; (empty? "629") ; Expected: #f ; TODO: Test string
+    #t #t
+  ))
+
 (define (nth-test)
   (&&
     (eql? 2 (nth '(1 2 3 4 5) 1))
@@ -518,3 +516,5 @@
 (println! (string "(foldl-test): ......... " (foldl-test)))
 (println! (string "(map-test): ........... " (map-test)))
 (println! "")
+
+#t

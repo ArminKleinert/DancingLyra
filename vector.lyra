@@ -1,9 +1,133 @@
 
-(add-type-fn! vector-id 'set-at
-  (lambda (v idx element)
-    (vector-iterate v []
+
+(define (vector-size v)
+  (let* (f (find-type-fn v 'vector-size)) (if f (f v) (_vector-size v))))
+
+(define (vector-get v i)
+  (let* (f (find-type-fn v '_vector-get)) (if f (f v i) (_vector-get v i))))
+
+(define (vector-append v e)
+  (let* (f (find-type-fn v 'vector-append))
+    (if f (f v e) (_vector-append v e))))
+
+(define (vector-iterate v acc fn)
+  (let* (f (find-type-fn v 'vector-iterate))
+    (if f (f v acc fn) (_vector-iterate v acc fn))))
+
+
+
+      
+
+(define vector-pair-id (add-type!))
+(define-record vector-pair-id vector-pair x y)
+
+; TODO Tests
+(add-type-fn! vector-pair-id 'vector-size
+  (lambda (vp)
+    (+ (_vector-size (vector-pair-x vp)))))
+
+; TODO Tests
+(add-type-fn! vector-pair-id 'vector-append
+  (lambda (vp e)
+    (vector-pair (vector-pair-x vp) (vector-append (vector-pair-y vp) e))))
+
+; TODO Needs optimization
+(add-type-fn! vector-pair-id 'append
+  (lambda (vp v1)
+    (if (empty? v1)
+      vp
+      (append (->vector vp) v1))))
+
+; TODO Tests
+(add-type-fn! vector-pair-id '->vector
+  (lambda (vp) 
+    (vector-iterate (->vector (vector-pair-x vp)) (->vector (vector-pair-y vp))
+      (lambda (acc e i) (_vector-append acc e)))))
+
+; TODO Tests
+(add-type-fn! vector-pair-id 'but-last
+  (lambda (vp) 
+    (vector-pair (vector-pair-x vp) (but-last (vector-pair-y vp)))))
+
+; TODO Tests
+(add-type-fn! vector-pair-id 'foldl
+  (lambda (f x vp) 
+    (foldl f (foldl f x (vector-pair-x vp)) (vector-pair-y vp))))
+
+; TODO Tests
+(add-type-fn! vector-pair-id 'map
+  (lambda (f vp)
+    (vector-pair (map f (vector-pair-x vp)) (map f (vector-pair-y vp)))))
+
+; TODO Tests
+(add-type-fn! vector-pair-id 'reverse
+  (lambda (f vp)
+    (vector-pair (reverse (vector-pair-y vp)) (reverse (vector-pair-x vp)))))
+
+; TODO Tests
+(add-type-fn! vector-pair-id '->string
+  (lambda (vp)
+    (let ((f (lambda (s0 s1) (string s0 " " s1)))
+          (v0-s (foldl f "" (vector-pair-x vp)))
+          (v1-s (foldl f "" (vector-pair-x vp))))
+      (string "[" v0-s " " v1-s "]"))))
+
+; TODO Tests
+(add-type-fn! vector-pair-id 'find-first
+  (lambda (p vp)
+    (let* (res0 (find-first p (vector-pair-x vp)))
+      (if (null? res0)
+        (find-first p (vector-pair-y vp))
+        res0))))
+
+; TODO Tests
+(add-type-fn! vector-pair-id 'eql?
+  (lambda (v0 v1)
+    (if (vector-pair? v1)
+      (&& (eql? (vector-pair-x v0) (vector-pair-x v1))
+          (eql? (vector-pair-y v0) (vector-pair-y v1)))
+      (eql? (->vector v0) v1)))
+
+; TODO Tests
+(add-type-fns! vector-pair-id
+  (list
+    (list 'empty? (lambda (vp) (&& (empty? (vector-pair-x vp)) (empty? (vector-pair-y vp)))))
+    (list 'copy ->vector)
+    (list 'list? always-false)
+    (list 'vector? always-true)
+    
+    ; TODO All need proper implementation (Especially vector-get and nth !!!)
+    (list 'vector-set (lambda (vp i e) (vector-set (->vector vp) idx)))
+    (list 'vector-get (lambda (vp idx) (vector-get (->vector vp) idx))) ; TODO
+    (list 'nth (lambda (vp idx) (vector-get (->vector vp) idx))) ; TODO
+    (list 'set-at (lambda (vp idx e) (set-at (->vector vp) idx e))) ; TODO
+    (list 'vector-iterate (lambda (vp e f) (vector-iterate (->vector vp) e f))) ; TODO
+    (list 'vector-get (lambda (vp idx) (vector-get (->vector vp) idx))) ; TODO
+    (list 'filter (lambda (p vp) (filter p (->vector vp)))) ; TODO
+    (list 'map-while (lambda (f p vp) (map-while f p (->vector vp)))) ; TODO
+    (list 'map-until (lambda (f p vp) (map-until f p (->vector vp)))) ; TODO
+    (list 'take-while (lambda (p vp) (take-while f p (->vector vp)))) ; TODO
+    (list 'take-until (lambda (p vp) (take-until f p (->vector vp)))) ; TODO
+    (list 'drop-while (lambda (p vp) (drop-while f p (->vector vp)))) ; TODO
+    (list 'drop-until (lambda (p vp) (drop-until f p (->vector vp)))) ; TODO
+    (list 'zip (lambda (vp v1) (zip (->vector vp) v1))) ; TODO
+    (list '->list (lambda (vp) (->list (->vector vp)))) ; TODO
+    ))
+    
+    
+    
+
+(add-type-fn! vector-id 'vector-get _vector-get)
+(add-type-fn! vector-id 'vectord-iterate _vector-iterate)
+(add-type-fn! vector-id 'vector-append _vector-append)
+
+(define (_vector-set v idx element)
+  (vector-iterate v []
       (lambda (acc e i)
-        (if (= i idx) (vector-append acc element) (vector-append acc e))))))
+        (if (= i idx) (vector-append acc element) (vector-append acc e)))))
+
+(add-type-fn! vector-id 'vector-set _vector-set)
+(add-type-fn! vector-id 'set-at _vector-set)
 
 (add-type-fn! vector-id 'eql?
   (lambda (v0 v1)
@@ -11,7 +135,7 @@
       (if (&& (vector? v1) (= (vector-size v0) (vector-size v1)))
         (vector-iterate v0 []
           (lambda (acc e i)
-            (if (&& acc (= e (vector-get v1 i))) #t #f)))
+            (if (&& acc (= e (nth v1 i))) #t #f)))
         #f)
       #f)))
 
@@ -34,19 +158,27 @@
         (if (p e) (_vector-append acc [e]) acc)))))
 
 ; TODO Tests
-(add-type-fn! vector-id 'append
+(comment add-type-fn! vector-id 'append
   (lambda (v v1) 
     (vector-iterate (->vector v1) v
       (lambda (acc e i) (_vector-append acc e)))))
 
 ; TODO Tests
+(add-type-fn! vector-id 'append
+  (lambda (v v1)
+    (cond ((empty? v) v1)
+          ((empty? v1) v)
+          (#t (vector-pair v (->vector v1))))))
+
+; TODO Tests
 (add-type-fn! vector-id 'find-first
   (lambda (p v) 
-    (vector-iterate v (cons #f '())
-      (lambda (acc e i)
-        (cond ((car acc) acc)
-              ((p e) (cons #t e))
-              (#t acc))))))
+    (car (cdr
+      (vector-iterate v (cons #f '())
+        (lambda (acc e i)
+          (cond ((car acc) acc)
+                ((p e) (cons #t e))
+                (#t acc))))))))
 
 ; TODO Tests
 (add-type-fn! vector-id '->list
@@ -125,10 +257,12 @@
 (add-type-fn! vector-id 'zip
   (lambda (v0 v1) 
     ; TODO
+    ; Note: First use ->vector on v1
     '()))
 
 (add-type-fns! vector-id
   (list
+    (list 'vector-size (lambda (v) (_vector-size v)))
     (list 'empty? (lambda (v) (= (vector-size v) 0)))
     (list 'nth (lambda (v idx) (vector-get v idx)))
     (list '->vector id)

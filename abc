@@ -1,0 +1,148 @@
+(add-type-fn! vector-id 'vector-size _vector-size)
+
+(add-type-fn! vector-id 'vector-get _vector-get)
+
+(add-type-fn! vector-id 'vectord-iterate _vectord-iterate)
+
+(add-type-fn! vector-id 'set-at
+  (lambda (v idx element)
+    (vector-iterate v []
+      (lambda (acc e i)
+        (if (= i idx) (vector-append acc element) (vector-append acc e))))))
+
+(add-type-fn! vector-id 'eql?
+  (lambda (v0 v1)
+    (if (vector? v1)
+      (if (&& (vector? v1) (= (vector-size v0) (vector-size v1)))
+        (vector-iterate v0 []
+          (lambda (acc e i)
+            (if (&& acc (= e (nth v1 i))) #t #f)))
+        #f)
+      #f)))
+
+(add-type-fn! vector-id 'foldl
+  (lambda (f x v)
+    (vector-iterate v x
+      (lambda (acc e i)
+        (f acc e)))))
+
+(add-type-fn! vector-id 'map
+  (lambda (f v) 
+    (vector-iterate v []
+      (lambda (acc e i) (_vector-append acc (f e))))))
+
+; TODO Tests
+(add-type-fn! vector-id 'filter
+  (lambda (p v) 
+    (vector-iterate v []
+      (lambda (acc e i)
+        (if (p e) (_vector-append acc [e]) acc)))))
+
+; TODO Tests
+(comment add-type-fn! vector-id 'append
+  (lambda (v v1) 
+    (vector-iterate (->vector v1) v
+      (lambda (acc e i) (_vector-append acc e)))))
+
+(add-type-fn! vector-id 'append
+  (lambda (v v1) ¨
+    (vector-pair v (->vector v1))))
+
+; TODO Tests
+(add-type-fn! vector-id 'find-first
+  (lambda (p v) 
+    (car (cdr
+      (vector-iterate v (cons #f '())
+        (lambda (acc e i)
+          (cond ((car acc) acc)
+                ((p e) (cons #t e))
+                (#t acc))))))))
+
+; TODO Tests
+(add-type-fn! vector-id '->list
+  (lambda (v)
+    (let* (iter (lambda (i nl)
+            (if (< i 0)
+              nl
+              (iter (dec i)
+                (cons (vector-get v i) nl)))))
+      (iter (dec (vector-size v)) '()))))
+
+; TODO Tests
+(add-type-fn! vector-id 'but-last
+  (lambda (v)
+    (let* (last-idx (- (_vector-size v) 2))
+      (vector-iterate v []
+        (lambda (acc e i) (if (<= last-idx i) acc (_vector-append acc e)))))))
+
+; TODO Tests
+(add-type-fn! vector-id 'reverse
+  (lambda (v) 
+    (let* (vlen (- (_vector-size v) 1))
+      (vector-iterate v []
+        (lambda (acc e i)
+          (vector-append acc (_vector_get v (- vlen i))))))))
+
+; TODO Tests
+(add-type-fn! vector-id 'map-while
+  (lambda (f p v)
+    (vector-iterate v '([] #f)
+      (lambda (acc e i)
+        (if (car (cdr acc))
+          acc
+          (if (p e)
+            (list (_vector-append acc (f e)) #f)
+            (list acc #t)))))))
+
+; TODO Tests
+(add-type-fn! vector-id 'map-until
+  (lambda (f p v)
+    (map-while f (lambda (e) (not (p e))) v)))
+
+; TODO Tests
+(add-type-fn! vector-id 'take-while
+  (lambda (p v)
+    (vector-iterate v '([] #f)
+      (lambda (acc e i)
+        (if (car (cdr acc))
+          acc
+          (if (p e)
+            (list (_vector-append acc e) #f)
+            (list acc #t)))))))
+
+; TODO Tests
+(add-type-fn! vector-id 'take-until
+  (lambda (p v)
+    (take-while (lambda (e) (not (p e))) v)))
+
+; TODO Tests
+(add-type-fn! vector-id 'drop-while
+  (lambda (p v)
+    (vector-iterate v '([] #t)
+      (lambda (acc e i)
+        (if (car (cdr acc))
+          (if (p e)
+            (list (_vector-append acc e) #t)
+            (list acc #f))
+          acc)))))
+
+; TODO Tests
+(add-type-fn! vector-id 'drop-until
+  (lambda (p v)
+    (drop-while (lambda (e) (not (p e))) v)))
+
+; TODO Tests
+(add-type-fn! vector-id 'zip
+  (lambda (v0 v1) 
+    ; TODO
+    '()))
+
+(add-type-fns! vector-id
+  (list
+    (list 'vector-size _vector-size)
+    (list 'empty? (lambda (v) (= (vector-size v) 0)))
+    (list 'nth (lambda (v idx) (vector-get v idx)))
+    (list '->vector id)
+    (list 'copy id)
+    (list 'list? always-false)
+    (list 'vector? always-true)))

@@ -29,6 +29,35 @@ void main(string[] args) {
             break;
         }
     }
+    
+    /*
+    LyraRecord.create(15, "vector-pair", Env.globalEnv(),
+            true, ["a","b"]);
+    writeln(Env.globalEnv().toStringWithoutParents());
+    
+    auto testcode = "(vector-pair 1 2)";
+    auto code = make_ast(tokenize(testcode));
+    
+    auto lr = evalKeepLast(code,  Env.globalEnv());
+    
+    testcode = "vector-pair-a";
+    code = make_ast(tokenize(testcode));
+    auto a = evalKeepLast(code, Env.globalEnv());
+    writeln(a.toString());
+    writeln(evalKeepLast(list(list(a, lr)), Env.globalEnv()));
+    
+    testcode = "vector-pair-b";
+    code = make_ast(tokenize(testcode));
+    writeln(evalKeepLast(code, Env.globalEnv()));
+    
+    testcode = "(vector-pair-a (vector-pair 1 2 ))";
+    code = make_ast(tokenize(testcode));
+    writeln(evalKeepLast(code, Env.globalEnv()));
+    
+    testcode = "(vector-pair-b (vector-pair 1 2 ))";
+    code = make_ast(tokenize(testcode));
+    writeln(evalKeepLast(code, Env.globalEnv()));
+    */
 
     auto code = make_ast(tokenize(readText("core.lyra")));
     evalKeepLast(code, Env.globalEnv);

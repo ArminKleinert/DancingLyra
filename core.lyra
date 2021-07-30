@@ -32,15 +32,6 @@
 (define first car)
 (define rest cdr)
 
-(define vector-append _vector-append)
-(define vector-get _vector-get)
-(define vector-size _vector-size)
-(define vector-iterate _vector-iterate)
-(define (vector-set v idx xyz)
-  (_vector-iterate v []
-    (lambda (acc e i)
-      (if (= i idx) (_vector-append acc xyz) (_vector-append acc e)))))
-
 (define _types (box []))
 (define (box-swap! b f)(box-set! b (f (unbox b))))
 
@@ -57,31 +48,38 @@
   (associated
     (_vector-get (unbox _types) (lyra-type-id x))
     sym))
+    
+(let* (vector-set (lambda (v idx xyz)
+  (_vector-iterate v []
+    (lambda (acc e i)
+      (if (= i idx) (_vector-append acc xyz) (_vector-append acc e))))))
 
-(define (add-type-fn! type sym f)
-  (let* (v (unbox _types))
-    (box-set! _types
-      (vector-set
-        v type
-        (cons
-          (list sym f)
-          (_vector-get v type))))
-    (unbox _types)))
-
-(define (add-type-fns! type sym-to-f-list)
-  (let* (list-append1
-          (lambda (l0 l1)
-            (if (null? l0)
-              l1
-              (cons (car l0) (list-append1 (cdr l0) l1)))))
+  (define (add-type-fn! type sym f)
     (let* (v (unbox _types))
       (box-set! _types
         (vector-set
           v type
-          (list-append1
-            sym-to-f-list
+          (cons
+            (list sym f)
             (_vector-get v type))))
-      (unbox _types))))
+      type))
+
+  (define (add-type-fns! type sym-to-f-list)
+    (println! type)
+    (let* (list-append1
+            (lambda (l0 l1)
+              (if (null? l0)
+                l1
+                (cons (car l0) (list-append1 (cdr l0) l1)))))
+      (let* (v (unbox _types))
+        (box-set! _types
+          (vector-set
+            v type
+            (list-append1
+              sym-to-f-list
+              (_vector-get v type))))
+        type)))
+)
 
 (define nil-id    (add-type!))
 (define symbol-id (add-type!))

@@ -192,7 +192,7 @@ class Env {
     string toStringWithoutParents() {
         string s = "";
         foreach (k; inner.byKey())
-            s ~= k ~ ":" ~ inner[k].toString() ~ ";";
+            s ~= k ~ ": " ~ inner[k].toString() ~ ";\n";
         return s;
     }
 }
@@ -319,32 +319,31 @@ class LyraObj {
 // TODO Temporary code. Integration and heavy testing have to be done!
 class LyraRecord : LyraObj {
     import lyrafunction;
+    
+    private static void createAndAddGetter(uint type_id, Symbol typename, Symbol memberName, Env env) {
+      // Create getters
+      string getterName = typename ~ "-" ~ memberName;
+      auto getter = new NativeLyraFunc(getterName, 1, 1, false, true, false, (xs, env) {
+          if (xs.car.type != type_id) {
+              throw new Exception(getterName ~ ": Invalid input.");
+          }
+          return xs.car.value.record_val[memberName];
+      });
+      env.set(getterName, getter);
+    }
 
-    public static void create(uint type_id, Symbol name, Env env,
-            bool createTypeChecker, Symbol[] members...) {
-        foreach (member; members) {
+    public static void create(uint type_id, Symbol name, Env env,Symbol[] members) {
             // Create getters
-            string getterName = name ~ "-" ~ member;
-            auto getter = new NativeLyraFunc(getterName, 1, 1, false, true, false, (xs, env) {
-                if (xs.car.type != type_id) {
-                    throw new Exception(getterName ~ " Invalid input.");
-                }
-                return xs.car.value.record_val[member];
-            });
-            env.set(getterName, getter);
+        foreach (member; members) {
+            createAndAddGetter(type_id,name, member, env);
         }
 
-        // The typechecker might not be necessary for types that just abstract a different
-        // type, like offset-vectors. Those can still be created the conventional way 
-        // using = and the type-id.
-        if (createTypeChecker) {
             Symbol typeCheckerName = name ~ "?";
             auto typeChecker = new NativeLyraFunc(typeCheckerName, 1, 1, false,
                     true, false, (xs, env) {
                 return LyraObj.makeBoolean(xs.car.type != type_id);
             });
             env.set(typeCheckerName, typeChecker);
-        }
 
         // Create constructor
         auto constructor = new NativeLyraFunc(name, members.length % 0xFFFFFFFF,
