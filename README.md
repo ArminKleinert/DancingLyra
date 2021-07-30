@@ -30,6 +30,9 @@ Development on this port will be slow because life is a thing.
   - Build in a stack limit which can be adjusted in the future
   - define for variables works
   - eval function gives warnings for invalid forms.
+- 0.0.02
+  - Functions can now be called with different behaviours for different types.
+  - User-defined types are now available
 
 ## Usage
 
@@ -73,59 +76,52 @@ In my tests, ldc with -O3 was 30% faster, but took 50% longer to compile.
 ```
 Name           | Arity | Description
 ---------------+-------+-------------------------------------------------------------
-p+             | 2     | Addition (numbers)
-p-             | 2     | Subtraction (numbers)
-p*             | 2     | Multiplication (numbers)
-p/             | 2     | Division (numbers)
-p%             | 2     | Modulo (numbers)
++              | 2     | Addition (numbers)
+-              | 2     | Subtraction (numbers)
+*              | 2     | Multiplication (numbers)
+/              | 2     | Division (numbers)
+%              | 2     | Modulo (numbers)
                |       | 
-p&             | 2     | Bitwise and (integers)
-p|             | 2     | Bitwise or (integers)
-p<<            | 2     | Bitwise shift left (integers)
-p>>            | 2     | Bitwise shift right (integers)
-               |       | 
-p=             | 2     | Equality (atoms)
-p<             | 2     | Less than (numbers)
-p>             | 2     | Greater than (numbers)
+=              | 2     | Equality (atoms)
+<              | 2     | Less than (numbers and strings)
+>              | 2     | Greater than (numbers and strings)
+<=             | 2     | Less than or equal (numbers and strings)
+>=             | 2     | Greater than equal (numbers and strings)
                |       | 
 cons           | 2     | Creates a new cons
-car            | 1     | Gets the car of a cons. Undefined for other types.
-cdr            | 1     | Gets the cdr of a cons. Undefined for other types.
+_car           | 1     | Gets the car of a cons.
+_cdr           | 1     | Gets the cdr of a cons.
                |       | 
 vector         | any   | Returns its arguments as a vector.
-vector-nth     | 2     | Returns an element from a vector.
-vector-set     | 3     | Sets an element of a vector without mutating.
-vector-append  | 2     | Appends an element to a vector without mutating.
-vector-iterate | 2     | Quickly iterates a vector.
-vector-size    | 1     | Returns the size of a vector
+_vector-get    | 2     | Returns an element from a vector.
+_vector-set    | 3     | Sets an element of a vector without mutating.
+_vector-append | 2     | Appends an element to a vector without mutating.
+_vector-iterate| 2     | Quickly iterates a vector.
+_vector-size   | 1     | Returns the size of a vector
                |       | 
 int            | 1     | Returns a cons. The car is the converted element as an int. 
-               |       | The cdr is an error message if the conversion failed. 
-float          | 1     | Same as int but tries to convert to a float.
+               |       | The cdr is an error message if the conversion failed. (Not implemented)
+float          | 1     | Same as int but tries to convert to a float. (Not implemented)
 string         | 1     | Returns the string representation of a variable.
-bool           | 1     | Converts #f and '() into #f and anything else into #t.
+bool           | 1     | Converts #f and '() into #f and anything else into #t. (Not implemented)
                |       | 
 box            | 1     | Creates a new box. This type makes mutation possible.
 unbox          | 1     | Returns the contents of a box.
 box-set!       | 2     | Sets the contents of a box.
                |       | 
-open!          | 2     | Opens a file stream.
-close!         | 1     | Closes a file stream.
-stream-seek!   | 2     | Set a stream to a given position.
-sread!         | 1     | Reads from a stream. (stdin or file)
-sprint!        | 2     | Writes to a stream. (stdout, stderr or file)
+open!          | 2     | Opens a file stream. (Not implemented)
+close!         | 1     | Closes a file stream. (Not implemented)
+stream-seek!   | 2     | Set a stream to a given position. (Not implemented)
+sread!         | 1     | Reads from a stream. (stdin or file) (Not implemented)
+sprint!        | 2     | Writes to a stream. (stdout, stderr or file) (Not implemented)
 slurp!         | 1     | Reads a whole file into string.
 parse          | 1     | Parses a string into lyra types.
 eval!          | 1     | Evaluates a piece of lyra using the compiler's internal
                |       | "eval" function.
                |       | 
-plist          | any   | Creates a new list but sets its type to the first parameter
-               |       | (int). At least one parameter is required.
-pcons          | 3     | Creates a new cons but sets its type to the first parameter
-               |       | (int).
-pvector        | any   | Creates a new vector but sets its type to the first parameter
-               |       | (int). At least one parameter is required.
 lyra-type-id   | 1     | Returns the type id of its argument.
+measure        | 2     | Measures the median time for n runs of a function f in milliseconds.
+define-record  | 2     | Define a new type (Explained far below).
 ```
 
 ## Core library function
@@ -133,30 +129,14 @@ lyra-type-id   | 1     | Returns the type id of its argument.
 ```
 Name           | Arity | Description
 ---------------+-------+-------------------------------------------------------------
-+              | any   | Addition
--              | any   | Subtraction
-*              | any   | Multiplication
-/              | any   | Division
-%              | any   | Modulo
 inc            | 1     |
 dec            | 1     |
-               |       | 
-&              | 2     | Bitwise and (integers)
-|              | 2     | Bitwise or (integers)
-<<             | 2     | Bitwise shift left (integers)
->>             | 2     | Bitwise shift right (integers)
-               |       | 
-=              | any   | Equality
-<              | any   | Less than
-<=             | any   | Less than or equal
->              | any   | Greater than
->=             | any   | Greater than or equal
                |       | 
 and            | 2     | Logic and
 or             | 2     | Logic or
 not            | 2     | Logic not
                |       | 
-nil?           | 1     | Check whether the value is an int.
+null?          | 1     | Check whether the value is an nil.
 atom?          | 1     | Check whether the value is not a cons, not a string and not
                |       | a vector.
 int?           | 1     | Check whether the value is an int.
@@ -166,17 +146,10 @@ string?        | 1     | Check whether the value is a string.
 list?          | 1     | Check whether the value is a list.
 cons?          | 1     | Check whether the value is a cons.
 vector?        | 1     | Check whether the value is a vector.
+eql?           | 2     | Check for equality of two objects.
                |       | 
 nth            | 2     | Get the nth element of a collection.
-first          | 1     | Get the first element of a collection.
-second         | 1     | Get the second element of a collection.
-third          | 1     | Get the third element of a collection.
-rest           | 1     | Get all but the first element of a collection.
-rrest          | 1     | Short for (rest (rest xs))
-ffirst         | 1     | Short for (first (first xs)
-sfirst         | 1     | Short for (second (first xs)
-rfirst         | 1     | Short for (rest (first xs)
-length         | 1     | Get the length of a collection
+length         | 1     | Get the length of a collection.
                |       | 
 begin          | 2     | Run two expressions and return the result of the second.
                |       | 
@@ -189,12 +162,12 @@ import!        | 1     | Alias for load!
 map            | 2     | Apply a function to each element of a list and return the new
                |       | list.
 foldl          | 3     | 
-foldl1         | 2     | 
 foldr          | 3     | 
 filter         | 2     | Filter a collection by predicate.
                |       | 
-print!         | 1     | 
 println!       | 1     | 
+
+// TODO: This list needs updating
 ```
 
 ## Examples
@@ -237,4 +210,46 @@ Here is a sample definition for `load!` and `foldl`.
 ; Example usage of foldl: Sum all the elements of a list.
 (define (sum xs)
   (foldl + 0 xs))
+```
+
+## Different functions on different types
+
+With `add-type-fn!`, the user can set a function's behaviour for a given type:
+```
+(add-type-fn! list-id 'empty? null?)
+(add-type-fn! vector-id 'empty? (lambda (v) (= (vector-size v) 0)))
+```
+
+Lists and vectors now use different implementations for `empty?`. The `empty?` function itself should now be implemented as  
+`(define (empty? c) ((find-type-fn c 'empty?) c))`  
+Which means that `empty?` will do a lookup for an implementation for `empty?` for the type of `c`. If it is found, the function is called with `c` as its input.  
+
+To define a function with a default behaviour (for example a type-checker), you can define it as
+`(define (vector? e) (let* (f (find-type-fn e 'vector?)) (if f (f e) #f)))`  
+This means that if the function `vector?` is defined for the type of `e`, that implementation is used. If it is not found, `#f` is returned as the default output.  
+
+## User-defined types
+
+To define a new type, Lyra provides the functions `add-type!`, `define-record`, `add-type-fn!` and `find-type-fn`.  
+```
+(define offset-vector-id (add-type!)) ; add-type! returns a new id
+
+; This automatically generates the functions (offset-vector start end vec), (offset-vector? e), (offset-vector-start e), (offset-vector-end e) and (offset-vector-vec e)
+(define-record offset-vector-id offset-vector start end vec)
+
+; Example:
+(let* (ov (offset-vector 1 3 [1 2 3 4 5 6]))
+  (offset-vector? ov) ; -> #t
+  (offset-vector-start ov) ; -> 1
+  (offset-vector-end ov) ; -> 3
+  (offset-vector-vec ov) ; -> [1 2 3 4 5 6]
+  )
+
+; Now we can define some new functions for this type:
+(add-type-fn! offset-vector-id 'vector? (lambda (ov) #t)) ; An offset-vector is a vector
+
+(add-type-fn! offset-vector-id 'empty?
+  (lambda (ov) (and (= (offset-vector-start ov) 0) (= (offset-vector-end ov) 0))))
+
+...
 ```
