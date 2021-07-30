@@ -297,7 +297,7 @@ class LyraObj {
         case nil_id:
             return "()";
         case vector_id:
-            import std.stdio;
+            //import std.stdio;
 
             Vector v = this.value.vector_val;
             if (v.length == 0)

@@ -15,7 +15,11 @@
     (if f (f v acc fn) (_vector-iterate v acc fn))))
 
 
+; --------------------------------------------------
 
+
+
+; --------------------------------------------------
       
 
 (define vector-pair-id (add-type!))
@@ -69,8 +73,8 @@
   (lambda (vp)
     (let ((f (lambda (s0 s1) (string s0 " " s1)))
           (v0-s (foldl f "" (vector-pair-x vp)))
-          (v1-s (foldl f "" (vector-pair-x vp))))
-      (string "[" v0-s " " v1-s "]"))))
+          (v1-s (foldl f "" (vector-pair-y vp))))
+      (string "[" v0-s v1-s "]"))))
 
 ; TODO Tests
 (add-type-fn! vector-pair-id 'find-first
@@ -86,7 +90,7 @@
     (if (vector-pair? v1)
       (&& (eql? (vector-pair-x v0) (vector-pair-x v1))
           (eql? (vector-pair-y v0) (vector-pair-y v1)))
-      (eql? (->vector v0) v1)))
+      (eql? (->vector v0) v1))))
 
 ; TODO Tests
 (add-type-fns! vector-pair-id
@@ -115,11 +119,18 @@
     ))
     
     
+; --------------------------------------------------
+    
     
 
 (add-type-fn! vector-id 'vector-get _vector-get)
 (add-type-fn! vector-id 'vectord-iterate _vector-iterate)
 (add-type-fn! vector-id 'vector-append _vector-append)
+
+(comment define (vector->string v)
+  (vector-iterate v ""
+    (lambda (acc e i)
+      (string acc (->string e) (if (< i (- (vector-size v) 1)) " " "")))))
 
 (define (_vector-set v idx element)
   (vector-iterate v []

@@ -1,0 +1,52 @@
+(define seq-map-id (add-type!))
+(define-record seq-map-id seq-map keys vals)
+
+(define (get m k) ((find-type-fn m 'get) m k))
+
+(let* (seq-map-get
+       (lambda (k keys vals)
+        (cond ((empty? (keys m)) '())
+              ((eql? k (car (keys m))) (car (vals m)))
+              (#t (seq-map-get k (cdr keys) (cdr vals))))))
+  (add-type-fn! seq-map-id 'get
+    (lambda (m k)
+      (seq-map-get k (seq-map-keys m) (seq-map-vals m))))
+)
+
+(add-type-fn! seq-map-id 'add
+  (lambda (m0 k v)
+    (seq-map
+      (cons k (seq-map-keys m))
+      (cons v (seq-map-vals m)))))
+
+(add-type-fn! seq-map-id 'append
+  (lambda (m0 m1)
+    (seq-map
+      (append (seq-map-keys m1) (seq-map-keys m0))
+      (append (seq-map-vals m1) (seq-map-vals m0)))))
+
+(define (seq-map->list m)
+  (let* (pairs
+          (lambda (ks vs)
+          (if (empty? ks)
+            '()
+            (cons (list (car ks) (car vs))
+                  (pairs (cdr ks) (cdr vs))))))
+    (pairs (seq-map-keys m) (seq-map-vals m))))
+
+(add-type-fn! seq-map-id '->list seq-map->list)
+
+(add-type-fn! seq-map-id '->vector
+  (lambda(m) (->vector (seq-map->list m))))
+
+(add-type-fn! seq-map-id '->string
+  (lambda (m) (->string (seq-map->list m))))
+
+(println! (string
+  (append [1 2 3] [4 5 6])))
+(println! (string
+  (append (list 1 2 3) (list 4 5 6))))
+(println! (string
+  (append (seq-map (list 'a 'd) (list 1 2))
+          (seq-map (list 'b 'c) (list 3 5)))))
+

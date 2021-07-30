@@ -29,6 +29,11 @@
 
 (define (list-empty? l) (null? l))
 
+(define (list->string l)
+  (if (list-empty? l)
+    ""
+    (string (->string (car l)) (cdr l))))
+
 (define (list-eql? x y)
   (if (list? y)
     (let* (list-eql1?

@@ -163,13 +163,11 @@ void initializeGlobalEnv(Env env) {
         return accumulator;
     });
 
-    addFn("string", 0, true, true, false, (xs, env) {
+    addFn("_string", 0, true, true, false, (xs, env) {
         auto s = "";
         while (!xs.isNil()) {
             if (xs.car.type == string_id)
                 s ~= xs.car.string_val;
-            else if (xs.car.type > 11)
-                s ~= evalKeepLast(list(list(symbol("->string"), xs.car)), env).toString();
             else
                 s ~= xs.car.toString();
             xs = xs.next();
@@ -177,7 +175,7 @@ void initializeGlobalEnv(Env env) {
         return LyraObj.makeString(s);
     });
 
-    addFn("println!", 1, false, false, false, (xs, env) {
+    addFn("_println!", 1, false, false, false, (xs, env) {
         if (xs.car.type == string_id)
             writeln(xs.car.string_val);
         else

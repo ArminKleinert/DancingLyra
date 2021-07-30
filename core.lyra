@@ -48,7 +48,7 @@
   (associated
     (_vector-get (unbox _types) (lyra-type-id x))
     sym))
-    
+
 (let* (vector-set (lambda (v idx xyz)
   (_vector-iterate v []
     (lambda (acc e i)
@@ -65,7 +65,6 @@
       type))
 
   (define (add-type-fns! type sym-to-f-list)
-    (println! type)
     (let* (list-append1
             (lambda (l0 l1)
               (if (null? l0)
@@ -116,6 +115,9 @@
 (define (filter p x) ((find-type-fn x 'filter) p x))
 (define (append x y) ((find-type-fn x 'append) x y))
 (define (find-first p x) ((find-type-fn x 'find-first) p x))
+(define (->string x)
+  (let* (f (find-type-fn x '->string))
+    (if f (f x) (_string x))))
 (define (->vector x) ((find-type-fn x '->vector) x))
 (define (->list x) ((find-type-fn x '->list) x))
 (define (copy x) ((find-type-fn x 'copy) x))
@@ -129,13 +131,22 @@
 (define (drop-until f p x) ((find-type-fn x 'drop-until) f p x))
 (define (zip x y) ((find-type-fn x 'zip) x y))
 
+(define (string & xs)
+  (if (empty? xs)
+    ""
+    (_string (->string (car xs)) (apply string (cdr xs)))))
+
+(define (println! x)
+  (_println! (->string x)))
+
 (load! "list.lyra")
 (load! "vector.lyra")
 
-(comment
-
 (println! (apply vector 1 2 3 '(3 4 5)))
 (println! (apply string '(3 4 5)))
+
+(comment
+
 (println! (string "(&& #t #t #t)" (&& #t #t #t)))
 (println! (string "(&& #t #t #f)" (&& #t #t #f)))
 (println! (string "(&& #t #f #t)" (&& #t #f #t)))
