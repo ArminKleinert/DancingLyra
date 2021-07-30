@@ -21,7 +21,6 @@ union Val {
     Vector vector_val;
     LyraObj boxed_val;
     Cons lazy_args_val;
-    byte[] buffer_val;
     LyraObj[Symbol] record_val;
 }
 
@@ -38,7 +37,6 @@ enum : uint {
     vector_id = 9,
     box_id = 10,
     lazy_id = 11,
-    buffer_id = 12,
 
     unknown_id = uint.max
 }
@@ -345,7 +343,7 @@ class LyraRecord : LyraObj {
         env.set(typeCheckerName, typeChecker);
 
         // Create constructor
-        auto constructor = new NativeLyraFunc(name, members.length % 0xFFFFFFFF,
+        auto constructor = new NativeLyraFunc("make-"~name, members.length % 0xFFFFFFFF,
                 members.length % 0xFFFFFFFF, false, true, false, (xs, env) {
             LyraObj[Symbol] inner;
             foreach (m; members) {
@@ -424,41 +422,6 @@ class Cons : LyraObj {
         _cdr = v;
     }
 }
-/*
-class LazyObj : LyraObj {
-    private LyraObj fn;
-    private bool _isEvaluated;
-
-    nothrow public static LazyObj create(LyraFunc fn, Cons arguments) {
-        return new LazyObj (fn,arguments);
-    }
-
-     @nogc nothrow LyraObj getValue() {
-        return value.boxed_val;
-    }
-
-    @safe @nogc nothrow public bool isEvaluated() {
-        return _isEvaluated;
-    }
-
-     nothrow LazyObj evaluated(LyraObj o){value.boxed_val = o; return this;}
-
-    @safe nothrow private this(LyraFunc fn, Cons arguments) {
-        this.fn = fn;
-        Val v = {boxed_val : arguments};
-        this.value = v;
-        this._isEvaluated = false;
-    }
-
-    override uint type() {
-        return _isEvaluated ? value.boxed_val.type() : lazy_id;
-    }
-
-    nothrow override LyraObj objtype() {
-        return LyraObj.makeFixnum(type());
-    }
-}
-*/
 
 @nogc nothrow Symbol symbol_val(LyraObj obj) {
     return obj.value.symbol_val;

@@ -189,9 +189,10 @@ void initializeGlobalEnv(Env env) {
         boxSet(xs.car, xs.cdr.car);
         return xs.cdr.car;
     });
-    
+
     addFn("defined?", 1, false, false, false, (xs, env) {
-    if (xs.car.type != symbol_id) return LyraObj.makeBoolean(false);
+        if (xs.car.type != symbol_id)
+            return LyraObj.makeBoolean(false);
         auto res = env.safeFind(xs.car.symbol_val);
         return LyraObj.makeBoolean(res !is null);
     });
@@ -280,5 +281,17 @@ void initializeGlobalEnv(Env env) {
         LyraRecord.create(cast(uint) type, typename.symbol_val, env, members);
 
         return Cons.nil();
+    });
+
+    addFn("char->fixnum", 1, false, true, false, (xs, env) {
+        if (xs.car.type != char_id)
+            throw new Exception("char->fixnum: Expected char.");
+        return LyraObj.makeFixnum(cast(fixnum) xs.car.char_val);
+    });
+
+    addFn("fixnum->char", 1, false, true, false, (xs, env) {
+        if (xs.car.type != fixnum_id)
+            throw new Exception("fixnum->char: Expected fixnum.");
+        return LyraObj.makeFixnum(cast(char) xs.car.fixnum);
     });
 }

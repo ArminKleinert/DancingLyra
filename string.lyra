@@ -1,0 +1,39 @@
+(when (not (defined? 'lyra-core-string-loaded))
+
+(define lyra-core-string-loaded #t)
+
+(define string-id (add-type!))
+(define-record string-id string chars)
+
+(add-type-fns! string-id
+  (list
+    (list 'vector? always-true)
+    (list 'empty? (lambda (s) (empty? (string-chars s))))
+    (list 'eql? (lambda (s s1) (eql? (string-chars s) (string-chars s1))))
+    (list 'nth (lambda (s i) (nth (string-chars s) i)))
+    (list 'foldl (lambda (f e s) (foldl f e (string-chars s))))
+    (list 'map (lambda (f s) (make-string (map f (string-chars s)))))
+    (list 'filter (lambda (p s) (make-string (filter p (string-chars s)))))
+    (list 'append (lambda (s0 s1) (make-string (append (string-chars s0) (string-chars s1)))))
+    (list 'find-first (lambda (p s) (find-first p (string-chars s))))
+    (list '->string id)
+    (list '->vector string-chars)
+    (list '->list (lambda (s) (->list (string-chars s))))
+    (list 'copy id)
+    (list 'but-last (lambda (s) (but-last (string-chars s))))
+    
+    (list 'but-last (lambda (s) (but-last (string-chars s))))
+    (list 'reverse (lambda (s) (reverse (string-chars s))))
+    (list 'map-while (lambda (f p s) (map-while f p (string-chars s))))
+    (list 'map-until (lambda (f p s) (map-until f p (string-chars s))))
+    (list 'take-while (lambda (p s) (take-while p (string-chars s))))
+    (list 'take-until (lambda (p s) (take-until p (string-chars s))))
+    (list 'drop-while (lambda (p s) (drop-while p (string-chars s))))
+    (list 'drop-until (lambda (p s) (drop-until p (string-chars s))))
+    (list 'zip (lambda (s s1) (zip (string-chars s) (string-chars s1))))
+    ))
+
+
+)
+
+'lyra-core-string-loaded
