@@ -262,9 +262,9 @@ class LyraObj {
         Val v = {vector_val: e};
         return new LyraObj(v, vector_id);
     }
-    
-    nothrow public static LyraObj makeBuffer (byte[] e){
-        Val v = {buffer_val : e};
+
+    nothrow public static LyraObj makeBuffer(byte[] e) {
+        Val v = {buffer_val: e};
         return new LyraObj(v, buffer_id);
     }
 
