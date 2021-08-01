@@ -21,7 +21,7 @@ union Val {
     Vector vector_val;
     LyraObj boxed_val;
     Cons lazy_args_val;
-    LyraObj[Symbol] record_val;
+    LyraObj[] record_val;
 }
 
 enum : uint {
@@ -317,14 +317,14 @@ class LyraObj {
 class LyraRecord : LyraObj {
     import lyrafunction;
 
-    private static void createAndAddGetter(uint type_id, Symbol typename, Symbol memberName, Env env) {
+    private static void createAndAddGetter(uint type_id, Symbol typename, Symbol memberName, uint memberIdx, Env env) {
         // Create getters
         string getterName = typename ~ "-" ~ memberName;
         auto getter = new NativeLyraFunc(getterName, 1, 1, false, true, false, (xs, env) {
             if (xs.car.type != type_id) {
                 throw new Exception(getterName ~ ": Invalid input.");
             }
-            return xs.car.value.record_val[memberName];
+            return xs.car.value.record_val[memberIdx];
         });
         env.set(getterName, getter);
     }
@@ -345,7 +345,7 @@ class LyraRecord : LyraObj {
         // Create constructor
         auto constructor = new NativeLyraFunc("make-"~name, members.length % 0xFFFFFFFF,
                 members.length % 0xFFFFFFFF, false, true, false, (xs, env) {
-            LyraObj[Symbol] inner;
+            LyraObj[] inner;
             foreach (m; members) {
                 inner[m] = xs.car;
                 xs = xs.cdr;
