@@ -21,9 +21,6 @@
 (define (always-true e) #t)
 (define (always-false e) #f)
 
-(define first car)
-(define rest cdr)
-
 (define _types (box []))
 (define (box-swap! b f)(box-set! b (f (unbox b))))
 
@@ -99,6 +96,10 @@
 (define (list? x) (let* (f (find-type-fn x 'list?)) (if f (f x) #f)))
 (define (vector? x) (let* (f (find-type-fn x 'vector?)) (if f (f x) #f)))
 
+(define (first x) ((find-type-fn x 'first) x))
+(define (second x) ((find-type-fn x 'second) x))
+(define (rest x) ((find-type-fn x 'rest) x))
+
 (define (empty? x) (let* (f (find-type-fn x 'empty?)) (if f (f x) #f)))
 (define (eql? x y) (let* (f (find-type-fn x 'eql?)) (if f (f x y) (= x y))))
 (define (nth x i)  (let* (f (find-type-fn x 'nth)) (if f (f x i) '())))
@@ -110,7 +111,7 @@
 (define (->string x)
   (let* (f (find-type-fn x '->string))
     (if f (f x) (_string x))))
-(define (->vector x) ((find-type-fn x '->vector) x))
+(define (->vector x) (println! (lyra-type-id x)) ((find-type-fn x '->vector) x))
 (define (->list x) ((find-type-fn x '->list) x))
 (define (copy x) ((find-type-fn x 'copy) x))
 (define (but-last x) ((find-type-fn x 'but-last) x))

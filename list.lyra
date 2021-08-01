@@ -143,15 +143,22 @@
     c
     (list-drop-until p (cdr c))))
 
+
 ; TODO Tests
 (define (list-zip c0 c1)
-  (let* (c2 (->list c1))
-    (cond ((list-empty? c0) '())
-          ((list-empty? c2) '())
-          (#t (cons (cons (car c0) (car c2)) (list-zip c0 c2))))))
+  (cond ((list-empty? c0) '())
+        ((empty? c1) '())
+        (#t
+        (let* (i 99)
+          (println! (list (car c0) (first c1)))
+          (println! (list (cdr c0) (rest c1)))
+          (cons (list (car c0) (first c1)) (list-zip (cdr c0) (rest c1)))))))
 
 (add-type-fns! cons-id
   (list
+    (list 'first car)
+    (list 'second cadr)
+    (list 'rest cdr)
     (list 'empty? always-false)
     (list 'eql? list-eql?)
     (list 'nth list-nth)
@@ -177,6 +184,9 @@
   
 (add-type-fns! nil-id
   (list
+    (list 'first car)
+    (list 'second cadr)
+    (list 'rest cdr)
     (list 'empty? always-true)
     (list 'eql? (lambda (l0 l1) (= (lyra-type-id l0) (lyra-type-id l1))))
     (list 'nth list-nth)

@@ -261,10 +261,12 @@ class LyraObj {
         return new LyraObj(v, vector_id);
     }
 
+    /*
     nothrow public static LyraObj makeBuffer(byte[] e) {
         Val v = {buffer_val: e};
         return new LyraObj(v, buffer_id);
     }
+    */
 
     nothrow public static LyraObj makeEmpty() {
         return Cons.nil();
@@ -320,7 +322,7 @@ class LyraRecord : LyraObj {
     private static void createAndAddGetter(uint type_id, Symbol typename, Symbol memberName, uint memberIdx, Env env) {
         // Create getters
         string getterName = typename ~ "-" ~ memberName;
-        auto getter = new NativeLyraFunc(getterName, 1, 1, false, true, false, (xs, env) {
+        auto getter = new NativeLyraFunc(getterName, 1, 1, false, true, false, (xs, env1) {
             if (xs.car.type != type_id) {
                 throw new Exception(getterName ~ ": Invalid input.");
             }
@@ -328,14 +330,30 @@ class LyraRecord : LyraObj {
         });
         env.set(getterName, getter);
     }
+    
+    private static void createConstructor(uint type_id ,Symbol typeName, Symbol[] members, Env env) {
+    auto constrName = "make-" ~ typeName;
+        auto constructor = new NativeLyraFunc(constrName, members.length % 0xFFFFFFFF,
+                members.length % 0xFFFFFFFF, false, true, false, (xs, env1) {
+            LyraObj[] inner;
+            for (uint i = 0; i < members.length; i++) {
+                inner~= xs.car;
+                xs = xs.cdr;
+            }
+            Val v = {record_val: inner};
+            auto obj = new LyraObj(v, type_id);
+            return obj;
+        });
+        env.set(constrName, constructor);
+    }
 
-    public static void create(uint type_id, Symbol name, Env env, Symbol[] members) {
+    public static void create(uint type_id, Symbol typeName, Env env, Symbol[] members) {
         // Create getters
-        foreach (member; members) {
-            createAndAddGetter(type_id, name, member, env);
+        for (uint i = 0; i < members.length; i++) {
+            createAndAddGetter(type_id, typeName, members[i], i, env);
         }
 
-        Symbol typeCheckerName = name ~ "?";
+        Symbol typeCheckerName = typeName ~ "?";
         auto typeChecker = new NativeLyraFunc(typeCheckerName, 1, 1, false,
                 true, false, (xs, env) {
             return LyraObj.makeBoolean(xs.car.type != type_id);
@@ -343,18 +361,7 @@ class LyraRecord : LyraObj {
         env.set(typeCheckerName, typeChecker);
 
         // Create constructor
-        auto constructor = new NativeLyraFunc("make-"~name, members.length % 0xFFFFFFFF,
-                members.length % 0xFFFFFFFF, false, true, false, (xs, env) {
-            LyraObj[] inner;
-            foreach (m; members) {
-                inner[m] = xs.car;
-                xs = xs.cdr;
-            }
-            Val v = {record_val: inner};
-            auto obj = new LyraObj(v, type_id);
-            return obj;
-        });
-        env.set(name, constructor);
+        createConstructor(type_id, typeName,members,env);
     }
 }
 

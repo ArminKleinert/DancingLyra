@@ -491,6 +491,33 @@
     #t #t
   ))
 
+(define (zip-test)
+  (&&
+    (eql? (list (list 1 2) (list 3 4)) (zip '(1 3) '(2 4)))
+    (eql? (list (list 1 2) (list 3 4)) (zip '(1 3) '(2 4 5)))
+    
+    (eql? '() (zip '() '(1 2 3 4 5)))
+    (eql? '() (zip '() '()))
+    
+    (eql? (vector [1 2] [3 4]) (zip [1 3] [2 4]))
+    (eql? (vector [1 2] [3 4]) (zip [1 3] [2 4 5]))
+    
+    (eql? '() (zip '() [1 2 3 4 5]))
+    (eql? '() (zip '() '()))
+    
+    (eql? [] (zip [] [1 2 3 4 5]))
+    (eql? [] (zip [] '()))
+    
+    (eql? (list (list 1 2) (list 3 4)) (zip '(1 3) [2 4]))
+    (eql? (list (list 1 2) (list 3 4)) (zip '(1 3) [2 4 5]))
+    (eql? (vector [1 2] [3 4]) (zip [1 3] '(2 4)))
+    (eql? (vector [1 2] [3 4]) (zip [1 3] '(2 4 5)))
+    #t #t
+  ))
+
+
+
+
 )
 
 (println! (string "(null?-test): ............... " (null?-test)))
@@ -523,6 +550,9 @@
 (println! (string "(foldl-test): ............... " (foldl-test)))
 (println! (string "(map-test): ................. " (map-test)))
 (println! "")
+;(println! (zip '(1 3) '(2 4)))
+;(println! (zip '(1 3) '(2 4 5)))
+;(println! (zip '(1) '(2)))
 
 'lyra-core-tests-loaded
 

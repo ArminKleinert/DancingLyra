@@ -283,6 +283,7 @@ void initializeGlobalEnv(Env env) {
         return Cons.nil();
     });
 
+    /*
     addFn("char->fixnum", 1, false, true, false, (xs, env) {
         if (xs.car.type != char_id)
             throw new Exception("char->fixnum: Expected char.");
@@ -292,6 +293,7 @@ void initializeGlobalEnv(Env env) {
     addFn("fixnum->char", 1, false, true, false, (xs, env) {
         if (xs.car.type != fixnum_id)
             throw new Exception("fixnum->char: Expected fixnum.");
-        return LyraObj.makeFixnum(cast(char) xs.car.fixnum);
+        return LyraObj.makeFixnum(cast(char) xs.car.fixnum_val);
     });
+    */
 }

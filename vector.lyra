@@ -35,7 +35,7 @@
 ; TODO Tests
 (add-type-fn! vector-pair-id 'vector-append
   (lambda (vp e)
-    (vector-pair (vector-pair-x vp) (vector-append (vector-pair-y vp) e))))
+    (make-vector-pair (vector-pair-x vp) (vector-append (vector-pair-y vp) e))))
 
 ; TODO Needs optimization
 (add-type-fn! vector-pair-id 'append
@@ -53,7 +53,7 @@
 ; TODO Tests
 (add-type-fn! vector-pair-id 'but-last
   (lambda (vp) 
-    (vector-pair (vector-pair-x vp) (but-last (vector-pair-y vp)))))
+    (make-vector-pair (vector-pair-x vp) (but-last (vector-pair-y vp)))))
 
 ; TODO Tests
 (add-type-fn! vector-pair-id 'foldl
@@ -63,12 +63,12 @@
 ; TODO Tests
 (add-type-fn! vector-pair-id 'map
   (lambda (f vp)
-    (vector-pair (map f (vector-pair-x vp)) (map f (vector-pair-y vp)))))
+    (make-vector-pair (map f (vector-pair-x vp)) (map f (vector-pair-y vp)))))
 
 ; TODO Tests
 (add-type-fn! vector-pair-id 'reverse
   (lambda (f vp)
-    (vector-pair (reverse (vector-pair-y vp)) (reverse (vector-pair-x vp)))))
+    (make-vector-pair (reverse (vector-pair-y vp)) (reverse (vector-pair-x vp)))))
 
 ; TODO Tests
 (add-type-fn! vector-pair-id '->string
@@ -181,7 +181,7 @@
   (lambda (v v1)
     (cond ((empty? v) v1)
           ((empty? v1) v)
-          (#t (vector-pair v (->vector v1))))))
+          (#t (make-vector-pair v (->vector v1))))))
 
 ; TODO Tests
 (add-type-fn! vector-id 'find-first
@@ -217,6 +217,23 @@
       (vector-iterate v []
         (lambda (acc e i)
           (vector-append acc (_vector_get v (- vlen i))))))))
+
+; TODO Tests
+(add-type-fn! vector-id 'take
+  (lambda (n v)
+    (vector-iterate v [])
+      (lambda (acc e i)
+        (if (= n 0)
+          acc
+          (_vector-append acc e)))))
+
+(add-type-fn! vector-id 'drop
+  (lambda (n v)
+    (vector-iterate v [])
+      (lambda (acc e i)
+        (if (> n i)
+          acc
+          (_vector-append acc e)))))
 
 ; TODO Tests
 (add-type-fn! vector-id 'map-while
@@ -275,6 +292,9 @@
 
 (add-type-fns! vector-id
   (list
+    (list 'first (lambda (v) ((vector-get v 0))))
+    (list 'second (lambda (v) ((vector-get v 1))))
+    (list 'rest (lambda (v) (drop 1 v)))
     (list 'vector-size (lambda (v) (_vector-size v)))
     (list 'empty? (lambda (v) (= (vector-size v) 0)))
     (list 'nth (lambda (v idx) (vector-get v idx)))

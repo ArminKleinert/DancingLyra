@@ -45,7 +45,8 @@
   (lambda(m) (->vector (seq-map->list m))))
 
 (add-type-fn! seq-map-id '->string
-  (lambda (m) (->string (seq-map->list m))))
+  (lambda (m)
+    (->string (seq-map->list m))))
 
 (println! (string
   (append [1 2 3] [4 5 6])))
