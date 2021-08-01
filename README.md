@@ -238,11 +238,11 @@ To define a new type, Lyra provides the functions `add-type!`, `define-record`, 
 ```
 (define offset-vector-id (add-type!)) ; add-type! returns a new id
 
-; This automatically generates the functions (offset-vector start end vec), (offset-vector? e), (offset-vector-start e), (offset-vector-end e) and (offset-vector-vec e)
+; This automatically generates the functions (make-offset-vector start end vec), (offset-vector? e), (offset-vector-start e), (offset-vector-end e) and (offset-vector-vec e)
 (define-record offset-vector-id offset-vector start end vec)
 
 ; Example:
-(let* (ov (offset-vector 1 3 [1 2 3 4 5 6]))
+(let* (ov (make-offset-vector 1 3 [1 2 3 4 5 6]))
   (offset-vector? ov) ; -> #t
   (offset-vector-start ov) ; -> 1
   (offset-vector-end ov) ; -> 3
