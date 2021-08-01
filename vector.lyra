@@ -173,7 +173,7 @@
   (lambda (p v) 
     (vector-iterate v []
       (lambda (acc e i)
-        (if (p e) (_vector-append acc [e]) acc)))))
+        (if (p e) (_vector-append acc e) acc)))))
 
 ; TODO Tests
 (comment add-type-fn! vector-id 'append

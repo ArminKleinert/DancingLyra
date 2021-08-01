@@ -14,6 +14,9 @@
 (define (inc x) (+ x 1))
 (define (dec x) (- x 1))
 
+(define (even? x) (= (% x 2) 0))
+(define (odd? x) (= (% x 2) 1))
+
 (define (list & xs) xs)
 (define car _car)
 (define cdr _cdr)
@@ -92,6 +95,7 @@
 (define (func? x) (= (lyra-type-id x) func-id))
 (define (bool? x) (= (lyra-type-id x) bool-id))
 (define (box? x) (= (lyra-type-id x) box-id))
+(define (number? x) (let* (f (find-type-fn x 'number?)) (if f (f x) (or (integer? x) (real? x)))))
 
 (define (list? x) (let* (f (find-type-fn x 'list?)) (if f (f x) #f)))
 (define (vector? x) (let* (f (find-type-fn x 'vector?)) (if f (f x) #f)))

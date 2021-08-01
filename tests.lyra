@@ -691,6 +691,116 @@
     #t #t
   ))
 
+(define (foldl-list-test)
+  (let* (helper (lambda (xs) (foldl (lambda (x y) (cons y x)) '() xs)))
+  (&&
+    (eq? 0 (foldl + 0 '()))
+    (eq? 1 (foldl + 1 '()))
+    (eq? 6 (foldl + 5 (list 1)))
+    (eq? 15 (foldl + 0 (list 1 2 3 4 5)))
+    (eq? "12345" (foldl string "" (list 1 2 3 4 5)))
+    
+    (eq? '() (helper (list)))
+    (eq? (list 10 9 8 7 6 5 4 3 2 1) (helper (list 1 2 3 4 5 6 7 8 9 10)))
+    (eq? (list '() '() '()) (helper (list '() '() '())))
+    (eq? (list [] [] []) (helper (list [] [] [])))
+    (eq? (list "c" "b" "a") (helper (list "a" "b" "c")))
+    (eq? (list 10.0 9.0 8.0 7.0 6.0 5.0 4.0 3.0 2.0 1.0) (helper (list 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0)))
+    (eq? (list id % / * - +) (helper (list + - * / % id)))
+    (eq? (list 'def 'abc 'z 'y 'x) (helper (list 'x 'y 'z 'abc 'def)))
+    (eq? (list #\newline #\space #\z #\y #\x) (helper (list #\x #\y #\z #\space #\newline)))
+    (eq? (list '(3 4 5) '(2 3 4) '(1 2 3)) (helper (list '(1 2 3) '(2 3 4) '(3 4 5))))
+    (eq? (list [3 4 5] [2 3 4] [1 2 3]) (helper (list [1 2 3] [2 3 4] [3 4 5])))
+    #t #t
+  )))
+
+(define (foldl-vector-test)
+  (let* (helper (lambda (xs) (foldl (lambda (x y) (cons y x)) '() xs)))
+    (&&
+    (eq? 0 (foldl + 0 []))
+    (eq? 1 (foldl + 1 []))
+    (eq? 6 (foldl + 5 [1]))
+    (eq? 15 (foldl + 0 [1 2 3 4 5]))
+    (eq? "12345" (foldl string "" [1 2 3 4 5]))
+      
+    (eq? '() (helper []))
+    (eq? (list 10 9 8 7 6 5 4 3 2 1) (helper [1 2 3 4 5 6 7 8 9 10]))
+    (eq? (list '() '() '()) (helper ['() '() '()]))
+    (eq? (list [] [] []) (helper [[] [] []]))
+    (eq? (list "c" "b" "a") (helper ["a" "b" "c"]))
+    (eq? (list 10.0 9.0 8.0 7.0 6.0 5.0 4.0 3.0 2.0 1.0) (helper [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0]))
+    (eq? (list id % / * - +) (helper [+ - * / % id]))
+    (eq? (list 'def 'abc 'z 'y 'x) (helper ['x 'y 'z 'abc 'def]))
+    (eq? (list #\newline #\space #\z #\y #\x) (helper [#\x #\y #\z #\space #\newline]))
+    (eq? (list '(3 4 5) '(2 3 4) '(1 2 3)) (helper ['(1 2 3) '(2 3 4) '(3 4 5)]))
+    (eq? (list [3 4 5] [2 3 4] [1 2 3]) (helper [[1 2 3] [2 3 4] [3 4 5]]))
+      #t #t
+    )))
+
+(define (map-list-test)
+  (&&
+    (eq? '(1 4 9 16 25 36 49 64 81 100) (map (lambda (n) (* n n)) '(1 2 3 4 5 6 7 8 9 10)))
+    (eq? '() (map string '()))
+    (eq? (list "1" "2" "3" "4" "5" "6" "7" "8" "9" "10") (map string (list 1 2 3 4 5 6 7 8 9 10)))
+    (eq? (list "()" "()" "()") (map string (list '() '() '())))
+    (eq? (list "[]" "[]" "[]") (map string (list [] [] [])))
+    (eq? (list "a" "b" "c") (map string (list "a" "b" "c")))
+    (eq? (list "1.1" "2.2" "3.3" "4.4" "5.5" "6.6" "7.7" "8.8" "9.9" "10.1") (map string (list 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1)))
+    (eq? (list "x" "y" "z" "abc" "def") (map string (list 'x 'y 'z 'abc 'def)))
+    (eq? (list "x" "y" "z" " " "\n") (map string (list #\x #\y #\z #\space #\newline)))
+    (eq? (list "(1 2 3)" "(2 3 4)" "(3 4 5)") (map string (list '(1 2 3) '(2 3 4) '(3 4 5))))
+    (eq? (list "[1 2 3]" "[2 3 4]" "[3 4 5]") (map string (list [1 2 3] [2 3 4] [3 4 5])))
+    #t #t
+  ))
+
+(define (map-vector-test)
+  (&&
+    (eq? [1 4 9 16 25 36 49 64 81 100] (map (lambda (n) (* n n)) [1 2 3 4 5 6 7 8 9 10]))
+    (eq? [] (map string []))
+    (eq? ["1" "2" "3" "4" "5" "6" "7" "8" "9" "10"] (map string [1 2 3 4 5 6 7 8 9 10]))
+    (eq? ["()" "()" "()"] (map string ['() '() '()]))
+    (eq? ["[]" "[]" "[]"] (map string [[] [] []]))
+    (eq? ["a" "b" "c"] (map string ["a" "b" "c"]))
+    (eq? ["1.1" "2.2" "3.3" "4.4" "5.5" "6.6" "7.7" "8.8" "9.9" "10.1"] (map string [1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1]))
+    (eq? ["x" "y" "z" "abc" "def"] (map string ['x 'y 'z 'abc 'def]))
+    (eq? ["x" "y" "z" " " "\n"] (map string [#\x #\y #\z #\space #\newline]))
+    (eq? ["(1 2 3)" "(2 3 4)" "(3 4 5)"] (map string ['(1 2 3) '(2 3 4) '(3 4 5)]))
+    (eq? ["[1 2 3]" "[2 3 4]" "[3 4 5]"] (map string [[1 2 3] [2 3 4] [3 4 5]]))
+    #t #t
+  ))
+
+(define (filter-list-test)
+  (let* (v (list 1 2 3 4 5 6 7 8 9 10 '() '() '() [] [] [] "a" "b" "c" 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1 + - * / % id 'x 'y 'z 'abc 'def #\x #\y #\z #\space #\newline '(1 2 3) '(2 3 4) '(3 4 5) [1 2 3] [2 3 4] [3 4 5]))
+    (&&
+      (eq? (list 'x 'y 'z 'abc 'def) (filter symbol? v))
+      (eq? (list [] [] [] [1 2 3] [2 3 4] [3 4 5]) (filter vector? v))
+      (eq? (list '(1 2 3) '(2 3 4) '(3 4 5)) (filter list? v))
+      (eq? (list 1 2 3 4 5 6 7 8 9 10) (filter integer? v))
+      (eq? (list 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1) (filter real? v))
+      (eq? (list + - * / % id) (filter func? v))
+      (eq? (list 1 2 3 4 5 6 7 8 9 10 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1)
+           (filter number? v))
+      (eq? (list #\x #\y #\z #\space #\newline) (filter char? v))
+      (eq? (list "a" "b" "c") (filter string? v))
+      #t #t
+    )))
+
+(define (filter-vector-test)
+  (let* (v [1 2 3 4 5 6 7 8 9 10 '() '() '() [] [] [] "a" "b" "c" 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1 + - * / % id 'x 'y 'z 'abc 'def #\x #\y #\z #\space #\newline '(1 2 3) '(2 3 4) '(3 4 5) [1 2 3] [2 3 4] [3 4 5]])
+    (&&
+      (eq? (vector 'x 'y 'z 'abc 'def) (filter symbol? v))
+      (eq? (vector [] [] [] [1 2 3] [2 3 4] [3 4 5]) (filter vector? v))
+      (eq? (vector '(1 2 3) '(2 3 4) '(3 4 5)) (filter list? v))
+      (eq? (vector 1 2 3 4 5 6 7 8 9 10) (filter integer? v))
+      (eq? (vector 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1) (filter real? v))
+      (eq? (vector + - * / % id) (filter func? v))
+      (eq? (vector 1 2 3 4 5 6 7 8 9 10 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1)
+           (filter number? v))
+      (eq? (vector #\x #\y #\z #\space #\newline) (filter char? v))
+      (eq? (vector "a" "b" "c") (filter string? v))
+      #t #t
+  )))
+
 
 
 (define (zip-test)
@@ -721,8 +831,6 @@
 
 
 )
-
-
 
 (println! (string "(null?-test): ............... " (null?-test)))
 (println! (string "(symbol?-test): ............. " (symbol?-test)))
@@ -762,20 +870,17 @@
 (println! "")
 (println! (string "(empty?-list-test): ......... " (empty?-list-test)))
 (println! (string "(empty?-vector-test): ....... " (empty?-vector-test)))
+(println! "")
+(println! (string "(foldl-list-test): .......... " (foldl-list-test)))
+(println! (string "(foldl-vector-test): ........ " (foldl-vector-test)))
+(println! (string "(map-list-test): ............ " (map-list-test)))
+(println! (string "(map-vector-test): .......... " (map-vector-test)))
+(println! (string "(filter-list-test): ......... " (filter-list-test)))
+(println! (string "(filter-vector-test): ....... " (filter-vector-test)))
 
-(comment println! [
-    (eq? '() (nth '() 0))
-    (eq? 1 (nth (list 1 2 3 4 5 6 7 8 9 10) 0))
-    (eq? '() (nth (list '() '() '()) 0))
-    (eq? [] (nth (list [] [] []) 0))
-    (eq? "a" (nth (list "a" "b" "c") 0))
-    (eq? 1.0 (nth (list 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0) 0))
-    (eq? + (nth (list + - * / % id) 0))
-    (eq? 'x (nth (list 'x 'y 'z 'abc 'def) 0))
-    (eq? #\x (nth (list #\x #\y #\z #\space #\newline) 0))
-    (eq? '(1 2 3) (nth (list '(1 2 3) '(2 3 4) '(3 4 5)) 0))
-    (eq? [1 2 3] (nth (list [1 2 3] [2 3 4] [3 4 5]) 0))
-    ])
+(println! [
+])
+
 
 'lyra-core-tests-loaded
 
