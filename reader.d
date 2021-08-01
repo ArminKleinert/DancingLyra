@@ -74,9 +74,7 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
     while ((token = tokens.next()) !is null) {
         switch (token) {
         case "'":
-            root ~= listLiteral([
-                    symbol("quote"), make_ast(tokens, level, "", true)
-                    ]);
+            root ~= list([                    symbol("quote"), make_ast(tokens, level, "", true)]);
             break;
         case "(":
             root ~= make_ast(tokens, level + 1, ")");
@@ -88,12 +86,12 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
             if (level == 0 || expected != ")") {
                 throw new Exception("Unexpected ')'");
             }
-            return listLiteral(root);
+            return list(root);
         case "]":
             if (level == 0 || expected != "]") {
                 throw new Exception("Unexpected ']'");
             }
-            return listLiteral([LyraObj.makeSymbol("vector")] ~ (root));
+            return list([LyraObj.makeSymbol("vector")] ~ root);
         case "#t":
             root ~= LyraObj.makeBoolean(true);
             break;
@@ -120,5 +118,5 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
         }
     }
 
-    return listLiteral(root);
+    return list(root);
 }

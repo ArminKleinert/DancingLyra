@@ -373,8 +373,8 @@ class Cons : LyraObj {
     private Cons _cdr = null;
     public bool isLiteral = false;
 
-    nothrow public static Cons create(LyraObj _car, Cons _cdr, bool literal = false) {
-        auto c = new Cons(_car, _cdr, literal);
+    nothrow public static Cons create(LyraObj _car, Cons _cdr) {
+        auto c = new Cons(_car, _cdr);
         return c;
     }
 
@@ -393,10 +393,9 @@ class Cons : LyraObj {
         return _cdr;
     }
 
-    @safe nothrow private this(LyraObj _car, Cons _cdr, bool literal = false) {
+    @safe nothrow private this(LyraObj _car, Cons _cdr) {
         this._car = _car;
         this._cdr = _cdr;
-        this.isLiteral = literal;
     }
 
     @nogc nothrow override uint type() {
@@ -537,15 +536,6 @@ nothrow Cons list(Vector e) {
     Cons result = nil();
     while (e.length > 0) {
         result = cons(e[$ - 1], result);
-        e = e[0 .. $ - 1];
-    }
-    return result;
-}
-
-nothrow Cons listLiteral(Vector e) {
-    Cons result = nil();
-    while (e.length > 0) {
-        result = Cons.create(e[$ - 1], result, true);
         e = e[0 .. $ - 1];
     }
     return result;

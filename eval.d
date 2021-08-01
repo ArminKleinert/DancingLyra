@@ -199,13 +199,7 @@ LyraObj evLambda(LyraObj expr, Env env, Symbol name = "", bool isMacro = false) 
 }
 
 LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
-start:
-
     if (expr.type == cons_id) {
-        if (!expr.cons_val.isLiteral) {
-            writeln(expr);
-            return expr;
-        } else
         if (expr.car.type == symbol_id) {
             switch (expr.car.symbol_val) {
             case "quote":
@@ -313,7 +307,7 @@ start:
                     if (!evaluatedCondition.isFalsy()) {
                         auto temp = eval(case0.cdr.car, env);
                         inlineValueIntoCarIfPossible(case0.cdr.car, case0.cdr, temp, env);
-                        return eval(temp, env);
+                        return temp;
                     }
 
                     cases = cases.cdr;
@@ -330,7 +324,7 @@ start:
                 }
                 auto lastArg = eval(list(symbol("->list"), args.car), env);
                 args1 ~= listToVector(lastArg);
-                expr = Cons.create(fn, list(args1),true);
+                expr = Cons.create(fn, list(args1));
                 return eval(expr, env);
             default:
                 auto found = env.safeFind(expr.car.value.symbol_val);
@@ -338,11 +332,11 @@ start:
                     throw new LyraSyntaxError("Unresolved symbol: " ~ expr.car.toString(),
                             callStack);
                 }
-                expr = Cons.create(found, expr.cdr,true);
+                expr = Cons.create(found, expr.cdr);
                 return eval(expr, env,disableTailCall);
             }
         } else if (expr.car.type == cons_id) {
-            expr = Cons.create(eval(expr.car, env, disableTailCall), expr.cdr,true);
+            expr = Cons.create(eval(expr.car, env, disableTailCall), expr.cdr);
                 return eval(expr, env,disableTailCall);
         } else if (expr.car.type == func_id) {
             LyraFunc func = expr.car.func_val;
