@@ -146,13 +146,11 @@
 
 ; TODO Tests
 (define (list-zip c0 c1)
+(println! c0)
+(println! (list-empty? c0))
   (cond ((list-empty? c0) '())
         ((empty? c1) '())
-        (#t
-        (let* (i 99)
-          (println! (list (car c0) (first c1)))
-          (println! (list (cdr c0) (rest c1)))
-          (cons (list (car c0) (first c1)) (list-zip (cdr c0) (rest c1)))))))
+        (#t (cons (list (car c0) (first c1)) (list-zip (cdr c0) (rest c1))))))
 
 (add-type-fns! cons-id
   (list

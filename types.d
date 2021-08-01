@@ -319,7 +319,8 @@ class LyraObj {
 class LyraRecord : LyraObj {
     import lyrafunction;
 
-    private static void createAndAddGetter(uint type_id, Symbol typename, Symbol memberName, uint memberIdx, Env env) {
+    private static void createAndAddGetter(uint type_id, Symbol typename,
+            Symbol memberName, uint memberIdx, Env env) {
         // Create getters
         string getterName = typename ~ "-" ~ memberName;
         auto getter = new NativeLyraFunc(getterName, 1, 1, false, true, false, (xs, env1) {
@@ -330,14 +331,14 @@ class LyraRecord : LyraObj {
         });
         env.set(getterName, getter);
     }
-    
-    private static void createConstructor(uint type_id ,Symbol typeName, Symbol[] members, Env env) {
-    auto constrName = "make-" ~ typeName;
+
+    private static void createConstructor(uint type_id, Symbol typeName, Symbol[] members, Env env) {
+        auto constrName = "make-" ~ typeName;
         auto constructor = new NativeLyraFunc(constrName, members.length % 0xFFFFFFFF,
                 members.length % 0xFFFFFFFF, false, true, false, (xs, env1) {
             LyraObj[] inner;
             for (uint i = 0; i < members.length; i++) {
-                inner~= xs.car;
+                inner ~= xs.car;
                 xs = xs.cdr;
             }
             Val v = {record_val: inner};
@@ -361,7 +362,7 @@ class LyraRecord : LyraObj {
         env.set(typeCheckerName, typeChecker);
 
         // Create constructor
-        createConstructor(type_id, typeName,members,env);
+        createConstructor(type_id, typeName, members, env);
     }
 }
 
@@ -370,9 +371,10 @@ class Cons : LyraObj {
 
     private LyraObj _car = null;
     private Cons _cdr = null;
+    public bool isLiteral = false;
 
-    nothrow public static Cons create(LyraObj _car, Cons _cdr) {
-        auto c = new Cons(_car, _cdr);
+    nothrow public static Cons create(LyraObj _car, Cons _cdr, bool literal = false) {
+        auto c = new Cons(_car, _cdr, literal);
         return c;
     }
 
@@ -391,9 +393,10 @@ class Cons : LyraObj {
         return _cdr;
     }
 
-    @safe nothrow private this(LyraObj _car, Cons _cdr) {
+    @safe nothrow private this(LyraObj _car, Cons _cdr, bool literal = false) {
         this._car = _car;
         this._cdr = _cdr;
+        this.isLiteral = literal;
     }
 
     @nogc nothrow override uint type() {
@@ -534,6 +537,15 @@ nothrow Cons list(Vector e) {
     Cons result = nil();
     while (e.length > 0) {
         result = cons(e[$ - 1], result);
+        e = e[0 .. $ - 1];
+    }
+    return result;
+}
+
+nothrow Cons listLiteral(Vector e) {
+    Cons result = nil();
+    while (e.length > 0) {
+        result = Cons.create(e[$ - 1], result, true);
         e = e[0 .. $ - 1];
     }
     return result;

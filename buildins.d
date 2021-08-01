@@ -107,7 +107,6 @@ void initializeGlobalEnv(Env env) {
 
     addFn("cons", 2, false, true, false, (xs, env) {
         if (!isConsOrNil(xs.cdr.car)) {
-            writeln(xs.cdr.car.toString());
             throw new Exception("cons: cdr must be another cons or nil.");
         }
         return cons(xs.car, cast(Cons) xs.cdr.car);

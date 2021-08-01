@@ -111,7 +111,7 @@
 (define (->string x)
   (let* (f (find-type-fn x '->string))
     (if f (f x) (_string x))))
-(define (->vector x) (println! (lyra-type-id x)) ((find-type-fn x '->vector) x))
+(define (->vector x) ((find-type-fn x '->vector) x))
 (define (->list x) ((find-type-fn x '->list) x))
 (define (copy x) ((find-type-fn x 'copy) x))
 (define (but-last x) ((find-type-fn x 'but-last) x))

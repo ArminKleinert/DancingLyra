@@ -285,10 +285,15 @@
 
 ; TODO Tests
 (add-type-fn! vector-id 'zip
-  (lambda (v0 v1) 
-    ; TODO
-    ; Note: First use ->vector on v1
-    '()))
+  (lambda (v0 v1)
+    (let* (v1size (vector-size (->vector v1)))
+      (vector-iterate v0 []
+        (lambda (acc e i)
+          (println! i)
+          (if (< i v1size)
+            (vector-append acc [ e (nth v1 i)])
+            acc
+            ))))))
 
 (add-type-fns! vector-id
   (list

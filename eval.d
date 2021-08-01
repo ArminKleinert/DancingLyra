@@ -110,7 +110,7 @@ LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
             // If optimizations are on and the expression is trivial, evaluate it once
             // to make sure that evaluation is possible. Then delete it from the AST.
             if (evaluatesToSelf(exprList1.car)) {
-                eval(exprList1.car, env);
+                eval(exprList1.car, env, disableTailCall);
                 (cast(Cons) exprList).internalSetCar(exprList1.cdr.car);
                 (cast(Cons) exprList).internalSetCdr(exprList1.cdr.cdr);
             } else {
@@ -152,7 +152,7 @@ LyraObj evDefine(LyraObj expr, Env env, bool isMacro) {
 
         checkForGlobalRedefinition(name.symbol_val);
 
-        expr = cons(expr.car.cdr, expr.cdr); // Remove name
+        expr = Cons.create(expr.car.cdr, expr.cdr); // Remove name
         auto func = evLambda(expr, env, name.symbol_val, isMacro);
         Env.globalEnv.set(name, func);
         return func;
@@ -185,12 +185,12 @@ LyraObj evLambda(LyraObj expr, Env env, Symbol name = "", bool isMacro = false) 
         Cons temp = nil();
         for (auto i = argVector.length - 1; i > 0; i--) {
             if (i != argVector.length - 2) {
-                temp = cons(argVector[i], temp);
+                temp = Cons.create(argVector[i], temp);
             }
             argNames = temp;
         }
         if (argVector.length > 2)
-            argNames = cons(argVector[0], argNames);
+            argNames = Cons.create(argVector[0], argNames);
     }
 
     auto ispure = false; // TODO
@@ -202,6 +202,10 @@ LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
 start:
 
     if (expr.type == cons_id) {
+        if (!expr.cons_val.isLiteral) {
+            writeln(expr);
+            return expr;
+        } else
         if (expr.car.type == symbol_id) {
             switch (expr.car.symbol_val) {
             case "quote":
@@ -326,7 +330,7 @@ start:
                 }
                 auto lastArg = eval(list(symbol("->list"), args.car), env);
                 args1 ~= listToVector(lastArg);
-                expr = cons(fn, list(args1));
+                expr = Cons.create(fn, list(args1),true);
                 return eval(expr, env);
             default:
                 auto found = env.safeFind(expr.car.value.symbol_val);
@@ -334,12 +338,12 @@ start:
                     throw new LyraSyntaxError("Unresolved symbol: " ~ expr.car.toString(),
                             callStack);
                 }
-                expr = cons(found, expr.cdr);
-                goto start;
+                expr = Cons.create(found, expr.cdr,true);
+                return eval(expr, env,disableTailCall);
             }
         } else if (expr.car.type == cons_id) {
-            expr = cons(eval(expr.car, env, disableTailCall), expr.cdr);
-            goto start;
+            expr = Cons.create(eval(expr.car, env, disableTailCall), expr.cdr,true);
+                return eval(expr, env,disableTailCall);
         } else if (expr.car.type == func_id) {
             LyraFunc func = expr.car.func_val;
             LyraObj args = expr.cdr;
@@ -363,7 +367,8 @@ start:
         } else {
             throw new LyraSyntaxError("Object not callable: " ~ expr.car.toString(), callStack);
         }
-    } else if (expr.type == vector_id) {
+    }
+    if (expr.type == vector_id) {
         return evalVector(expr, env);
     } else if (expr.type == symbol_id) {
         auto found = env.safeFind(expr.value.symbol_val);
