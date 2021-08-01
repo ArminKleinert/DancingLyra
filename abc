@@ -1,0 +1,596 @@
+(eql? '() (rest '()))
+(eql? '(2 3 4 5 6 7 8 9 10) (rest '(1 2 3 4 5 6 7 8 9 10)))
+(eql? '('() '()) (rest '('() '() '())))
+(eql? '([] []) (rest '([] [] [])))
+(eql? '("a" "b" "c") (rest '("a" "b" "c")))
+(eql? '(2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0) (rest '(1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0)))
+(eql? '(- * / % id) (rest '(+ - * / % id)))
+(eql? '('y 'z 'abc 'def) (rest '('x 'y 'z 'abc 'def)))
+(eql? '(#\y #\z #\space #\newline) (rest '(#\x #\y #\z #\space #\newline)))
+(eql? '('(2 3 4) '(3 4 5)) (rest '('(1 2 3) '(2 3 4) '(3 4 5))))
+(eql? '([2 3 4] [3 4 5]) (rest '([1 2 3] [2 3 4] [3 4 5])))
+
+(eql? [] (rest []))
+(eql? [2 3 4 5 6 7 8 9 10] (rest [1 2 3 4 5 6 7 8 9 10]))
+(eql? ['() '()] (rest ['() '() '()]))
+(eql? [[] []] (rest [[] [] []]))
+(eql? ["b" "c"] (rest ["a" "b" "c"]))
+(eql? [2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0] (rest [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0]))
+(eql? [- * / % id] (rest [+ - * / % id]))
+(eql? ['y 'z 'abc 'def] (rest ['x 'y 'z 'abc 'def]))
+(eql? [#\y #\z #\space #\newline] (rest [#\x #\y #\z #\space #\newline]))
+(eql? ['(2 3 4) '(3 4 5)] (rest ['(1 2 3) '(2 3 4) '(3 4 5)]))
+(eql? [[2 3 4] [3 4 5]] (rest [[1 2 3] [2 3 4] [3 4 5]]))
+
+
+
+
+
+(empty? '())
+(not (empty? '(1 2 3 4 5 6 7 8 9 10)))
+(not (empty? '('() '() '())))
+(not (empty? '([] [] [])))
+(not (empty? '("a" "b" "c")))
+(not (empty? '(1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0)))
+(not (empty? '(+ - * / % id)))
+(not (empty? '('x 'y 'z 'abc 'def)))
+(not (empty? '(#\x #\y #\z #\space #\newline)))
+(not (empty? '('(1 2 3) '(2 3 4) '(3 4 5))))
+(not (empty? '([1 2 3] [2 3 4] [3 4 5])))
+
+(empty? [])
+(not (empty? [1 2 3 4 5 6 7 8 9 10]))
+(not (empty? ['() '() '()]))
+(not (empty? [[] [] []]))
+(not (empty? ["a" "b" "c"]))
+(not (empty? [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0]))
+(not (empty? [+ - * / % id]))
+(not (empty? ['x 'y 'z 'abc 'def]))
+(not (empty? [#\x #\y #\z #\space #\newline]))
+(not (empty? ['(1 2 3) '(2 3 4) '(3 4 5)]))
+(not (empty? [[1 2 3] [2 3 4] [3 4 5]]))
+
+
+
+
+
+(define (eql?-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (eql?-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+
+(define (first-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (first-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (second-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (second-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (third-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (third-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (rest-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (rest-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (empty?-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (empty?-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (nth-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (nth-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (foldl-list-test)
+  (&&
+    (
+    #t #t
+  ))
+
+(define (foldl-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (foldl-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (foldl-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (map-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (map-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (map-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (map-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (filter-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (filter-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (filter-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (filter-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (append-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (append-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (append-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (append-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (find-first-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (find-first-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (find-first-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (find-first-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (->vector-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (->vector-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (->vector-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (->vector-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (->list-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (->list-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (->list-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (->list-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (copy-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (copy-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (copy-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (copy-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (but-last-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (but-last-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (but-last-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (but-last-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (reverse-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (reverse-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (reverse-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (reverse-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (map-while-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (map-while-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (map-while-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (map-while-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (map-until-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (map-until-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (map-until-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (map-until-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (take-while-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (take-while-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (take-while-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (take-while-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (take-until-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (take-until-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (take-until-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (take-until-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (drop-while-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (drop-while-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (drop-while-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (drop-while-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (drop-until-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (drop-until-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (drop-until-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (drop-until-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (zip-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (zip-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (zip-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (zip-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (list?-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (list?-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (list?-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (list?-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (vector?-list-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (vector?-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (vector?-vector-pair-test)
+  (&&
+    TODO
+    #t #t
+  ))
+
+(define (vector?-offset-vector-test)
+  (&&
+    TODO
+    #t #t
+  ))

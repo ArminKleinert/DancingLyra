@@ -98,10 +98,12 @@
 
 (define (first x) ((find-type-fn x 'first) x))
 (define (second x) ((find-type-fn x 'second) x))
+(define (third x) ((find-type-fn x 'third) x))
 (define (rest x) ((find-type-fn x 'rest) x))
 
 (define (empty? x) (let* (f (find-type-fn x 'empty?)) (if f (f x) #f)))
 (define (eql? x y) (let* (f (find-type-fn x 'eql?)) (if f (f x y) (= x y))))
+(define (eq? x y) (let* (f (find-type-fn x 'eq?)) (if f (f x y) (= x y)))) ; TODO: Make this the default name!
 (define (nth x i)  (let* (f (find-type-fn x 'nth)) (if f (f x i) '())))
 (define (foldl f s x) ((find-type-fn x 'foldl) f s x))
 (define (map f x) ((find-type-fn x 'map) f x))
@@ -118,6 +120,8 @@
 (define (reverse x) ((find-type-fn x 'reverse) x))
 (define (map-while f p x) ((find-type-fn x 'map-while) f p x))
 (define (map-until f p x) ((find-type-fn x 'map-until) f p x))
+(define (take n x) ((find-type-fn x 'take) n x))
+(define (drop n x) ((find-type-fn x 'drop) n x))
 (define (take-while f p x) ((find-type-fn x 'take-while) f p x))
 (define (take-until f p x) ((find-type-fn x 'take-until) f p x))
 (define (drop-while f p x) ((find-type-fn x 'drop-while) f p x))

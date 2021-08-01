@@ -9,7 +9,7 @@
   (list
     (list 'vector? always-true)
     (list 'empty? (lambda (s) (empty? (string-chars s))))
-    (list 'eql? (lambda (s s1) (eql? (string-chars s) (string-chars s1))))
+    (list 'eq? (lambda (s s1) (eq? (string-chars s) (string-chars s1))))
     (list 'nth (lambda (s i) (nth (string-chars s) i)))
     (list 'foldl (lambda (f e s) (foldl f e (string-chars s))))
     (list 'map (lambda (f s) (make-string (map f (string-chars s)))))

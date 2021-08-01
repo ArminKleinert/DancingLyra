@@ -6,7 +6,12 @@
   (let* (f (find-type-fn v 'vector-size)) (if f (f v) (_vector-size v))))
 
 (define (vector-get v i)
-  (let* (f (find-type-fn v '_vector-get)) (if f (f v i) (_vector-get v i))))
+  (let* (f (find-type-fn v '_vector-get))
+    (if f
+      (f v i)
+      (if (or (< i 0) (>= i (vector-size v)))
+        '() ; Default to nil if out of range
+        (_vector-get v i)))))
 
 (define (vector-append v e)
   (let* (f (find-type-fn v 'vector-append))
@@ -87,12 +92,12 @@
         res0))))
 
 ; TODO Tests
-(add-type-fn! vector-pair-id 'eql?
+(add-type-fn! vector-pair-id 'eq?
   (lambda (v0 v1)
     (if (vector-pair? v1)
-      (&& (eql? (vector-pair-x v0) (vector-pair-x v1))
-          (eql? (vector-pair-y v0) (vector-pair-y v1)))
-      (eql? (->vector v0) v1))))
+      (&& (eq? (vector-pair-x v0) (vector-pair-x v1))
+          (eq? (vector-pair-y v0) (vector-pair-y v1)))
+      (eq? (->vector v0) v1))))
 
 ; TODO Tests
 (add-type-fns! vector-pair-id
@@ -142,13 +147,13 @@
 (add-type-fn! vector-id 'vector-set _vector-set)
 (add-type-fn! vector-id 'set-at _vector-set)
 
-(add-type-fn! vector-id 'eql?
+(add-type-fn! vector-id 'eq?
   (lambda (v0 v1)
     (if (vector? v1)
       (if (&& (vector? v1) (= (vector-size v0) (vector-size v1)))
-        (vector-iterate v0 []
+        (vector-iterate v0 #t
           (lambda (acc e i)
-            (if (&& acc (= e (nth v1 i))) #t #f)))
+            (if (&& acc (eq? e (nth v1 i))) #t #f)))
         #f)
       #f)))
 
@@ -221,19 +226,19 @@
 ; TODO Tests
 (add-type-fn! vector-id 'take
   (lambda (n v)
-    (vector-iterate v [])
+    (vector-iterate v []
       (lambda (acc e i)
         (if (= n 0)
           acc
-          (_vector-append acc e)))))
+          (_vector-append acc e))))))
 
 (add-type-fn! vector-id 'drop
   (lambda (n v)
-    (vector-iterate v [])
+    (vector-iterate v []
       (lambda (acc e i)
         (if (> n i)
           acc
-          (_vector-append acc e)))))
+          (_vector-append acc e))))))
 
 ; TODO Tests
 (add-type-fn! vector-id 'map-while
@@ -297,8 +302,9 @@
 
 (add-type-fns! vector-id
   (list
-    (list 'first (lambda (v) ((vector-get v 0))))
-    (list 'second (lambda (v) ((vector-get v 1))))
+    (list 'first (lambda (v) (vector-get v 0)))
+    (list 'second (lambda (v) (vector-get v 1)))
+    (list 'third (lambda (v) (vector-get v 2)))
     (list 'rest (lambda (v) (drop 1 v)))
     (list 'vector-size (lambda (v) (_vector-size v)))
     (list 'empty? (lambda (v) (= (vector-size v) 0)))

@@ -38,12 +38,12 @@
     ""
     (string (->string (car l)) (cdr l))))
 
-(define (list-eql? x y)
+(define (list-eq? x y)
   (if (list? y)
     (let* (list-eql1?
             (lambda (l0 l1) (if (list-empty? l0)
               (list-empty? l1)
-              (and (eql? (car l0) (car l1)) (list-eql1? (cdr l0) (cdr l1))))))
+              (and (eq? (car l0) (car l1)) (list-eql1? (cdr l0) (cdr l1))))))
       (list-eql1? x y))
     #f))
 
@@ -155,9 +155,10 @@
   (list
     (list 'first car)
     (list 'second cadr)
+    (list 'third caddr)
     (list 'rest cdr)
     (list 'empty? always-false)
-    (list 'eql? list-eql?)
+    (list 'eq? list-eq?)
     (list 'nth list-nth)
     (list 'foldl list-foldl)
     (list 'map list-map)
@@ -181,11 +182,12 @@
   
 (add-type-fns! nil-id
   (list
-    (list 'first car)
-    (list 'second cadr)
-    (list 'rest cdr)
+    (list 'first id)
+    (list 'second id)
+    (list 'third id)
+    (list 'rest id)
     (list 'empty? always-true)
-    (list 'eql? (lambda (l0 l1) (= (lyra-type-id l0) (lyra-type-id l1))))
+    (list 'eq? (lambda (l0 l1) (= (lyra-type-id l0) (lyra-type-id l1))))
     (list 'nth list-nth)
     (list 'foldl list-foldl)
     (list 'map list-map)
