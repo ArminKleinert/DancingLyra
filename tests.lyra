@@ -22,7 +22,6 @@
     (not (null? id))
     (not (null? #t))
     (not (null? #f))
-    #t #t
   ))
 
 (define (symbol?-test)
@@ -40,7 +39,6 @@
     (not (symbol? id))
     (not (symbol? #t))
     (not (symbol? #f))
-    #t #t
   ))
 
 (define (string?-test)
@@ -58,7 +56,6 @@
     (not (string? id))
     (not (string? #t))
     (not (string? #f))
-    #t #t
   ))
 
 (define (char?-test)
@@ -76,7 +73,6 @@
     (not (char? id))
     (not (char? #t))
     (not (char? #f))
-    #t #t
   ))
 
 (define (integer?-test)
@@ -94,7 +90,6 @@
     (not (integer? id))
     (not (integer? #t))
     (not (integer? #f))
-    #t #t
   ))
 
 (define (real?-test)
@@ -112,7 +107,6 @@
     (not (real? id))
     (not (real? #t))
     (not (real? #f))
-    #t #t
   ))
 
 (define (cons?-test)
@@ -130,7 +124,6 @@
     (not (cons? id))
     (not (cons? #t))
     (not (cons? #f))
-    #t #t
   ))
 
 (define (func?-test)
@@ -148,7 +141,6 @@
     (func? id)
     (not (func? #t))
     (not (func? #f))
-    #t #t
   ))
 
 (define (bool?-test)
@@ -166,7 +158,6 @@
     (not (bool? id))
     (bool? #t)
     (bool? #f)
-    #t #t
   ))
 
 (define (box?-test)
@@ -184,7 +175,6 @@
     (not (box? id))
     (not (box? #t))
     (not (box? #f))
-    #t #t
   ))
 
 (define (list?-test)
@@ -202,7 +192,6 @@
     (not (list? id))
     (not (list? #t))
     (not (list? #f))
-    #t #t
   ))
 
 (define (vector?-test)
@@ -220,7 +209,6 @@
     (not (vector? id))
     (not (vector? #t))
     (not (vector? #f))
-    #t #t
   ))
 
 ; Test eq? function
@@ -240,7 +228,6 @@
     (not (eq? '(1 2 3) id))
     (not (eq? '(1 2 3) #t))
     (not (eq? '(1 2 3) #f))
-    #t #t
   ))
 
 (define (eq?-nil-test)
@@ -258,7 +245,6 @@
     (not (eq? '() id))
     (not (eq? '() #t))
     (not (eq? '() #f))
-    #t #t
   ))
 
 (define (eq?-vector-test)
@@ -289,7 +275,6 @@
     (not (eq? [] id))
     (not (eq? [] #t))
     (not (eq? [] #f))
-    #t #t
   ))
 
 (define (eq?-integer-test)
@@ -307,7 +292,6 @@
     (not (eq? 629 id))
     (not (eq? 629 #t))
     (not (eq? 629 #f))
-    #t #t
   ))
 
 (define (eq?-real-test)
@@ -325,7 +309,6 @@
     (not (eq? 62.9 id))
     (not (eq? 62.9 #t))
     (not (eq? 62.9 #f))
-    #t #t
   ))
 
 (define (eq?-string-test)
@@ -343,7 +326,6 @@
     (not (eq? "629" id))
     (not (eq? "629" #t))
     (not (eq? "629" #f))
-    #t #t
   ))
 
 (define (eq?-char-test)
@@ -361,7 +343,6 @@
     (not (eq? #\a id))
     (not (eq? #\a #t))
     (not (eq? #\a #f))
-    #t #t
   ))
 
 (define (eq?-box-test)
@@ -379,7 +360,6 @@
     (not (eq? (box '()) id))
     (not (eq? (box '()) #t))
     (not (eq? (box '()) #f))
-    #t #t
   ))
 
 (define (eq?-symbol-test)
@@ -397,7 +377,6 @@
     (not (eq? 'sym id))
     (not (eq? 'sym #t))
     (not (eq? 'sym #f))
-    #t #t
   ))
 
 (define (eq?-function-test)
@@ -415,7 +394,6 @@
     (eq? id id)
     (not (eq? id #t))
     (not (eq? id #f))
-    #t #t
   ))
 
 (define (eq?-boolean-test)
@@ -446,7 +424,6 @@
     (not (eq? #f id))
     (not (eq? #f #t))
     (eq? #f #f)
-    #t #t
   ))
 
 ; Test collection functions
@@ -464,7 +441,6 @@
     (eq? #\x (first (list #\x #\y #\z #\space #\newline)))
     (eq? '(1 2 3) (first (list '(1 2 3) '(2 3 4) '(3 4 5))))
     (eq? [1 2 3] (first (list [1 2 3] [2 3 4] [3 4 5])))
-    #t #t
   ))
 
 (define (first-vector-test)
@@ -480,7 +456,6 @@
     (eq? #\x (first [#\x #\y #\z #\space #\newline]))
     (eq? '(1 2 3) (first ['(1 2 3) '(2 3 4) '(3 4 5)]))
     (eq? [1 2 3] (first [[1 2 3] [2 3 4] [3 4 5]]))
-    #t #t
   ))
 
 (define (second-list-test)
@@ -496,7 +471,6 @@
     (eq? #\y (second (list #\x #\y #\z #\space #\newline)))
     (eq? '(2 3 4) (second (list '(1 2 3) '(2 3 4) '(3 4 5))))
     (eq? [2 3 4] (second (list [1 2 3] [2 3 4] [3 4 5])))
-    #t #t
   ))
 
 (define (second-vector-test)
@@ -512,7 +486,6 @@
     (eq? #\y (second [#\x #\y #\z #\space #\newline]))
     (eq? '(2 3 4) (second ['(1 2 3) '(2 3 4) '(3 4 5)]))
     (eq? [2 3 4] (second [[1 2 3] [2 3 4] [3 4 5]]))
-    #t #t
   ))
 
 (define (third-list-test)
@@ -528,7 +501,6 @@
     (eq? #\z (third (list #\x #\y #\z #\space #\newline)))
     (eq? '(3 4 5) (third (list '(1 2 3) '(2 3 4) '(3 4 5))))
     (eq? [3 4 5] (third (list [1 2 3] [2 3 4] [3 4 5])))
-    #t #t
   ))
 
 (define (third-vector-test)
@@ -544,7 +516,6 @@
     (eq? #\z (third [#\x #\y #\z #\space #\newline]))
     (eq? '(3 4 5) (third ['(1 2 3) '(2 3 4) '(3 4 5)]))
     (eq? [3 4 5] (third [[1 2 3] [2 3 4] [3 4 5]]))
-    #t #t
   ))
 
 (define (rest-list-test)
@@ -560,7 +531,6 @@
     (eq? (list #\y #\z #\space #\newline) (rest (list #\x #\y #\z #\space #\newline)))
     (eq? (list '(2 3 4) '(3 4 5)) (rest (list '(1 2 3) '(2 3 4) '(3 4 5))))
     (eq? (list [2 3 4] [3 4 5]) (rest (list [1 2 3] [2 3 4] [3 4 5])))
-    #t #t
   ))
 
 (define (rest-vector-test)
@@ -576,7 +546,6 @@
     (eq? [#\y #\z #\space #\newline] (rest [#\x #\y #\z #\space #\newline]))
     (eq? ['(2 3 4) '(3 4 5)] (rest ['(1 2 3) '(2 3 4) '(3 4 5)]))
     (eq? [[2 3 4] [3 4 5]] (rest [[1 2 3] [2 3 4] [3 4 5]]))
-    #t #t
   ))
 
 (define (nth-list-test)
@@ -616,7 +585,6 @@
     (eq? #\z (nth (list #\x #\y #\z #\space #\newline) 2))
     (eq? '(3 4 5) (nth (list '(1 2 3) '(2 3 4) '(3 4 5)) 2))
     (eq? [3 4 5] (nth (list [1 2 3] [2 3 4] [3 4 5]) 2))
-    #t #t
   ))
 
 (define (nth-vector-test)
@@ -656,7 +624,6 @@
     (eq? #\z (nth [#\x #\y #\z #\space #\newline] 2))
     (eq? '(3 4 5) (nth ['(1 2 3) '(2 3 4) '(3 4 5)] 2))
     (eq? [3 4 5] (nth [[1 2 3] [2 3 4] [3 4 5]] 2))
-    #t #t
   ))
 
 (define (empty?-list-test)
@@ -672,7 +639,6 @@
     (not (empty? '(#\x #\y #\z #\space #\newline)))
     (not (empty? '('(1 2 3) '(2 3 4) '(3 4 5))))
     (not (empty? '([1 2 3] [2 3 4] [3 4 5])))
-    #t #t
   ))
 
 (define (empty?-vector-test)
@@ -688,7 +654,6 @@
     (not (empty? [#\x #\y #\z #\space #\newline]))
     (not (empty? ['(1 2 3) '(2 3 4) '(3 4 5)]))
     (not (empty? [[1 2 3] [2 3 4] [3 4 5]]))
-    #t #t
   ))
 
 (define (foldl-list-test)
@@ -711,30 +676,28 @@
     (eq? (list #\newline #\space #\z #\y #\x) (helper (list #\x #\y #\z #\space #\newline)))
     (eq? (list '(3 4 5) '(2 3 4) '(1 2 3)) (helper (list '(1 2 3) '(2 3 4) '(3 4 5))))
     (eq? (list [3 4 5] [2 3 4] [1 2 3]) (helper (list [1 2 3] [2 3 4] [3 4 5])))
-    #t #t
   )))
 
 (define (foldl-vector-test)
   (let* (helper (lambda (xs) (foldl (lambda (x y) (cons y x)) '() xs)))
     (&&
-    (eq? 0 (foldl + 0 []))
-    (eq? 1 (foldl + 1 []))
-    (eq? 6 (foldl + 5 [1]))
-    (eq? 15 (foldl + 0 [1 2 3 4 5]))
-    (eq? "12345" (foldl string "" [1 2 3 4 5]))
-      
-    (eq? '() (helper []))
-    (eq? (list 10 9 8 7 6 5 4 3 2 1) (helper [1 2 3 4 5 6 7 8 9 10]))
-    (eq? (list '() '() '()) (helper ['() '() '()]))
-    (eq? (list [] [] []) (helper [[] [] []]))
-    (eq? (list "c" "b" "a") (helper ["a" "b" "c"]))
-    (eq? (list 10.0 9.0 8.0 7.0 6.0 5.0 4.0 3.0 2.0 1.0) (helper [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0]))
-    (eq? (list id % / * - +) (helper [+ - * / % id]))
-    (eq? (list 'def 'abc 'z 'y 'x) (helper ['x 'y 'z 'abc 'def]))
-    (eq? (list #\newline #\space #\z #\y #\x) (helper [#\x #\y #\z #\space #\newline]))
-    (eq? (list '(3 4 5) '(2 3 4) '(1 2 3)) (helper ['(1 2 3) '(2 3 4) '(3 4 5)]))
-    (eq? (list [3 4 5] [2 3 4] [1 2 3]) (helper [[1 2 3] [2 3 4] [3 4 5]]))
-      #t #t
+      (eq? 0 (foldl + 0 []))
+      (eq? 1 (foldl + 1 []))
+      (eq? 6 (foldl + 5 [1]))
+      (eq? 15 (foldl + 0 [1 2 3 4 5]))
+      (eq? "12345" (foldl string "" [1 2 3 4 5]))
+        
+      (eq? '() (helper []))
+      (eq? (list 10 9 8 7 6 5 4 3 2 1) (helper [1 2 3 4 5 6 7 8 9 10]))
+      (eq? (list '() '() '()) (helper ['() '() '()]))
+      (eq? (list [] [] []) (helper [[] [] []]))
+      (eq? (list "c" "b" "a") (helper ["a" "b" "c"]))
+      (eq? (list 10.0 9.0 8.0 7.0 6.0 5.0 4.0 3.0 2.0 1.0) (helper [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0]))
+      (eq? (list id % / * - +) (helper [+ - * / % id]))
+      (eq? (list 'def 'abc 'z 'y 'x) (helper ['x 'y 'z 'abc 'def]))
+      (eq? (list #\newline #\space #\z #\y #\x) (helper [#\x #\y #\z #\space #\newline]))
+      (eq? (list '(3 4 5) '(2 3 4) '(1 2 3)) (helper ['(1 2 3) '(2 3 4) '(3 4 5)]))
+      (eq? (list [3 4 5] [2 3 4] [1 2 3]) (helper [[1 2 3] [2 3 4] [3 4 5]]))
     )))
 
 (define (map-list-test)
@@ -750,7 +713,6 @@
     (eq? (list "x" "y" "z" " " "\n") (map string (list #\x #\y #\z #\space #\newline)))
     (eq? (list "(1 2 3)" "(2 3 4)" "(3 4 5)") (map string (list '(1 2 3) '(2 3 4) '(3 4 5))))
     (eq? (list "[1 2 3]" "[2 3 4]" "[3 4 5]") (map string (list [1 2 3] [2 3 4] [3 4 5])))
-    #t #t
   ))
 
 (define (map-vector-test)
@@ -766,7 +728,6 @@
     (eq? ["x" "y" "z" " " "\n"] (map string [#\x #\y #\z #\space #\newline]))
     (eq? ["(1 2 3)" "(2 3 4)" "(3 4 5)"] (map string ['(1 2 3) '(2 3 4) '(3 4 5)]))
     (eq? ["[1 2 3]" "[2 3 4]" "[3 4 5]"] (map string [[1 2 3] [2 3 4] [3 4 5]]))
-    #t #t
   ))
 
 (define (filter-list-test)
@@ -782,7 +743,6 @@
            (filter number? v))
       (eq? (list #\x #\y #\z #\space #\newline) (filter char? v))
       (eq? (list "a" "b" "c") (filter string? v))
-      #t #t
     )))
 
 (define (filter-vector-test)
@@ -798,7 +758,6 @@
            (filter number? v))
       (eq? (vector #\x #\y #\z #\space #\newline) (filter char? v))
       (eq? (vector "a" "b" "c") (filter string? v))
-      #t #t
   )))
 
 (define (append-list-nil-test)
@@ -831,7 +790,6 @@
          (append '() (list [1 2 3] [2 3 4] [3 4 5])))
     (eq? (list [1 2 3] [2 3 4] [3 4 5])
          (append (list [1 2 3] [2 3 4] [3 4 5]) '()))
-    #t #t
   ))
 
 (define (append-list-test)
@@ -888,7 +846,6 @@
          (append [] (vector [1 2 3] [2 3 4] [3 4 5])))
     (eq? (vector [1 2 3] [2 3 4] [3 4 5])
          (append (vector [1 2 3] [2 3 4] [3 4 5]) []))
-    #t #t
   ))
 
 (define (append-vector-test)
@@ -927,7 +884,6 @@
       (eq? 1 (find-first number? v))
       (eq? #\x (find-first char? v))
       (eq? "a" (find-first string? v))
-      #t #t
     )))
 
 (define (find-first-vector-test)
@@ -942,7 +898,6 @@
       (eq? 1 (find-first number? v))
       (eq? #\x (find-first char? v))
       (eq? "a" (find-first string? v))
-      #t #t
     )))
 
  
@@ -959,7 +914,6 @@
     (eq? [#\x #\y #\z #\space #\newline] (->vector (list #\x #\y #\z #\space #\newline)))
     (eq? ['(1 2 3) '(2 3 4) '(3 4 5)] (->vector (list '(1 2 3) '(2 3 4) '(3 4 5))))
     (eq? [[1 2 3] [2 3 4] [3 4 5]] (->vector (list [1 2 3] [2 3 4] [3 4 5])))
-    #t #t
   ))
 
 (define (->vector-vector-test)
@@ -975,7 +929,6 @@
     (eq? [#\x #\y #\z #\space #\newline] (->vector [#\x #\y #\z #\space #\newline]))
     (eq? ['(1 2 3) '(2 3 4) '(3 4 5)] (->vector ['(1 2 3) '(2 3 4) '(3 4 5)]))
     (eq? [[1 2 3] [2 3 4] [3 4 5]] (->vector [[1 2 3] [2 3 4] [3 4 5]]))
-    #t #t
   ))
 
 (define (->list-list-test)
@@ -991,7 +944,6 @@
     (eq? (list #\x #\y #\z #\space #\newline) (->list (list #\x #\y #\z #\space #\newline)))
     (eq? (list '(1 2 3) '(2 3 4) '(3 4 5)) (->list (list '(1 2 3) '(2 3 4) '(3 4 5))))
     (eq? (list [1 2 3] [2 3 4] [3 4 5]) (->list (list [1 2 3] [2 3 4] [3 4 5])))
-    #t #t
   ))
 
 (define (->list-vector-test)
@@ -1007,7 +959,6 @@
     (eq? (list #\x #\y #\z #\space #\newline) (->list [#\x #\y #\z #\space #\newline]))
     (eq? (list '(1 2 3) '(2 3 4) '(3 4 5)) (->list ['(1 2 3) '(2 3 4) '(3 4 5)]))
     (eq? (list [1 2 3] [2 3 4] [3 4 5]) (->list [[1 2 3] [2 3 4] [3 4 5]]))
-    #t #t
   ))
 
 (define (copy-list-test)
@@ -1023,7 +974,6 @@
     (eq? (list #\x #\y #\z #\space #\newline) (copy (list #\x #\y #\z #\space #\newline)))
     (eq? (list '(1 2 3) '(2 3 4) '(3 4 5)) (copy (list '(1 2 3) '(2 3 4) '(3 4 5))))
     (eq? (list [1 2 3] [2 3 4] [3 4 5]) (copy (list [1 2 3] [2 3 4] [3 4 5])))
-    #t #t
   ))
 
 (define (copy-vector-test)
@@ -1039,7 +989,6 @@
     (eq? [#\x #\y #\z #\space #\newline] (copy [#\x #\y #\z #\space #\newline]))
     (eq? ['(1 2 3) '(2 3 4) '(3 4 5)] (copy ['(1 2 3) '(2 3 4) '(3 4 5)]))
     (eq? [[1 2 3] [2 3 4] [3 4 5]] (copy [[1 2 3] [2 3 4] [3 4 5]]))
-    #t #t
   ))
 
 (define (but-last-list-test)
@@ -1055,7 +1004,6 @@
     (eq? (list #\x #\y #\z #\space) (but-last (list #\x #\y #\z #\space #\newline)))
     (eq? (list '(1 2 3) '(2 3 4)) (but-last (list '(1 2 3) '(2 3 4) '(3 4 5))))
     (eq? (list [1 2 3] [2 3 4]) (but-last (list [1 2 3] [2 3 4] [3 4 5])))
-    #t #t
   ))
 
 (define (but-last-vector-test)
@@ -1071,7 +1019,6 @@
     (eq? [#\x #\y #\z #\space] (but-last [#\x #\y #\z #\space #\newline]))
     (eq? ['(1 2 3) '(2 3 4)] (but-last ['(1 2 3) '(2 3 4) '(3 4 5)]))
     (eq? [[1 2 3] [2 3 4]] (but-last [[1 2 3] [2 3 4] [3 4 5]]))
-    #t #t
   ))
 
 (define (reverse-list-test)
@@ -1087,7 +1034,6 @@
     (eq? (list #\newline #\space #\z #\y #\x) (reverse (list #\x #\y #\z #\space #\newline)))
     (eq? (list '(3 4 5) '(2 3 4) '(1 2 3)) (reverse (list '(1 2 3) '(2 3 4) '(3 4 5))))
     (eq? (list [3 4 5] [2 3 4] [1 2 3]) (reverse (list [1 2 3] [2 3 4] [3 4 5])))
-    #t #t
   ))
 
 (define (reverse-vector-test)
@@ -1103,7 +1049,6 @@
     (eq? (vector #\newline #\space #\z #\y #\x) (reverse [#\x #\y #\z #\space #\newline]))
     (eq? (vector '(3 4 5) '(2 3 4) '(1 2 3)) (reverse ['(1 2 3) '(2 3 4) '(3 4 5)]))
     (eq? (vector [3 4 5] [2 3 4] [1 2 3]) (reverse [[1 2 3] [2 3 4] [3 4 5]]))
-    #t #t
   ))
 
 (define (map-while-list-test)
@@ -1114,7 +1059,6 @@
     (eq? (list 2 3 4 5) (map-while inc (lambda (n) (< n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list 2) (map-while inc odd? (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? '() (map-while inc even? (list 1 2 3 4 5 6 7 8 9 10)))
-    #t #t
   ))
 
 (define (map-while-vector-test)
@@ -1125,7 +1069,6 @@
     (eq? (vector 2 3 4 5) (map-while inc (lambda (n) (< n 5)) [1 2 3 4 5 6 7 8 9 10]))
     (eq? (vector 2) (map-while inc odd? [1 2 3 4 5 6 7 8 9 10]))
     (eq? [] (map-while inc even? [1 2 3 4 5 6 7 8 9 10]))
-    #t #t
   ))
 
 (define (map-until-list-test)
@@ -1135,7 +1078,6 @@
     (eq? (list 2 3 4 5 6) (map-until inc (lambda (n) (> n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? '() (map-until inc odd? (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list 2) (map-until inc even? (list 1 2 3 4 5 6 7 8 9 10)))
-    #t #t
   ))
 
 (define (map-until-vector-test)
@@ -1146,7 +1088,6 @@
     (eq? (vector 2 3 4 5 6) (map-until inc (lambda (n) (> n 5)) [1 2 3 4 5 6 7 8 9 10]))
     (eq? [] (map-until inc odd? [1 2 3 4 5 6 7 8 9 10]))
     (eq? (vector 2) (map-until inc even? [1 2 3 4 5 6 7 8 9 10]))
-    #t #t
   ))
 
 (define (take-list-test)
@@ -1183,7 +1124,6 @@
     (eq? (list #\x #\y #\z #\space #\newline) (take 1000000 (list #\x #\y #\z #\space #\newline)))
     (eq? (list '(1 2 3) '(2 3 4) '(3 4 5)) (take 1000000 (list '(1 2 3) '(2 3 4) '(3 4 5))))
     (eq? (list [1 2 3] [2 3 4] [3 4 5]) (take 1000000 (list [1 2 3] [2 3 4] [3 4 5])))
-    #t #t
   ))
 
 (define (take-vector-test)
@@ -1220,7 +1160,6 @@
     (eq? [#\x #\y #\z #\space #\newline] (take 1000000 [#\x #\y #\z #\space #\newline]))
     (eq? ['(1 2 3) '(2 3 4) '(3 4 5)] (take 1000000 ['(1 2 3) '(2 3 4) '(3 4 5)]))
     (eq? [[1 2 3] [2 3 4] [3 4 5]] (take 1000000 [[1 2 3] [2 3 4] [3 4 5]]))
-    #t #t
   ))
 
 (define (take-while-list-test)
@@ -1230,7 +1169,6 @@
     (eq? '()  (take-while always-false (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list 1 2 3 4) (take-while (lambda (n) (< n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? '()  (take-while (lambda (n) (> n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
-    #t #t
   ))
 
 (define (take-while-vector-test)
@@ -1240,7 +1178,6 @@
     (eq? [] (take-while always-false [1 2 3 4 5 6 7 8 9 10]))
     (eq? [1 2 3 4] (take-while (lambda (n) (< n 5)) [1 2 3 4 5 6 7 8 9 10]))
     (eq? [] (take-while (lambda (n) (> n 5)) [1 2 3 4 5 6 7 8 9 10]))
-    #t #t
   ))
 
 (define (take-until-list-test)
@@ -1250,7 +1187,6 @@
     (eq? (list 1 2 3 4 5 6 7 8 9 10)  (take-until always-false (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? '() (take-until (lambda (n) (< n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list 1 2 3 4 5)  (take-until (lambda (n) (> n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
-    #t #t
   ))
 
 (define (take-until-vector-test)
@@ -1260,7 +1196,6 @@
     (eq? [1 2 3 4 5 6 7 8 9 10] (take-until always-false [1 2 3 4 5 6 7 8 9 10]))
     (eq? [] (take-until (lambda (n) (< n 5)) [1 2 3 4 5 6 7 8 9 10]))
     (eq? [1 2 3 4 5] (take-until (lambda (n) (> n 5)) [1 2 3 4 5 6 7 8 9 10]))
-    #t #t
   ))
 
 (define (drop-while-list-test)
@@ -1270,7 +1205,6 @@
     (eq? (list 1 2 3 4 5 6 7 8 9 10)  (drop-while always-false (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list 5 6 7 8 9 10) (drop-while (lambda (n) (< n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list 1 2 3 4 5 6 7 8 9 10)  (drop-while (lambda (n) (> n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
-    #t #t
   ))
 
 (define (drop-while-vector-test)
@@ -1280,7 +1214,6 @@
     (eq? [1 2 3 4 5 6 7 8 9 10] (drop-while always-false [1 2 3 4 5 6 7 8 9 10]))
     (eq? [5 6 7 8 9 10] (drop-while (lambda (n) (< n 5)) [1 2 3 4 5 6 7 8 9 10]))
     (eq? [1 2 3 4 5 6 7 8 9 10] (drop-while (lambda (n) (> n 5)) [1 2 3 4 5 6 7 8 9 10]))
-    #t #t
   ))
 
 (define (drop-until-list-test)
@@ -1290,7 +1223,6 @@
     (eq? '()  (drop-until always-false (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list 1 2 3 4 5 6 7 8 9 10) (drop-until (lambda (n) (< n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list 6 7 8 9 10)  (drop-until (lambda (n) (> n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
-    #t #t
   ))
 
 (define (drop-until-vector-test)
@@ -1300,7 +1232,6 @@
     (eq? [] (drop-until always-false [1 2 3 4 5 6 7 8 9 10]))
     (eq? [1 2 3 4 5 6 7 8 9 10] (drop-until (lambda (n) (< n 5)) [1 2 3 4 5 6 7 8 9 10]))
     (eq? [6 7 8 9 10] (drop-until (lambda (n) (> n 5)) [1 2 3 4 5 6 7 8 9 10]))
-    #t #t
   ))
 
 (define (zip-list-test)
@@ -1311,7 +1242,6 @@
     (eq? (list (list 1 6) (list 2 7)) (zip (list 1 2) (list 6 7 8 9 10)))
     (eq? (list (list 1 6) (list 2 7)) (zip (list 1 2 3 4 5) (list 6 7)))
     (eq? (list (list 1 6) (list 2 7) (list 3 8) (list 4 9) (list 5 10)) (zip (list 1 2 3 4 5) (list 6 7 8 9 10)))
-    #t #t
   ))
 
 (define (zip-vector-test)
@@ -1322,7 +1252,6 @@
     (eq? [[1 6] [2 7]] (zip [1 2] [6 7 8 9 10]))
     (eq? [[1 6] [2 7]] (zip [1 2 3 4 5] [6 7]))
     (eq? [[1 6] [2 7] [3 8] [4 9] [5 10]] (zip [1 2 3 4 5] [6 7 8 9 10]))
-    #t #t
   ))
 
 
@@ -1399,13 +1328,13 @@
 (println! (string "(take-list-test): ........... " (take-list-test)))
 (println! (string "(take-vector-test): ......... " (take-vector-test)))
 (println! (string "(take-while-list-test): ..... " (take-while-list-test)))
-(println! (string "(take-while-vector-test):.... " (take-while-vector-test)))
+(println! (string "(take-while-vector-test): ... " (take-while-vector-test)))
 (println! (string "(take-until-list-test): ..... " (take-until-list-test)))
-(println! (string "(take-until-vector-test):.... " (take-until-vector-test)))
+(println! (string "(take-until-vector-test): ... " (take-until-vector-test)))
 (println! (string "(drop-while-list-test): ..... " (drop-while-list-test)))
-(println! (string "(drop-while-vector-test):.... " (drop-while-vector-test)))
+(println! (string "(drop-while-vector-test): ... " (drop-while-vector-test)))
 (println! (string "(drop-until-list-test): ..... " (drop-until-list-test)))
-(println! (string "(drop-until-vector-test):.... " (drop-until-vector-test)))
+(println! (string "(drop-until-vector-test): ... " (drop-until-vector-test)))
 (println! "")
 (println! (string "(zip-list-test): ............ " (zip-list-test)))
 (println! (string "(zip-vector-test):........... " (zip-vector-test)))

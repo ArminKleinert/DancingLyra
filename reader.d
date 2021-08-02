@@ -74,7 +74,7 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
     while ((token = tokens.next()) !is null) {
         switch (token) {
         case "'":
-            root ~= list([                    symbol("quote"), make_ast(tokens, level, "", true)]);
+            root ~= list([symbol("quote"), make_ast(tokens, level, "", true)]);
             break;
         case "(":
             root ~= make_ast(tokens, level + 1, ")");

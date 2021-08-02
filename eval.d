@@ -333,11 +333,11 @@ LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
                             callStack);
                 }
                 expr = Cons.create(found, expr.cdr);
-                return eval(expr, env,disableTailCall);
+                return eval(expr, env, disableTailCall);
             }
         } else if (expr.car.type == cons_id) {
             expr = Cons.create(eval(expr.car, env, disableTailCall), expr.cdr);
-                return eval(expr, env,disableTailCall);
+            return eval(expr, env, disableTailCall);
         } else if (expr.car.type == func_id) {
             LyraFunc func = expr.car.func_val;
             LyraObj args = expr.cdr;
