@@ -916,8 +916,7 @@
   ))
 
 (define (find-first-list-test)
-  (&&
-    (let* (v (list 1 2 3 4 5 6 7 8 9 10 '() '() '() [] [] [] "a" "b" "c" 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1 + - * / % id 'x 'y 'z 'abc 'def #\x #\y #\z #\space #\newline '(1 2 3) '(2 3 4) '(3 4 5) [1 2 3] [2 3 4] [3 4 5]))
+  (let* (v (list 1 2 3 4 5 6 7 8 9 10 '() '() '() [] [] [] "a" "b" "c" 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1 + - * / % id 'x 'y 'z 'abc 'def #\x #\y #\z #\space #\newline '(1 2 3) '(2 3 4) '(3 4 5) [1 2 3] [2 3 4] [3 4 5]))
     (&&
       (eq? 'x (find-first symbol? v))
       (eq? [] (find-first vector? v))
@@ -929,13 +928,10 @@
       (eq? #\x (find-first char? v))
       (eq? "a" (find-first string? v))
       #t #t
-    ))
-    #t #t
-  ))
+    )))
 
 (define (find-first-vector-test)
-  (&&
-    (let* (v [1 2 3 4 5 6 7 8 9 10 '() '() '() [] [] [] "a" "b" "c" 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1 + - * / % id 'x 'y 'z 'abc 'def #\x #\y #\z #\space #\newline '(1 2 3) '(2 3 4) '(3 4 5) [1 2 3] [2 3 4] [3 4 5]])
+  (let* (v [1 2 3 4 5 6 7 8 9 10 '() '() '() [] [] [] "a" "b" "c" 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1 + - * / % id 'x 'y 'z 'abc 'def #\x #\y #\z #\space #\newline '(1 2 3) '(2 3 4) '(3 4 5) [1 2 3] [2 3 4] [3 4 5]])
     (&&
       (eq? 'x (find-first symbol? v))
       (eq? [] (find-first vector? v))
@@ -947,9 +943,7 @@
       (eq? #\x (find-first char? v))
       (eq? "a" (find-first string? v))
       #t #t
-    ))
-    #t #t
-  ))
+    )))
 
  
 (define (->vector-list-test)
