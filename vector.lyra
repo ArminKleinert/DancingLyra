@@ -260,7 +260,7 @@ vector-size vector-append append ->vector but-last foldl map reverse ->string fi
       v
       (vector-iterate v []
         (lambda (acc e i)
-          (if (= n 0)
+          (if (>= i n)
             acc
             (_vector-append acc e)))))))
 
