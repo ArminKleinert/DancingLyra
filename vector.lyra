@@ -32,12 +32,10 @@
 (define vector-pair-id (add-type!))
 (define-record vector-pair-id vector-pair x y)
 
-; TODO Tests
 (add-type-fn! vector-pair-id 'vector-size
   (lambda (vp)
     (+ (_vector-size (vector-pair-x vp)) (_vector-size (vector-pair-y vp)))))
 
-; TODO Tests
 (add-type-fn! vector-pair-id 'vector-append
   (lambda (vp e)
     (make-vector-pair (vector-pair-x vp) (vector-append (vector-pair-y vp) e))))
@@ -49,33 +47,27 @@
       vp
       (append (->vector vp) v1))))
 
-; TODO Tests
 (add-type-fn! vector-pair-id '->vector
   (lambda (vp) 
     (vector-iterate (->vector (vector-pair-x vp)) (->vector (vector-pair-y vp))
       (lambda (acc e i) (_vector-append acc e)))))
 
-; TODO Tests
 (add-type-fn! vector-pair-id 'but-last
   (lambda (vp) 
     (make-vector-pair (vector-pair-x vp) (but-last (vector-pair-y vp)))))
 
-; TODO Tests
 (add-type-fn! vector-pair-id 'foldl
   (lambda (f x vp) 
     (foldl f (foldl f x (vector-pair-x vp)) (vector-pair-y vp))))
 
-; TODO Tests
 (add-type-fn! vector-pair-id 'map
   (lambda (f vp)
     (make-vector-pair (map f (vector-pair-x vp)) (map f (vector-pair-y vp)))))
 
-; TODO Tests
 (add-type-fn! vector-pair-id 'reverse
   (lambda (f vp)
     (make-vector-pair (reverse (vector-pair-y vp)) (reverse (vector-pair-x vp)))))
 
-; TODO Tests
 (add-type-fn! vector-pair-id '->string
   (lambda (vp)
     (let ((f (lambda (s0 s1) (string s0 " " s1)))
@@ -83,7 +75,6 @@
           (v1-s (foldl f "" (vector-pair-y vp))))
       (string "[" v0-s v1-s "]"))))
 
-; TODO Tests
 (add-type-fn! vector-pair-id 'find-first
   (lambda (p vp)
     (let* (res0 (find-first p (vector-pair-x vp)))
@@ -91,7 +82,6 @@
         (find-first p (vector-pair-y vp))
         res0))))
 
-; TODO Tests
 (add-type-fn! vector-pair-id 'eq?
   (lambda (v0 v1)
     (if (vector-pair? v1)
@@ -99,7 +89,6 @@
           (eq? (vector-pair-y v0) (vector-pair-y v1)))
       (eq? (->vector v0) v1))))
 
-; TODO Tests
 (add-type-fns! vector-pair-id
   (list
     (list 'empty? (lambda (vp) (&& (empty? (vector-pair-x vp)) (empty? (vector-pair-y vp)))))
@@ -168,27 +157,23 @@
     (vector-iterate v []
       (lambda (acc e i) (_vector-append acc (f e))))))
 
-; TODO Tests
 (add-type-fn! vector-id 'filter
   (lambda (p v) 
     (vector-iterate v []
       (lambda (acc e i)
         (if (p e) (_vector-append acc e) acc)))))
 
-; TODO Tests
 (comment add-type-fn! vector-id 'append
   (lambda (v v1) 
     (vector-iterate (->vector v1) v
       (lambda (acc e i) (_vector-append acc e)))))
 
-; TODO Tests
 (add-type-fn! vector-id 'append
   (lambda (v v1)
     (cond ((empty? v) v1)
           ((empty? v1) v)
           (#t (make-vector-pair v (->vector v1))))))
 
-; TODO Tests
 (add-type-fn! vector-id 'find-first
   (lambda (p v) 
     (car (cdr
@@ -198,7 +183,6 @@
                 ((p e) (list #t e))
                 (#t acc))))))))
 
-; TODO Tests
 (add-type-fn! vector-id '->list
   (lambda (v)
     (let* (iter (lambda (i nl)
@@ -208,14 +192,12 @@
                 (cons (vector-get v i) nl)))))
       (iter (dec (vector-size v)) '()))))
 
-; TODO Tests
 (add-type-fn! vector-id 'but-last
   (lambda (v)
     (let* (last-idx (- (_vector-size v) 1))
       (vector-iterate v []
         (lambda (acc e i) (if (<= last-idx i) acc (_vector-append acc e)))))))
 
-; TODO Tests
 (add-type-fn! vector-id 'reverse
   (lambda (v) 
     (let* (vlen (- (_vector-size v) 1))
@@ -223,7 +205,6 @@
         (lambda (acc e i)
           (vector-append acc (_vector-get v (- vlen i))))))))
 
-; TODO Tests
 (add-type-fn! vector-id 'take
   (lambda (n v)
     (vector-iterate v []
@@ -240,7 +221,6 @@
           acc
           (_vector-append acc e))))))
 
-; TODO Tests
 (add-type-fn! vector-id 'map-while
   (lambda (f p v)
     (car
@@ -252,12 +232,10 @@
             (list (_vector-append (car acc) (f e)) #f)
             (list (car acc) #t))))))))
 
-; TODO Tests
 (add-type-fn! vector-id 'map-until
   (lambda (f p v)
     (map-while f (lambda (e) (not (p e))) v)))
 
-; TODO Tests
 (add-type-fn! vector-id 'take
   (lambda (n v)
     (vector-iterate v []
@@ -266,7 +244,6 @@
           (_vector-append acc e)
           acc)))))
 
-; TODO Tests
 (add-type-fn! vector-id 'take-while
   (lambda (p v)
     (car
@@ -278,12 +255,10 @@
             (list (_vector-append (car acc) e) #f)
             (list (car acc) #t))))))))
 
-; TODO Tests
 (add-type-fn! vector-id 'take-until
   (lambda (p v)
     (take-while (lambda (e) (not (p e))) v)))
 
-; TODO Tests
 (add-type-fn! vector-id 'drop-while
   (lambda (p v)
     (car
@@ -294,12 +269,10 @@
           (list (_vector-append (car acc) e) #f)
           ))))))
 
-; TODO Tests
 (add-type-fn! vector-id 'drop-until
   (lambda (p v)
     (drop-while (lambda (e) (not (p e))) v)))
 
-; TODO Tests
 (add-type-fn! vector-id 'zip
   (lambda (v0 v1)
     (let* (v1size (vector-size (->vector v1)))

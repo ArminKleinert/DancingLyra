@@ -61,13 +61,11 @@
     start
     (list-foldl f (f start (car coll)) (cdr coll))))
 
-; TODO Tests
 (define (list-map f xs)
   (if (list-empty? xs)
     '()
     (cons (f (car xs)) (list-map f (cdr xs)))))
 
-; TODO Tests
 (define (list-filter f xs)
   (if (list-empty? xs)
     '()
@@ -75,76 +73,63 @@
       (cons (car xs) (list-filter f (cdr xs)))
       (list-filter f (cdr xs)))))
 
-; TODO Tests
 (define (list-append c0 c1)
   (if (null? c0)
     (->list c1)
     (cons (car c0) (list-append (cdr c0) c1))))
 
-; TODO Tests
 (define (list-find-first f l)
   (cond ((list-empty? l) '())
         ((f (car l)) (car l))
         (#t (list-find-first f (cdr l)))))
 
-; TODO Tests
 (define (list->vector ls)
   (foldl (lambda (v x) (_vector-append v x))
          (vector) ls))
 
-; TODO Tests
 (define (list-copy c)
   c)
 
-; TODO Tests
 (define (list-but-last c0)
   (cond ((null? c0) '())
         ((null? (cdr c0)) '())
         (#t (cons (car c0) (list-but-last (cdr c0))))))
 
-; TODO Tests
 (define (list-reverse xs)
   (foldl
     (lambda (res e) (cons e res))
     '() xs))
 
-; TODO Tests
 (define (list-map-while f p c)
   (cond ((list-empty? c) '())
         ((p (car c)) (cons (f (car c)) (list-map-while f p (cdr c))))
         (#t '())))
 
-; TODO Tests
 (define (list-map-until f p c)
   (cond ((list-empty? c) '())
         ((p (car c)) '())
         (#t (cons (f (car c)) (list-map-until f p (cdr c))))))
 
-; TODO Tests
 (define (list-take n c)
   (if (or (list-empty? c) (<= n 0))
     '()
     (cons (car c) (list-take (dec n) (cdr c)))))
 
-; TODO Tests
 (define (list-take-while p c)
   (if (or (list-empty? c) (not (p (car c))))
     '()
     (cons (car c) (list-take-while p (cdr c)))))
 
-; TODO Tests
 (define (list-take-until p c)
   (if (or (list-empty? c) (p (car c)))
     '()
     (cons (car c) (list-take-until p (cdr c)))))
 
-; TODO Tests
 (define (list-drop-while p c)
   (if (or (list-empty? c) (not (p (car c))))
     c
     (list-drop-while p (cdr c))))
 
-; TODO Tests
 (define (list-drop-until p c)
   (if (list-empty? c)
     '()
@@ -153,7 +138,6 @@
       (list-drop-until p (cdr c)))))
 
 
-; TODO Tests
 (define (list-zip c0 c1)
   (cond ((list-empty? c0) '())
         ((empty? c1) '())
