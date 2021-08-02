@@ -41,9 +41,10 @@
 (define (list-eq? x y)
   (if (list? y)
     (let* (list-eql1?
-            (lambda (l0 l1) (if (list-empty? l0)
-              (list-empty? l1)
-              (and (eq? (car l0) (car l1)) (list-eql1? (cdr l0) (cdr l1))))))
+            (lambda (l0 l1)
+              (if (list-empty? l0)
+                (list-empty? l1)
+                (and (eq? (car l0) (car l1)) (list-eql1? (cdr l0) (cdr l1))))))
       (list-eql1? x y))
     #f))
 
@@ -109,15 +110,21 @@
 
 ; TODO Tests
 (define (list-map-while f p c)
-  (cond ((list-empty? c) c)
-        ((p (car c)) (cons c (list-map-while f p (cdr c))))
-        #t '()))
+  (cond ((list-empty? c) '())
+        ((p (car c)) (cons (f (car c)) (list-map-while f p (cdr c))))
+        (#t '())))
 
 ; TODO Tests
 (define (list-map-until f p c)
-  (cond ((list-empty? c) c)
+  (cond ((list-empty? c) '())
         ((p (car c)) '())
-        #t (cons c (list-map-until f p (cdr c)))))
+        (#t (cons (f (car c)) (list-map-until f p (cdr c))))))
+
+; TODO Tests
+(define (list-take n c)
+  (if (or (list-empty? c) (<= n 0))
+    '()
+    (cons (car c) (list-take (dec n) (cdr c)))))
 
 ; TODO Tests
 (define (list-take-while p c)
@@ -139,9 +146,11 @@
 
 ; TODO Tests
 (define (list-drop-until p c)
-  (if (or (list-empty? c) (not (p (car c))))
-    c
-    (list-drop-until p (cdr c))))
+  (if (list-empty? c)
+    '()
+    (if (p (car c))
+      c
+      (list-drop-until p (cdr c)))))
 
 
 ; TODO Tests
@@ -172,6 +181,7 @@
     (list 'reverse list-reverse)
     (list 'map-while list-map-while)
     (list 'map-until list-map-until)
+    (list 'take list-take)
     (list 'take-while list-take-while)
     (list 'take-until list-take-until)
     (list 'drop-while list-drop-while)
@@ -201,6 +211,7 @@
     (list 'reverse list-reverse)
     (list 'map-while list-map-while)
     (list 'map-until list-map-until)
+    (list 'take list-take)
     (list 'take-while list-take-while)
     (list 'take-until list-take-until)
     (list 'drop-while list-drop-while)
