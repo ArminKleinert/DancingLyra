@@ -21,13 +21,20 @@
   (let* (f (find-type-fn v 'vector-iterate))
     (if f (f v acc fn) (_vector-iterate v acc fn))))
 
+(define (vector-set v i e)
+  ((find-type-fn v 'vector-set) v i e))
+
 
 ; --------------------------------------------------
 
+(comment
+(define offset-vector-id (add-type!))
+(define-record offset-vector-id offset-vector v start end)
 
+vector-size vector-append append ->vector but-last foldl map reverse ->string find-first eq? vector-get nth filter take drop vector-set set-at vector-iterate empty? list? vector? ->list map-while map-until take-while take-until drop-while drop-until zip
+)
 
 ; --------------------------------------------------
-      
 
 (define vector-pair-id (add-type!))
 (define-record vector-pair-id vector-pair x y)
@@ -48,8 +55,8 @@
       (append (->vector vp) v1))))
 
 (add-type-fn! vector-pair-id '->vector
-  (lambda (vp) 
-    (vector-iterate (->vector (vector-pair-x vp)) (->vector (vector-pair-y vp))
+  (lambda (vp)
+    (vector-iterate (vector-pair-y vp) (vector-pair-x vp)
       (lambda (acc e i) (_vector-append acc e)))))
 
 (add-type-fn! vector-pair-id 'but-last
@@ -89,29 +96,71 @@
           (eq? (vector-pair-y v0) (vector-pair-y v1)))
       (eq? (->vector v0) v1))))
 
+(let* (vp-get (lambda (vp i)
+        (let* (vpxsize (vector-size (vector-pair-x vp)))
+          (cond
+            ((> vpxsize i) (vector-get (vector-pair-x vp) i))
+            ((> (vector-size (vector-pair-y vp)) (- i vpxsize))
+              (vector-get (vector-pair-y vp) (- i vpxsize)))
+            (#t '())))))
+  (add-type-fns! vector-pair-id
+    (list
+      (list 'vector-get vp-get)
+      (list 'nth vp-get)))
+  )
+
+(add-type-fn! vector-pair-id 'filter
+  (lambda (p vp)
+    (make-vector-pair (filter p (vector-pair-x vp)) (filter p (vector-pair-y vp)))))
+
+(add-type-fn! vector-pair-id 'take
+  (lambda (n vp)
+    (cond ((<= n (vector-size (vector-pair-x vp))) (take n (vector-pair-x vp)))
+          (#t (make-vector-pair (vector-pair-x vp) (take (- n (vector-size (vector-pair-x vp))) (vector-pair-y vp)))))))
+
+(add-type-fn! vector-pair-id 'drop
+  (lambda (n vp)
+    (cond ((= n 0) vp)
+          ((<= n (vector-size vp)) [])
+          ((< n (vector-size (vector-pair-x vp)))
+           (make-vector-pair (drop (- n (vector-size (vector-pair-x vp))) (vector-pair-y vp))
+                              (vector-pair-y vp)))
+          (#t (drop (- n (vector-size (vector-pair-x vp))) (vector-pair-y vp))))))
+
+(let* (setter (lambda (vp i e)
+    (if (< i (vector-pair-x vp))
+      (make-vector-pair (vector-set (vector-pair-x vp) i e) (vector-pair-y vp))
+      (make-vector-pair
+        (vector-pair-x vp)
+        (vector-set (vector-pair-y vp) (- i (vector-size (vector-pair-x vp))) e)))))
+  (add-type-fns! vector-pair-id
+    (list
+    (list 'vector-set setter)
+    (list 'set-at setter))))
+
+(add-type-fn! vector-pair-id 'vector-iterate
+  (lambda (vp e fn)
+    (vector-iterate (->vector (vector-pair-y vp))
+      (vector-iterate (->vector (vector-pair-x vp)) e fn)
+        fn)))
+
 (add-type-fns! vector-pair-id
   (list
     (list 'empty? (lambda (vp) (&& (empty? (vector-pair-x vp)) (empty? (vector-pair-y vp)))))
     (list 'copy ->vector)
     (list 'list? always-false)
     (list 'vector? always-true)
+    (list '->list (lambda (vp) (append (->list (vector-pair-x vp))
+                                      (->list (vector-pair-y vp)))))
     
     ; TODO All need proper implementation (Especially vector-get and nth !!!)
-    (list 'vector-set (lambda (vp i e) (vector-set (->vector vp) idx)))
-    (list 'vector-get (lambda (vp idx) (vector-get (->vector vp) idx))) ; TODO
-    (list 'nth (lambda (vp idx) (vector-get (->vector vp) idx))) ; TODO
-    (list 'set-at (lambda (vp idx e) (set-at (->vector vp) idx e))) ; TODO
-    (list 'vector-iterate (lambda (vp e f) (vector-iterate (->vector vp) e f))) ; TODO
-    (list 'vector-get (lambda (vp idx) (vector-get (->vector vp) idx))) ; TODO
-    (list 'filter (lambda (p vp) (filter p (->vector vp)))) ; TODO
     (list 'map-while (lambda (f p vp) (map-while f p (->vector vp)))) ; TODO
     (list 'map-until (lambda (f p vp) (map-until f p (->vector vp)))) ; TODO
-    (list 'take-while (lambda (p vp) (take-while f p (->vector vp)))) ; TODO
-    (list 'take-until (lambda (p vp) (take-until f p (->vector vp)))) ; TODO
-    (list 'drop-while (lambda (p vp) (drop-while f p (->vector vp)))) ; TODO
-    (list 'drop-until (lambda (p vp) (drop-until f p (->vector vp)))) ; TODO
+    (list 'take-while (lambda (p vp) (take-while p (->vector vp)))) ; TODO
+    (list 'take-until (lambda (p vp) (take-until p (->vector vp)))) ; TODO
+    (list 'drop-while (lambda (p vp) (drop-while p (->vector vp)))) ; TODO
+    (list 'drop-until (lambda (p vp) (drop-until p (->vector vp)))) ; TODO
     (list 'zip (lambda (vp v1) (zip (->vector vp) v1))) ; TODO
-    (list '->list (lambda (vp) (->list (->vector vp)))) ; TODO
     ))
     
     
@@ -130,8 +179,8 @@
 
 (define (_vector-set v idx element)
   (vector-iterate v []
-      (lambda (acc e i)
-        (if (= i idx) (vector-append acc element) (vector-append acc e)))))
+    (lambda (acc e i)
+      (if (= i idx) (vector-append acc element) (vector-append acc e)))))
 
 (add-type-fn! vector-id 'vector-set _vector-set)
 (add-type-fn! vector-id 'set-at _vector-set)
@@ -207,19 +256,24 @@
 
 (add-type-fn! vector-id 'take
   (lambda (n v)
-    (vector-iterate v []
-      (lambda (acc e i)
-        (if (= n 0)
-          acc
-          (_vector-append acc e))))))
+    (if (>= n (vector-size v))
+      v
+      (vector-iterate v []
+        (lambda (acc e i)
+          (if (= n 0)
+            acc
+            (_vector-append acc e)))))))
 
 (add-type-fn! vector-id 'drop
   (lambda (n v)
-    (vector-iterate v []
-      (lambda (acc e i)
-        (if (> n i)
-          acc
-          (_vector-append acc e))))))
+    (cond
+      ((= n 0) v)
+      ((>= n (vector-size v)) [])
+      (#t (vector-iterate v []
+            (lambda (acc e i)
+              (if (> n i)
+                acc
+                (_vector-append acc e))))))))
 
 (add-type-fn! vector-id 'map-while
   (lambda (f p v)
@@ -235,14 +289,6 @@
 (add-type-fn! vector-id 'map-until
   (lambda (f p v)
     (map-while f (lambda (e) (not (p e))) v)))
-
-(add-type-fn! vector-id 'take
-  (lambda (n v)
-    (vector-iterate v []
-      (lambda (acc e i)
-        (if (< i n)
-          (_vector-append acc e)
-          acc)))))
 
 (add-type-fn! vector-id 'take-while
   (lambda (p v)

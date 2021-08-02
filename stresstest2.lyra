@@ -1,0 +1,25 @@
+; Stresstest for vector get
+
+(define (fill-huge-vector v n)
+  (cond ((= n 0) v)
+        (#t (fill-huge-vector (append v v) (dec n)))))
+
+(let ((v (fill-huge-vector [0 1 2 3 4 5 6 7 8 9] 9))
+      (iter (lambda (n)
+              (if (= n (vector-size v))
+                n
+                (begin (nth v n) (iter (inc n)))))))
+  (println! (measure 10 (lambda ()
+      (empty? v)
+      (map id v)
+      (filter always-true v)
+      (take (vector-size v) v)
+      (drop (vector-size v) v)
+      (map-while id always-true v)
+      (map-until id always-false v)
+      (drop-while always-true v)
+      (drop-until always-false v)
+      (vector-set v (dec (vector-size v)) 99)
+      (vector-iterate v 0 (lambda (acc e i) acc))
+    )))
+  )

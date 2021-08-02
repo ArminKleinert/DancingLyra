@@ -5,11 +5,13 @@ import types;
 import lyrafunction;
 
 alias CallStack = LyraFunc[];
-private CallStack callStack = [null];
+private CallStack _callStack = [null];
 
 private bool allowRedefine = false;
 private bool globalDisallowTailRecursion = false;
 private bool optimize = false;
+
+CallStack callStack() {return _callStack;}
 
 void eval_AllowRedefine() {
     allowRedefine = true;
@@ -21,6 +23,14 @@ void eval_DisallowTailRecursion() {
 
 void eval_DoOptimize() {
     optimize = true;
+}
+
+class LyraError : Exception {
+    this(string msg, CallStack callStack, string file = __FILE__, size_t line = __LINE__) {
+        import std.string;
+
+        super(format("Error! " ~ msg ~ "\nInternal callstack: %s", callStack), file, line);
+    }
 }
 
 class LyraStackOverflow : Exception {
@@ -73,12 +83,12 @@ void inlineValueIntoCarIfPossible(LyraObj checkValue, LyraObj exprList, LyraObj 
 
 void pushOnCallStack(LyraFunc fn) {
     const auto CALLSTACK_MAX_HEIGHT = 12001;
-    if (callStack.length + 1 > CALLSTACK_MAX_HEIGHT) {
+    if (_callStack.length + 1 > CALLSTACK_MAX_HEIGHT) {
         import std.string;
 
-        throw new LyraStackOverflow(callStack);
+        throw new LyraStackOverflow(_callStack);
     }
-    callStack ~= fn;
+    _callStack ~= fn;
 }
 
 Cons evalList(LyraObj exprList, Env env) {
@@ -137,7 +147,7 @@ LyraObj evDefine(LyraObj expr, Env env, bool isMacro) {
         expr = expr.cdr;
         if (!expr.cdr.isNil())
             throw new LyraSyntaxError("define with name can take only 2 arguments (name and single expression).",
-                    callStack);
+                    _callStack);
         auto variable = eval(expr.car, env);
         checkForGlobalRedefinition(name.symbol_val);
         Env.globalEnv.set(name, variable);
@@ -147,7 +157,7 @@ LyraObj evDefine(LyraObj expr, Env env, bool isMacro) {
 
         if (name.type != symbol_id) {
             throw new LyraSyntaxError("Name in function definition must be a symbol. " ~ name.toString(),
-                    callStack);
+                    _callStack);
         }
 
         checkForGlobalRedefinition(name.symbol_val);
@@ -350,12 +360,12 @@ LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
                 pushOnCallStack(func);
                 args = evalList(args, env);
                 auto res = func.call(args.cons_val, env);
-                callStack = callStack[0 .. $ - 1];
+                _callStack = _callStack[0 .. $ - 1];
                 return res;
             } else {
                 pushOnCallStack(func);
                 auto res = func.call(args.cons_val(), env);
-                callStack = callStack[0 .. $ - 1];
+                _callStack = _callStack[0 .. $ - 1];
                 return eval(res, env);
             }
         } else {

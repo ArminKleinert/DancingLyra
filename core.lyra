@@ -104,6 +104,7 @@
 (define (second x) ((find-type-fn x 'second) x))
 (define (third x) ((find-type-fn x 'third) x))
 (define (rest x) ((find-type-fn x 'rest) x))
+(define (set-at x i e) ((find-type-fn x 'set-at) x i e))
 
 (define (empty? x) (let* (f (find-type-fn x 'empty?)) (if f (f x) #f)))
 (define (eql? x y) (let* (f (find-type-fn x 'eql?)) (if f (f x y) (= x y))))

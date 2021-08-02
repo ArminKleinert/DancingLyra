@@ -318,6 +318,7 @@ class LyraObj {
 
 class LyraRecord : LyraObj {
     import lyrafunction;
+    import evaluate;
 
     private static void createAndAddGetter(uint type_id, Symbol typename,
             Symbol memberName, uint memberIdx, Env env) {
@@ -325,7 +326,7 @@ class LyraRecord : LyraObj {
         string getterName = typename ~ "-" ~ memberName;
         auto getter = new NativeLyraFunc(getterName, 1, 1, false, true, false, (xs, env1) {
             if (xs.car.type != type_id) {
-                throw new Exception(getterName ~ ": Invalid input.");
+                throw new LyraError(getterName ~ ": Invalid input.", callStack());
             }
             return xs.car.value.record_val[memberIdx];
         });
@@ -357,7 +358,7 @@ class LyraRecord : LyraObj {
         Symbol typeCheckerName = typeName ~ "?";
         auto typeChecker = new NativeLyraFunc(typeCheckerName, 1, 1, false,
                 true, false, (xs, env) {
-            return LyraObj.makeBoolean(xs.car.type != type_id);
+            return LyraObj.makeBoolean(xs.car.type == type_id);
         });
         env.set(typeCheckerName, typeChecker);
 
