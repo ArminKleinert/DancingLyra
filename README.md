@@ -1,14 +1,6 @@
 # Lyra
 
-A port of https://github.com/ArminKleinert/Lyra from Ruby to D.  
-My hope is that this will make for a big performance improvement and maybe 
-help out with future projects where a statically typed language has to be 
-used for implementing a dynamically typed language.  
-
-Luckily, most functions were implemented in Lyra itself, lessening the 
-workload of porting it.  
-
-Development on this port will be slow because life is a thing.
+A dynamically typed Lisp written in D and mostly in itself.  
 
 ## Goals and differences to Lyra
 
@@ -34,6 +26,10 @@ Development on this port will be slow because life is a thing.
   - Functions can now be called with different behaviours for different types.
   - User-defined types are now available
   - Annoying bugs with variadic functions fixed.
+  - Renamed `eql?` to `eq?`
+  - Many tests
+  - Support for different types of vectors
+  - Support for a maybe type
 
 ## Usage
 
@@ -42,10 +38,7 @@ Currently, there is not much to run here, but if you want to play with it, try t
 A script `compile.sh` is provided for compiling. For compiling and running, do  
 ```./compile.sh && ./app```  
 
-If you want to compile the files yourself, the order is the following:  
-```dmd -O app.d types.d eval.d function.d reader.d buildins.d```  
-If you are using a different compiler, just replace `dmd` with it.  
-In my tests, ldc with -O3 was 30% faster, but took 50% longer to compile.
+In my tests, ldc with -O3 (in file `./compile2.sh`) was 30% faster, but took 50% longer to compile.
 
 ## Bugs
 
@@ -139,9 +132,9 @@ dec            | 1     |
 and            | 2     | Logic and
 or             | 2     | Logic or
 not            | 2     | Logic not
+eq?            | 2     | Compares 2 objects
                |       | 
 null?          | 1     | Check whether the value is an nil.
-atom?          | 1     | Check whether the value is not a cons, not a string and not
                |       | a vector.
 int?           | 1     | Check whether the value is an int.
 float?         | 1     | Check whether the value is an float.
@@ -150,7 +143,7 @@ string?        | 1     | Check whether the value is a string.
 list?          | 1     | Check whether the value is a list.
 cons?          | 1     | Check whether the value is a cons.
 vector?        | 1     | Check whether the value is a vector.
-eql?           | 2     | Check for equality of two objects.
+eq?            | 2     | Check for equality of two objects.
                |       | 
 nth            | 2     | Get the nth element of a collection.
 length         | 1     | Get the length of a collection.
@@ -166,8 +159,38 @@ import!        | 1     | Alias for load!
 map            | 2     | Apply a function to each element of a list and return the new
                |       | list.
 foldl          | 3     | 
-foldr          | 3     | 
+foldr          | 3     | (Not implemented)
 filter         | 2     | Filter a collection by predicate.
+               |       | 
+first          | 1     | 
+second         | 1     | 
+third          | 1     | 
+rest           | 2     | 
+set-at         | 2     | 
+               |       | 
+size           | 1     | 
+empty?         | 1     | 
+nth            | 2     | 
+append         | 2     | 
+find-first     | 2     | 
+               |       | 
+->vector       | 1     | 
+->list         | 1     | 
+copy           | 1     | 
+but-last       | 1     | 
+reverse        | 1     | 
+map-while      | 3     | 
+map-until      | 3     | 
+take           | 2     | 
+drop           | 2     | 
+take-while     | 3     | 
+take-until     | 3     | 
+drop-while     | 3     | 
+drop-until     | 3     | 
+zip            | 2     | 
+               |       | 
+maybe          | 1     | 
+nothing        | -     | 
                |       | 
 println!       | 1     | 
 
