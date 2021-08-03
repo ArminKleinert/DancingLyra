@@ -58,6 +58,7 @@
   (_println! (->string x)))
 
 (load! "typed.lyra")
+(load! "maybe.lyra")
 (load! "collections.lyra")
 (load! "list.lyra")
 (load! "vector.lyra")

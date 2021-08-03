@@ -1,0 +1,13 @@
+
+
+
+(define Maybe-id (add-type!))
+(define-record Maybe-id Maybe inner)
+
+(define nothing-id (add-type!))
+(define-record nothing-id nothing)
+
+(define (maybe & x) (if (null? x) (make-maybe (make-nothing)) (make-maybe x)))
+
+(add-type-fn! Maybe-id 'unwrap Maybe-inner)
+

@@ -5,6 +5,8 @@ reformat.sh
 *idea
 *.iml
 
+/d source/app.o
+
 compile2.sh
 
 app.o
