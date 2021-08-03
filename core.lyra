@@ -17,6 +17,8 @@
 (define car _car)
 (define cdr _cdr)
 
+(define (box-swap! b f) (box-set! b (f (unbox b))))
+
 (def-macro (not x) (list 'if x #f #t))
 
 (def-macro (or & xs)
@@ -49,6 +51,11 @@
 (def-macro (when p & xs)
   (list 'if p (cons begin xs) '()))
 
+(let* (gen-sym-counter (box 19980629))
+  (define (gensym)
+    (box-set! gen-sym-counter (inc (unbox gen-sym-counter)))
+    (symbol (_string "_gensym_" (unbox gen-sym-counter)))))
+
 (define (string & xs)
   (if (empty? xs)
     ""
@@ -57,13 +64,30 @@
 (define (println! x)
   (_println! (->string x)))
 
-(load! "typed.lyra")
+(load! "type.lyra")
 (load! "maybe.lyra")
 (load! "collections.lyra")
 (load! "list.lyra")
 (load! "vector.lyra")
 
 (comment
+
+(def-generic xs (foldr f e xs) foldl)
+
+(def-method cons-id foldr (list-foldr f e xs)
+  (if (null? xs)
+    e
+    (f (car xs) (list-foldr f e (cdr xs)))))
+
+(println! (foldr + 0 '(1 2 3 4 5)))
+
+(_println! (macro-expand (def-generic xs (foldr f e xs) foldl)))
+(_println! (macro-expand (def-method cons-id foldr (list-foldr f e xs)
+  (if (null? xs)
+    e
+    (f (car xs) (list-foldr f e (cdr xs)))))))
+
+(println! (macro-expand (or #t #f #t)))
 
 (println! (or #f #f #f))
 (println! (or #f #f #t))

@@ -91,6 +91,13 @@ void pushOnCallStack(LyraFunc fn) {
     _callStack ~= fn;
 }
 
+LyraObj macroExpand(LyraFunc f, Cons args, Env env) {
+    pushOnCallStack(f);
+    auto res = f.call(args, env);
+    _callStack = _callStack[0 .. $ - 1];
+    return res;
+}
+
 Cons evalList(LyraObj exprList, Env env) {
     Vector v = [];
     while (!exprList.isNil) {
@@ -336,6 +343,11 @@ LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
                 args1 ~= listToVector(lastArg);
                 expr = Cons.create(fn, list(args1));
                 return eval(expr, env);
+            case "macro-expand":
+                LyraFunc func = eval(expr.cdr.car.car, env).func_val;
+                Cons args = expr.cdr.car.next;
+                auto res = macroExpand(func, args, env);
+                return res;
             default:
                 auto found = env.safeFind(expr.car.value.symbol_val);
                 if (found is null) {
@@ -363,9 +375,7 @@ LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
                 _callStack = _callStack[0 .. $ - 1];
                 return res;
             } else {
-                pushOnCallStack(func);
-                auto res = func.call(args.cons_val(), env);
-                _callStack = _callStack[0 .. $ - 1];
+                auto res = macroExpand(func, args.cons_val, env);
                 return eval(res, env);
             }
         } else {

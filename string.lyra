@@ -2,7 +2,7 @@
 
 (define lyra-core-string-loaded #t)
 
-(define string-id (add-type!))
+(define string-id (register-type!))
 (define-record string-id string chars)
 
 (add-type-fns! string-id

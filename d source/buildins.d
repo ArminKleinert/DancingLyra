@@ -283,6 +283,11 @@ void initializeGlobalEnv(Env env) {
 
         return Cons.nil();
     });
+    
+    addFn("symbol", 1, false, true, false, (xs, env) {
+        if (xs.car.type == string_id) {return LyraObj.makeSymbol(xs.car.string_val);}
+        return LyraObj.makeSymbol(xs.car.toString());
+    });
 
     /*
     addFn("char->fixnum", 1, false, true, false, (xs, env) {

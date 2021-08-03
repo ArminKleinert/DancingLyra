@@ -2,8 +2,8 @@
 
 (define lyra-core-maybe-loaded #t)
 
-(let ((maybe-id (add-type!))
-      (nothing-id (add-type!)))
+(let ((maybe-id (register-type!))
+      (nothing-id (register-type!)))
   (define-record maybe-id maybe inner)
   (define (maybe x) (make-maybe x))
 

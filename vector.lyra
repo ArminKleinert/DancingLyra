@@ -32,7 +32,7 @@
 
 ; --------------------------------------------------
 
-(define offset-vector-id (add-type!))
+(define offset-vector-id (register-type!))
 (define-record offset-vector-id offset-vector v start len)
 
 (define (offset-vector vec start length) (make-offset-vector vec start length))
@@ -58,7 +58,6 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
     (vector-get (offset-vector-vec ov) (+ i (offset-vector-start ov)))))
 
 (define (offset-vector->vector ov)
-  ;(println! (->string (offset-vector-v ov)))
   (offset-vector-iterate ov []
     (lambda (acc e i)  (vector-append acc e))))
 
@@ -70,7 +69,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
     (list 'vector-get offset-vector-get)
     (list 'vectord-iterate offset-vector-iterate)
     (list 'vector-append (lambda (v x) (append (->vector v) x)))
-    (list 'eq? (lambda (v x) (if (vector? x) (println! x) '()) (eq? (->vector v) x)))
+    (list 'eq? (lambda (v x) (eq? (->vector v) x)))
     (list 'foldl (lambda (f e v) (foldl f e (->vector v))))
     (list 'map (lambda (f v) (map f (->vector v))))
     (list 'filter (lambda (p v) (filter p (->vector v))))
@@ -107,7 +106,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
 
 ; --------------------------------------------------
 
-(define vector-pair-id (add-type!))
+(define vector-pair-id (register-type!))
 (define-record vector-pair-id vector-pair x y)
 
 (add-type-fn! vector-pair-id 'vector-size

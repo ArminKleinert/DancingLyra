@@ -2,10 +2,9 @@
 
 (define lyra-core-typed-loaded #t)
 
-(define _types (box []))
-(define (box-swap! b f)(box-set! b (f (unbox b))))
+(let* (_types (box []))
 
-(define (add-type!)
+(define (register-type!)
   (box-swap! _types (lambda (x) (_vector-append x '())))
   (- (_vector-size (unbox _types)) 1))
 
@@ -19,10 +18,13 @@
     (_vector-get (unbox _types) (lyra-type-id x))
     sym))
 
-(let* (vector-set (lambda (v idx xyz)
-  (_vector-iterate v []
-    (lambda (acc e i)
-      (if (= i idx) (_vector-append acc xyz) (_vector-append acc e))))))
+(let* (vector-set
+        (lambda (v idx xyz)
+          (_vector-iterate v []
+            (lambda (acc e i)
+              (if (= i idx)
+                (_vector-append acc xyz)
+                (_vector-append acc e))))))
 
   (define (add-type-fn! type sym f)
     (let* (v (unbox _types))
@@ -48,20 +50,41 @@
               sym-to-f-list
               (_vector-get v type))))
         type)))
-)
+  )
 
-(define nil-id    (add-type!))
-(define symbol-id (add-type!))
-(define string-id (add-type!))
-(define char-id   (add-type!))
-(define fixnum-id (add-type!))
-(define real-id   (add-type!))
-(define cons-id   (add-type!))
-(define func-id   (add-type!))
-(define bool-id   (add-type!))
-(define vector-id (add-type!))
-(define box-id    (add-type!))
-(define _unused-id (add-type!))
+(def-macro (def-generic obj sig fallback)
+  (let ((fn (car sig))
+        (args (cdr sig))
+        (sy (gensym)))
+    (list 'define (cons fn args)
+      (list 'let* (list sy (list 'find-type-fn obj (list 'quote fn)))
+        (list 'if sy (cons sy args))
+        (cons fallback args)))))
+
+(def-macro (def-method t-id globalname sig & body)
+  (if (cons? sig)
+    (let ((fn (car sig))
+          (args (cdr sig)))
+      (list 'begin
+        (cons 'define (cons sig body))
+        (list 'add-type-fn! t-id (list 'quote globalname) fn)
+        fn))
+    (list 'begin
+      (list 'add-type-fn! t-id globalname sig)
+      sig)))
+
+(define nil-id    (register-type!))
+(define symbol-id (register-type!))
+(define string-id (register-type!))
+(define char-id   (register-type!))
+(define fixnum-id (register-type!))
+(define real-id   (register-type!))
+(define cons-id   (register-type!))
+(define func-id   (register-type!))
+(define bool-id   (register-type!))
+(define vector-id (register-type!))
+(define box-id    (register-type!))
+(define _unused-id (register-type!))
 
 ; Type checkers
 (define (null? x) (= (lyra-type-id x) nil-id))
@@ -87,4 +110,4 @@
     (if f (f x) (_string x))))
 (define (unwrap x) ((find-type-fn x 'unwrap) x))
 
-)
+))
