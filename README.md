@@ -1,6 +1,7 @@
 # Lyra
 
 A dynamically typed Lisp written in D and mostly in itself.  
+It started as a port of a language written in Ruby, but became its own thing by now.
 
 ## Goals and differences to Lyra
 
