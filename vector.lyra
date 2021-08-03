@@ -25,14 +25,85 @@
   ((find-type-fn v 'vector-set) v i e))
 
 
+(comment "Functions provided for every vector-type:"
+  vector-size size vector-append append ->vector but-last foldl map reverse ->string find-first eq? vector-get nth filter take drop vector-set set-at vector-iterate empty? list? vector? ->list map-while map-until take-while take-until drop-while drop-until zip
+)
+
+
 ; --------------------------------------------------
 
-(comment
 (define offset-vector-id (add-type!))
-(define-record offset-vector-id offset-vector v start end)
+(define-record offset-vector-id offset-vector v start len)
 
-vector-size vector-append append ->vector but-last foldl map reverse ->string find-first eq? vector-get nth filter take drop vector-set set-at vector-iterate empty? list? vector? ->list map-while map-until take-while take-until drop-while drop-until zip
+(define (offset-vector vec start length) (make-offset-vector vec start length))
+
+(comment
+vector-size size vector-append append ->vector but-last foldl map reverse ->string find-first eq? vector-get nth filter take drop vector-set set-at vector-iterate empty? list? vector? ->list map-while map-until take-while take-until drop-while drop-until zip
 )
+
+(define (offset-vector-iterate ov x f)
+  (let ((len (offset-vector-len ov))
+        (helper (lambda (acc i)
+          (if (= i len)
+            acc
+            (helper (f acc (offset-vector-get ov i) i) (inc i))))))
+    (helper x 0)))
+
+(define (offset-vector-size ov) (offset-vector-len v))
+(define (offset-vector-vec ov) (offset-vector-v ov))
+
+(define (offset-vector-get ov i)
+  (if (or (< i 0) (>= i (offset-vector-len ov)))
+    '()
+    (vector-get (offset-vector-vec ov) (+ i (offset-vector-start ov)))))
+
+(define (offset-vector->vector ov)
+  ;(println! (->string (offset-vector-v ov)))
+  (offset-vector-iterate ov []
+    (lambda (acc e i)  (vector-append acc e))))
+
+(define (offset-vector->string ov)
+  (->string (offset-vector->vector ov)))
+
+(add-type-fns! offset-vector-id
+  (list
+    (list 'vector-get offset-vector-get)
+    (list 'vectord-iterate offset-vector-iterate)
+    (list 'vector-append (lambda (v x) (append (->vector v) x)))
+    (list 'eq? (lambda (v x) (eq? (->vector v) x)))
+    (list 'foldl (lambda (f e v) (foldl f e (->vector v))))
+    (list 'map (lambda (f v) (map f (->vector v))))
+    (list 'filter (lambda (p v) (filter p (->vector v))))
+    (list 'append (lambda (v y) (append (->vector v) y)))
+    (list 'find-first (lambda (p v) (find-first p (->vector v))))
+    (list '->list (lambda (v) (->list (->vector v))))
+    (list 'but-last (lambda (v) (but-last (->vector v))))
+    (list 'reverse (lambda (v) (reverse (->vector v))))
+    (list 'take (lambda (n v) (take n (->vector v))))
+    (list 'drop (lambda (n v) (drop n (->vector v))))
+    (list 'map-while (lambda (f p v) (map-while f p (->vector v))))
+    (list 'map-until (lambda (f p v) (map-until f p (->vector v))))
+    (list 'take-while (lambda (p v) (take-while p (->vector v))))
+    (list 'take-until (lambda (p v) (take-until p (->vector v))))
+    (list 'drop-while (lambda (p v) (drop-while p (->vector v))))
+    (list 'drop-until (lambda (p v) (drop-until p (->vector v))))
+    (list 'zip (lambda (x y) (zip (->vector x) (->vector y))))
+    (list 'vector-set (lambda (v i e) (vector-set (->vector v) i e)))
+    (list 'set-at (lambda (v i e) (vector-set (->vector v) i e)))
+    (list 'size offset-vector-size)
+    (list 'first (lambda (v) (vector-get v 0)))
+    (list 'second (lambda (v) (vector-get v 1)))
+    (list 'third (lambda (v) (vector-get v 2)))
+    (list 'rest (lambda (v) (drop 1 v)))
+    (list 'vector-size offset-vector-size)
+    (list 'empty? (lambda (v) (= (vector-size v) 0)))
+    (list 'nth offset-vector-get)
+    (list '->vector offset-vector->vector)
+    (list 'copy id)
+    (list 'list? always-false)
+    (list 'vector? always-true)
+    (list '->string offset-vector->string)
+    ))
 
 ; --------------------------------------------------
 
@@ -146,6 +217,7 @@ vector-size vector-append append ->vector but-last foldl map reverse ->string fi
 
 (add-type-fns! vector-pair-id
   (list
+    (list 'size vector-size)
     (list 'empty? (lambda (vp) (&& (empty? (vector-pair-x vp)) (empty? (vector-pair-y vp)))))
     (list 'copy ->vector)
     (list 'list? always-false)
@@ -165,183 +237,178 @@ vector-size vector-append append ->vector but-last foldl map reverse ->string fi
     
     
 ; --------------------------------------------------
-    
-    
 
-(add-type-fn! vector-id 'vector-get _vector-get)
-(add-type-fn! vector-id 'vectord-iterate _vector-iterate)
-(add-type-fn! vector-id 'vector-append _vector-append)
-
-(comment define (vector->string v)
-  (vector-iterate v ""
-    (lambda (acc e i)
-      (string acc (->string e) (if (< i (- (vector-size v) 1)) " " "")))))
+(define (vector->string v)
+  (string "["
+    (vector-iterate v ""
+      (lambda (acc e i)
+        (string
+          acc (->string e)
+          (if (< i (- (vector-size v) 1)) " " ""))))
+    "]"))
 
 (define (_vector-set v idx element)
   (vector-iterate v []
     (lambda (acc e i)
       (if (= i idx) (vector-append acc element) (vector-append acc e)))))
 
-(add-type-fn! vector-id 'vector-set _vector-set)
-(add-type-fn! vector-id 'set-at _vector-set)
+(define (vector-eq? v0 v1)
+  (cond ((not (vector? v1)) #f)
+        ((= (vector-size v0) (vector-size v1))
+          (vector-iterate v0 #t
+            (lambda (acc e i)
+              (if (&& acc (eq? e (nth v1 i))) #t #f))))
+        (#t #f)))
 
-(add-type-fn! vector-id 'eq?
-  (lambda (v0 v1)
-    (if (vector? v1)
-      (if (= (vector-size v0) (vector-size v1))
-        (vector-iterate v0 #t
-          (lambda (acc e i)
-            (if (&& acc (eq? e (nth v1 i))) #t #f)))
-        #f)
-      #f)))
+(define (vector-foldl f x v)
+  (vector-iterate v x (lambda (acc e i) (f acc e))))
 
-(add-type-fn! vector-id 'foldl
-  (lambda (f x v)
-    (vector-iterate v x
+(define (vector-map f v)
+  (vector-iterate v [] (lambda (acc e i) (vector-append acc (f e)))))
+
+(define (vector-filter p v)
+  (vector-iterate v []
+    (lambda (acc e i)
+      (if (p e) (vector-append acc e) acc))))
+
+(define (vector-concat v v1)
+(cond ((empty? v) v1)
+      ((empty? v1) v)
+      (#t (make-vector-pair v (->vector v1)))))
+
+(define (vector-find-first p v)
+  (car (cdr
+    (vector-iterate v (list #f '())
       (lambda (acc e i)
-        (f acc e)))))
+        (cond ((car acc) acc)
+              ((p e) (list #t e))
+              (#t acc)))))))
 
-(add-type-fn! vector-id 'map
-  (lambda (f v) 
+(define (vector->list v)
+  (let* (iter (lambda (i nl)
+          (if (< i 0)
+            nl
+            (iter (dec i)
+              (cons (vector-get v i) nl)))))
+    (iter (dec (vector-size v)) '())))
+
+(define (vector-but-last v)
+  (let* (last-idx (- (_vector-size v) 1))
     (vector-iterate v []
-      (lambda (acc e i) (_vector-append acc (f e))))))
+      (lambda (acc e i) (if (<= last-idx i) acc (vector-append acc e))))))
 
-(add-type-fn! vector-id 'filter
-  (lambda (p v) 
+(define (vector-reverse v)
+  (let* (vlen (- (_vector-size v) 1))
     (vector-iterate v []
       (lambda (acc e i)
-        (if (p e) (_vector-append acc e) acc)))))
+        (vector-append acc (vector-get v (- vlen i)))))))
 
-(comment add-type-fn! vector-id 'append
-  (lambda (v v1) 
-    (vector-iterate (->vector v1) v
-      (lambda (acc e i) (_vector-append acc e)))))
+(define (vector-take n v)
+  (if (>= n (vector-size v))
+    v
+    (vector-iterate v []
+      (lambda (acc e i)
+        (if (>= i n)
+          acc
+          (vector-append acc e))))))
 
-(add-type-fn! vector-id 'append
-  (lambda (v v1)
-    (cond ((empty? v) v1)
-          ((empty? v1) v)
-          (#t (make-vector-pair v (->vector v1))))))
-
-(add-type-fn! vector-id 'find-first
-  (lambda (p v) 
-    (car (cdr
-      (vector-iterate v (list #f '())
-        (lambda (acc e i)
-          (cond ((car acc) acc)
-                ((p e) (list #t e))
-                (#t acc))))))))
-
-(add-type-fn! vector-id '->list
-  (lambda (v)
-    (let* (iter (lambda (i nl)
-            (if (< i 0)
-              nl
-              (iter (dec i)
-                (cons (vector-get v i) nl)))))
-      (iter (dec (vector-size v)) '()))))
-
-(add-type-fn! vector-id 'but-last
-  (lambda (v)
-    (let* (last-idx (- (_vector-size v) 1))
-      (vector-iterate v []
-        (lambda (acc e i) (if (<= last-idx i) acc (_vector-append acc e)))))))
-
-(add-type-fn! vector-id 'reverse
-  (lambda (v) 
-    (let* (vlen (- (_vector-size v) 1))
-      (vector-iterate v []
-        (lambda (acc e i)
-          (vector-append acc (_vector-get v (- vlen i))))))))
-
-(add-type-fn! vector-id 'take
-  (lambda (n v)
-    (if (>= n (vector-size v))
-      v
-      (vector-iterate v []
-        (lambda (acc e i)
-          (if (>= i n)
-            acc
-            (_vector-append acc e)))))))
-
-(add-type-fn! vector-id 'drop
-  (lambda (n v)
-    (cond
+(define (vector-drop n v)
+  (cond
       ((= n 0) v)
       ((>= n (vector-size v)) [])
       (#t (vector-iterate v []
             (lambda (acc e i)
               (if (> n i)
                 acc
-                (_vector-append acc e))))))))
+                (vector-append acc e)))))))
 
-(add-type-fn! vector-id 'map-while
-  (lambda (f p v)
-    (car
+(define (vector-map-while f p v)
+  (car
     (vector-iterate v (list [] #f)
       (lambda (acc e i)
         (if (car (cdr acc))
           acc
           (if (p e)
-            (list (_vector-append (car acc) (f e)) #f)
-            (list (car acc) #t))))))))
+            (list (vector-append (car acc) (f e)) #f)
+            (list (car acc) #t)))))))
 
-(add-type-fn! vector-id 'map-until
-  (lambda (f p v)
-    (map-while f (lambda (e) (not (p e))) v)))
+(define (vector-map-until f p v)
+  (map-while f (lambda (e) (not (p e))) v))
 
-(add-type-fn! vector-id 'take-while
-  (lambda (p v)
-    (car
+(define (vector-take-while p v)
+  (car
     (vector-iterate v (list [] #f)
       (lambda (acc e i)
         (if (car (cdr acc))
           acc
           (if (p e)
-            (list (_vector-append (car acc) e) #f)
-            (list (car acc) #t))))))))
+            (list (vector-append (car acc) e) #f)
+            (list (car acc) #t)))))))
 
-(add-type-fn! vector-id 'take-until
-  (lambda (p v)
-    (take-while (lambda (e) (not (p e))) v)))
+(define (vector-take-until p v)
+  (take-while (lambda (e) (not (p e))) v))
 
-(add-type-fn! vector-id 'drop-while
-  (lambda (p v)
-    (car
+(define (vector-drop-while p v)
+  (car
     (vector-iterate v (list [] #t)
       (lambda (acc e i)
         (if (and (car (cdr acc)) (p e))
           acc
-          (list (_vector-append (car acc) e) #f)
-          ))))))
+          (list (vector-append (car acc) e) #f)
+          )))))
 
-(add-type-fn! vector-id 'drop-until
-  (lambda (p v)
-    (drop-while (lambda (e) (not (p e))) v)))
+(define (vector-drop-until p v)
+  (drop-while (lambda (e) (not (p e))) v))
 
-(add-type-fn! vector-id 'zip
-  (lambda (v0 v1)
-    (let* (v1size (vector-size (->vector v1)))
-      (vector-iterate v0 []
-        (lambda (acc e i)
-          (if (< i v1size)
-            (vector-append acc [e (nth v1 i)])
-            acc
-            ))))))
+(define (vector-zip v0 v1)
+  (let* (v1size (vector-size (->vector v1)))
+    (vector-iterate v0 []
+      (lambda (acc e i)
+        (if (< i v1size)
+          (vector-append acc [e (nth v1 i)])
+          acc)))))
+
+(define (vector-empty? v)
+  (= (vector-size v) 0))
 
 (add-type-fns! vector-id
   (list
+    (list 'vector-get _vector-get)
+    (list 'vectord-iterate _vector-iterate)
+    (list 'vector-append _vector-append)
+    (list 'eq? vector-eq?)
+    (list 'foldl vector-foldl)
+    (list 'map vector-map)
+    (list 'filter vector-filter)
+    (list 'append vector-concat)
+    (list 'find-first vector-find-first)
+    (list '->list vector->list)
+    (list 'but-last vector-but-last)
+    (list 'reverse vector-reverse)
+    (list 'take vector-take)
+    (list 'drop vector-drop)
+    (list 'map-while vector-map-while)
+    (list 'map-until vector-map-until)
+    (list 'take-while vector-take-while)
+    (list 'take-until vector-take-until)
+    (list 'drop-while vector-drop-while)
+    (list 'drop-until vector-drop-until)
+    (list 'zip vector-zip)
+    (list 'vector-set _vector-set)
+    (list 'set-at _vector-set)
+    (list 'size vector-size)
     (list 'first (lambda (v) (vector-get v 0)))
     (list 'second (lambda (v) (vector-get v 1)))
     (list 'third (lambda (v) (vector-get v 2)))
     (list 'rest (lambda (v) (drop 1 v)))
     (list 'vector-size (lambda (v) (_vector-size v)))
-    (list 'empty? (lambda (v) (= (vector-size v) 0)))
+    (list 'empty? vector-empty?)
     (list 'nth (lambda (v idx) (vector-get v idx)))
     (list '->vector id)
     (list 'copy id)
     (list 'list? always-false)
-    (list 'vector? always-true)))
+    (list 'vector? always-true)
+    (list '->string vector->string)))
 
 'lyra-core-vector-loaded
 )

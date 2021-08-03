@@ -106,6 +106,7 @@
 (define (rest x) ((find-type-fn x 'rest) x))
 (define (set-at x i e) ((find-type-fn x 'set-at) x i e))
 
+(define (size x) (let* (f (find-type-fn x 'size)) (if f (f x) '())))
 (define (empty? x) (let* (f (find-type-fn x 'empty?)) (if f (f x) #f)))
 (define (eql? x y) (let* (f (find-type-fn x 'eql?)) (if f (f x y) (= x y))))
 (define (eq? x y) (let* (f (find-type-fn x 'eq?)) (if f (f x y) (= x y)))) ; TODO: Make this the default name!
