@@ -70,7 +70,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
     (list 'vector-get offset-vector-get)
     (list 'vectord-iterate offset-vector-iterate)
     (list 'vector-append (lambda (v x) (append (->vector v) x)))
-    (list 'eq? (lambda (v x) (eq? (->vector v) x)))
+    (list 'eq? (lambda (v x) (if (vector? x) (println! x) '()) (eq? (->vector v) x)))
     (list 'foldl (lambda (f e v) (foldl f e (->vector v))))
     (list 'map (lambda (f v) (map f (->vector v))))
     (list 'filter (lambda (p v) (filter p (->vector v))))
