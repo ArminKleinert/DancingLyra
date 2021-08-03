@@ -11,7 +11,9 @@ private bool allowRedefine = false;
 private bool globalDisallowTailRecursion = false;
 private bool optimize = false;
 
-CallStack callStack() {return _callStack;}
+CallStack callStack() {
+    return _callStack;
+}
 
 void eval_AllowRedefine() {
     allowRedefine = true;

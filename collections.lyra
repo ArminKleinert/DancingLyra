@@ -7,7 +7,6 @@
 (define (third x) ((find-type-fn x 'third) x))
 (define (rest x) ((find-type-fn x 'rest) x))
 (define (set-at x i e) ((find-type-fn x 'set-at) x i e))
-(_println! (macro-expand (def-generic xs (foldr f e xs) nothing)))
 
 (define (size x) (let* (f (find-type-fn x 'size)) (if f (f x) '())))
 (define (empty? x) (let* (f (find-type-fn x 'empty?)) (if f (f x) #f)))

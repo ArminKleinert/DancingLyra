@@ -58,8 +58,7 @@
         (sy (gensym)))
     (list 'define (cons fn args)
       (list 'let* (list sy (list 'find-type-fn obj (list 'quote fn)))
-        (list 'if sy (cons sy args))
-        (cons fallback args)))))
+        (list 'if sy (cons sy args) (cons fallback args))))))
 
 (def-macro (def-method t-id globalname sig & body)
   (if (cons? sig)
@@ -99,15 +98,11 @@
 (define boolean? bool?)
 (define (box? x) (= (lyra-type-id x) box-id))
 
-; Special type checkers
-(define (number? x) (let* (f (find-type-fn x 'number?)) (if f (f x) (or (integer? x) (real? x)))))
-(define (list? x) (let* (f (find-type-fn x 'list?)) (if f (f x) #f)))
-(define (vector? x) (let* (f (find-type-fn x 'vector?)) (if f (f x) #f)))
+(def-generic x (unwrap x) id)
+(def-generic x (force-eval x) id)
+(def-generic x (list? x) always-false)
+(def-generic x (vector? x) always-false)
+(def-generic x (number? x) (lambda (n) (or (integer? n) (real? n))))
 
-
-(define (->string x)
-  (let* (f (find-type-fn x '->string))
-    (if f (f x) (_string x))))
-(define (unwrap x) ((find-type-fn x 'unwrap) x))
-
+(def-generic x (->string x) _string)
 ))

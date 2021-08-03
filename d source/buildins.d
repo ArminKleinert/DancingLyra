@@ -113,13 +113,13 @@ void initializeGlobalEnv(Env env) {
     });
     addFn("_car", 1, false, true, false, (xs, env) {
         if (xs.car.type != cons_id) {
-            throw new LyraError("_car: Expected Cons.",callStack());
+            throw new LyraError("_car: Expected Cons.", callStack());
         }
         return xs.car.car;
     });
     addFn("_cdr", 1, false, true, false, (xs, env) {
         if (xs.car.type != cons_id) {
-            throw new LyraError("_cdr: Expected Cons.",callStack());
+            throw new LyraError("_cdr: Expected Cons.", callStack());
         }
         return xs.car.cdr;
     });
@@ -130,28 +130,29 @@ void initializeGlobalEnv(Env env) {
 
     addFn("_vector-append", 2, false, true, false, (xs, env) {
         if (xs.car.type != vector_id) {
-            throw new LyraError("_vector-append: Expected vector.",callStack());
+            throw new LyraError("_vector-append: Expected vector.", callStack());
         }
         return vector(xs.car.vector_val ~ xs.cdr.car);
     });
 
     addFn("_vector-get", 2, false, true, false, (xs, env) {
         if (xs.car.type != vector_id || xs.cdr.car.type != fixnum_id) {
-            throw new LyraError("_vector-get: Expected vector and fixnum.",callStack());
+            throw new LyraError("_vector-get: Expected vector and fixnum.", callStack());
         }
         return xs.car.vector_val[xs.cdr.car.fixnum_val];
     });
 
     addFn("_vector-size", 1, false, true, false, (xs, env) {
         if (xs.car.type != vector_id) {
-            throw new LyraError("_vector-size: Expected vector.",callStack());
+            throw new LyraError("_vector-size: Expected vector.", callStack());
         }
         return LyraObj.makeFixnum(xs.car.vector_val.length);
     });
 
     addFn("_vector-iterate", 3, false, true, false, (xs, env) {
         if (xs.car.type != vector_id || xs.cdr.cdr.car.type != func_id) {
-            throw new LyraError("_vector-iterate: Expected vector, then any, then function.",callStack());
+            throw new LyraError("_vector-iterate: Expected vector, then any, then function.",
+                callStack());
         }
         auto vec = xs.car.vector_val;
         auto accumulator = xs.cdr.car;
@@ -233,7 +234,7 @@ void initializeGlobalEnv(Env env) {
         import reader;
 
         if (xs.car.type != string_id) {
-            throw new LyraError("parse: Expected string.",callStack());
+            throw new LyraError("parse: Expected string.", callStack());
         }
         return make_ast(tokenize(xs.car.value.string_val));
     });
@@ -241,7 +242,7 @@ void initializeGlobalEnv(Env env) {
         import std.file : readText;
 
         if (xs.car.type != string_id) {
-            throw new LyraError("slurp!: Expected string.",callStack());
+            throw new LyraError("slurp!: Expected string.", callStack());
         }
         return LyraObj.makeString(readText(xs.car.value.string_val));
     });
@@ -255,10 +256,10 @@ void initializeGlobalEnv(Env env) {
         auto typename = xs.cdr.car;
 
         if (type_id.type != fixnum_id) {
-            throw new LyraError("define-record: First argument must be a type-id.",callStack());
+            throw new LyraError("define-record: First argument must be a type-id.", callStack());
         }
         if (typename.type != symbol_id) {
-            throw new LyraError("define-record: Second argument must be a symbol.",callStack());
+            throw new LyraError("define-record: Second argument must be a symbol.", callStack());
         }
 
         xs = xs.cdr.cdr;
@@ -266,7 +267,7 @@ void initializeGlobalEnv(Env env) {
         Symbol[] members = [];
         while (!xs.isNil()) {
             if (xs.car.type != symbol_id) {
-                throw new LyraError("define-record: Name of member must be a symbol.",callStack());
+                throw new LyraError("define-record: Name of member must be a symbol.", callStack());
             }
             members ~= xs.car.symbol_val;
             xs = xs.cdr;
@@ -274,18 +275,20 @@ void initializeGlobalEnv(Env env) {
 
         auto type = type_id.fixnum_val;
         if (type < 0 || type > uint.max) {
-            throw new LyraError("define-record: type id not in range 0 .. 2**32-1",callStack());
+            throw new LyraError("define-record: type id not in range 0 .. 2**32-1", callStack());
         }
 
         LyraRecord.create(cast(uint) type, typename.symbol_val, Env.globalEnv(), members);
-        
+
         //writeln(Env.globalEnv().toStringWithoutParents());
 
         return Cons.nil();
     });
-    
+
     addFn("symbol", 1, false, true, false, (xs, env) {
-        if (xs.car.type == string_id) {return LyraObj.makeSymbol(xs.car.string_val);}
+        if (xs.car.type == string_id) {
+            return LyraObj.makeSymbol(xs.car.string_val);
+        }
         return LyraObj.makeSymbol(xs.car.toString());
     });
 
