@@ -2,7 +2,7 @@
 
 (define lyra-core-string-loaded #t)
 
-(define string-id (register-type!))
+(let* (string-id (register-type!))
 (define-record string-id string chars)
 
 (add-type-fns! string-id
@@ -34,6 +34,6 @@
     ))
 
 
-)
+))
 
 'lyra-core-string-loaded

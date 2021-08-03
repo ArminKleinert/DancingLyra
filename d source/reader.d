@@ -163,6 +163,8 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
             return root[0];
         }
     }
+    
+    if (level > 0) throw new Exception("Unclosed token. Expected "~expected ~ "!");
 
     return list(root);
 }

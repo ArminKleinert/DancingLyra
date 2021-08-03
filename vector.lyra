@@ -408,6 +408,6 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
     (list 'list? always-false)
     (list 'vector? always-true)
     (list '->string vector->string)))
+)
 
 'lyra-core-vector-loaded
-)

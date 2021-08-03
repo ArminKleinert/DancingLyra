@@ -8,9 +8,11 @@
   (define (maybe x) (make-maybe x))
 
   (define-record nothing-id nothing)
-  (define nothing (make-maybe (make-nothing)))
+  (define Nothing (make-maybe (make-nothing)))
+  (define (nothing & x) Nothing)
 
   (add-type-fn! maybe-id 'unwrap maybe-inner)
   (add-type-fn! maybe-id '->string (lambda (m) (string "(maybe " (->string m.?) ")")))
   (add-type-fn! nothing-id '->string (lambda (n) "nothing"))
   )
+)

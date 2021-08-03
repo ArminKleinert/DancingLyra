@@ -2,55 +2,54 @@
 
 (define lyra-core-typed-loaded #t)
 
-(let* (_types (box []))
-
-(define (register-type!)
-  (box-swap! _types (lambda (x) (_vector-append x '())))
-  (- (_vector-size (unbox _types)) 1))
-
-(define (associated xs sym)
-  (if (null? xs)
-    '()
-    (if (= (car (car xs)) sym) (car (cdr (car xs))) (associated (cdr xs) sym))))
-
-(define (find-type-fn x sym)
-  (associated
-    (_vector-get (unbox _types) (lyra-type-id x))
-    sym))
-
-(let* (vector-set
+(let ((_types (box []))
+      (associated (lambda (xs sym)
+                    (if (null? xs)
+                      '()
+                      (if (= (car (car xs)) sym)
+                        (car (cdr (car xs)))
+                        (associated (cdr xs) sym)))))
+      (vector-set
         (lambda (v idx xyz)
           (_vector-iterate v []
             (lambda (acc e i)
               (if (= i idx)
                 (_vector-append acc xyz)
                 (_vector-append acc e))))))
+      (list-append1
+            (lambda (l0 l1)
+              (if (null? l0)
+                l1
+                (cons (car l0) (list-append1 (cdr l0) l1))))))
 
-  (define (add-type-fn! type sym f)
+(define (register-type!)
+  (box-swap! _types (lambda (x) (_vector-append x '())))
+  (- (_vector-size (unbox _types)) 1))
+
+(define (find-type-fn x sym)
+  (associated
+    (_vector-get (unbox _types) (lyra-type-id x))
+    sym))
+
+(define (add-type-fn! type sym f)
+  (let* (v (unbox _types))
+    (box-set! _types
+      (vector-set
+        v type
+        (cons
+          (list sym f)
+          (_vector-get v type))))
+    type))
+
+(define (add-type-fns! type sym-to-f-list)
     (let* (v (unbox _types))
       (box-set! _types
         (vector-set
           v type
-          (cons
-            (list sym f)
+          (list-append1
+            sym-to-f-list
             (_vector-get v type))))
       type))
-
-  (define (add-type-fns! type sym-to-f-list)
-    (let* (list-append1
-            (lambda (l0 l1)
-              (if (null? l0)
-                l1
-                (cons (car l0) (list-append1 (cdr l0) l1)))))
-      (let* (v (unbox _types))
-        (box-set! _types
-          (vector-set
-            v type
-            (list-append1
-              sym-to-f-list
-              (_vector-get v type))))
-        type)))
-  )
 
 (def-macro (def-generic obj sig fallback)
   (let ((fn (car sig))
@@ -71,6 +70,9 @@
     (list 'begin
       (list 'add-type-fn! t-id globalname sig)
       sig)))
+      
+(define (get-functions-for i) (_vector-get (unbox _types) i))
+(define (get-functions-for-obj o) (_vector-get (unbox _types) (lyra-type-id o)))
 
 (define nil-id    (register-type!))
 (define symbol-id (register-type!))
@@ -83,7 +85,6 @@
 (define bool-id   (register-type!))
 (define vector-id (register-type!))
 (define box-id    (register-type!))
-(define _unused-id (register-type!))
 
 ; Type checkers
 (define (null? x) (= (lyra-type-id x) nil-id))
@@ -99,10 +100,14 @@
 (define (box? x) (= (lyra-type-id x) box-id))
 
 (def-generic x (unwrap x) id)
-(def-generic x (force-eval x) id)
 (def-generic x (list? x) always-false)
 (def-generic x (vector? x) always-false)
 (def-generic x (number? x) (lambda (n) (or (integer? n) (real? n))))
+(def-generic x (eq? x y) =)
+
+(def-generic x (force-eval x) id) ; TODO
 
 (def-generic x (->string x) _string)
 ))
+
+'lyra-core-typed-loaded

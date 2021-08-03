@@ -37,8 +37,12 @@
         (cons and (cdr xs))
         #f)))
 
-(define (always-true e) #t)
-(define (always-false e) #f)
+(define (wrap1 e) (lambda (x) e))
+(define always-null (wrap1 '()))
+(define always-true (wrap1 #t))
+(define always-false (wrap1 #f))
+
+(define (negate p) (lambda (x) (not (p e))))
 
 (def-macro (begin & xs)
   (if (not (cdr xs))
@@ -57,7 +61,7 @@
     (symbol (_string "_gensym_" (unbox gen-sym-counter)))))
 
 (define (string & xs)
-  (if (empty? xs)
+  (if (null? xs)
     ""
     (_string (->string (car xs)) (apply string (cdr xs)))))
 
@@ -69,3 +73,5 @@
 (load! "collections.lyra")
 (load! "list.lyra")
 (load! "vector.lyra")
+
+'lyra-core-loaded
