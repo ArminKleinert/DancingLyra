@@ -30,6 +30,7 @@ A dynamically typed Lisp written in D and mostly in itself.
   - Many tests
   - Support for different types of vectors
   - Support for a maybe type
+  - Easy macros for defining new types
 
 ## Usage
 
@@ -256,6 +257,8 @@ To define a function with a default behaviour (for example a type-checker), you 
 This means that if the function `vector?` is defined for the type of `e`, that implementation is used. If it is not found, `#f` is returned as the default output.  
 
 ## User-defined types
+
+### Section outdated!
 
 To define a new type, Lyra provides the functions `add-type!`, `define-record`, `add-type-fn!` and `find-type-fn`.  
 ```
