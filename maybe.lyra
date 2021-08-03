@@ -1,13 +1,17 @@
+(when (not (defined? 'lyra-core-maybe-loaded))
 
+(define lyra-core-maybe-loaded #t)
 
-
-(define Maybe-id (add-type!))
-(define-record Maybe-id Maybe inner)
+(define maybe-id (add-type!))
+(define-record maybe-id maybe inner)
+(define (maybe x) (make-maybe x))
 
 (define nothing-id (add-type!))
 (define-record nothing-id nothing)
+(define nothing (make-maybe (make-nothing)))
 
-(define (maybe & x) (if (null? x) (make-maybe (make-nothing)) (make-maybe x)))
+(add-type-fn! maybe-id 'unwrap maybe-inner)
+(add-type-fn! maybe-id '->string (lambda (m) (string "(maybe " (->string m.?) ")")))
+(add-type-fn! nothing-id '->string (lambda (n) "nothing"))
 
-(add-type-fn! Maybe-id 'unwrap Maybe-inner)
-
+)

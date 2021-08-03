@@ -1,4 +1,6 @@
+(when (not (defined? 'lyra-core-typed-loaded))
 
+(define lyra-core-typed-loaded #t)
 
 (define _types (box []))
 (define (box-swap! b f)(box-set! b (f (unbox b))))
@@ -79,4 +81,10 @@
 (define (list? x) (let* (f (find-type-fn x 'list?)) (if f (f x) #f)))
 (define (vector? x) (let* (f (find-type-fn x 'vector?)) (if f (f x) #f)))
 
+
+(define (->string x)
+  (let* (f (find-type-fn x '->string))
+    (if f (f x) (_string x))))
 (define (unwrap x) ((find-type-fn x 'unwrap) x))
+
+)

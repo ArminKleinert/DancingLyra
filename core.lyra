@@ -20,7 +20,7 @@
 (def-macro (not x) (list 'if x #f #t))
 
 (def-macro (or & xs)
-  (if (null? (cdr xs))
+  (if (not (cdr xs))
     (car xs)
     (list
       'if (car xs)
@@ -28,7 +28,7 @@
         (cons or (cdr xs)))))
 
 (def-macro (and & xs)
-  (if (null? (cdr xs))
+  (if (not (cdr xs))
     (car xs)
     (list
       'if (car xs)
@@ -39,7 +39,7 @@
 (define (always-false e) #f)
 
 (def-macro (begin & xs)
-  (if (null? (cdr xs))
+  (if (not (cdr xs))
     (car xs)
     (list
       'if (car xs)
@@ -82,6 +82,12 @@
 (println! (and #t #f #t))
 (println! (and #t #t #f))
 (println! (and #t #t #t))
+
+(let* (m (maybe 4))
+  (println! m)
+  (println! m.?)
+  (println! nothing)
+)
 
 (when #t (println! 1))
 (when #t (println! 1) (println! 2))
