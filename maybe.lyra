@@ -2,16 +2,15 @@
 
 (define lyra-core-maybe-loaded #t)
 
-(define maybe-id (add-type!))
-(define-record maybe-id maybe inner)
-(define (maybe x) (make-maybe x))
+(let ((maybe-id (add-type!))
+      (nothing-id (add-type!)))
+  (define-record maybe-id maybe inner)
+  (define (maybe x) (make-maybe x))
 
-(define nothing-id (add-type!))
-(define-record nothing-id nothing)
-(define nothing (make-maybe (make-nothing)))
+  (define-record nothing-id nothing)
+  (define nothing (make-maybe (make-nothing)))
 
-(add-type-fn! maybe-id 'unwrap maybe-inner)
-(add-type-fn! maybe-id '->string (lambda (m) (string "(maybe " (->string m.?) ")")))
-(add-type-fn! nothing-id '->string (lambda (n) "nothing"))
-
-)
+  (add-type-fn! maybe-id 'unwrap maybe-inner)
+  (add-type-fn! maybe-id '->string (lambda (m) (string "(maybe " (->string m.?) ")")))
+  (add-type-fn! nothing-id '->string (lambda (n) "nothing"))
+  )

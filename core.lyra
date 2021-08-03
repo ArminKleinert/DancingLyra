@@ -97,18 +97,6 @@
 (println! (apply vector 1 2 3 '(3 4 5)))
 (println! (apply string '(3 4 5)))
 
-(println! (string "(&& #t #t #t)" (&& #t #t #t)))
-(println! (string "(&& #t #t #f)" (&& #t #t #f)))
-(println! (string "(&& #t #f #t)" (&& #t #f #t)))
-(println! (string "(&& #t #f #f)" (&& #t #f #f)))
-(println! (string "(&& #f #t #t)" (&& #f #t #t)))
-(println! (string "(&& #f #t #f)" (&& #f #t #f)))
-(println! (string "(&& #f #f #t)" (&& #f #f #t)))
-(println! (string "(&& #f #f #f)" (&& #f #f #f)))
-(println! (&& #f (println! "SHOULD NOT BE HERE!")))
-(println! (&& #f #f (println! "SHOULD NOT BE HERE!")))
-(println! (&& #f #f #f (println! "SHOULD NOT BE HERE!")))
-
 (println! (add-type-fn! nil-id 'a (lambda (x) 67890)))
 (println! (find-type-fn '() 'a))
 (println! (empty? '()))

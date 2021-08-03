@@ -8,7 +8,7 @@
 ; Type-checkers
 
 (define (null?-test)
-  (&&
+  (and
     (not (null? '(1 2 3)))
     (null? '())
     (not (null? [1 2 3]))
@@ -27,7 +27,7 @@
   ))
 
 (define (symbol?-test)
-  (&&
+  (and
     (not (symbol? '(1 2 3)))
     (not (symbol? '()))
     (not (symbol? [1 2 3]))
@@ -46,7 +46,7 @@
   ))
 
 (define (string?-test)
-  (&&
+  (and
     (not (string? '(1 2 3)))
     (not (string? '()))
     (not (string? [1 2 3]))
@@ -65,7 +65,7 @@
   ))
 
 (define (char?-test)
-  (&&
+  (and
     (not (char? '(1 2 3)))
     (not (char? '()))
     (not (char? [1 2 3]))
@@ -84,7 +84,7 @@
   ))
 
 (define (integer?-test)
-  (&&
+  (and
     (not (integer? '(1 2 3)))
     (not (integer? '()))
     (not (integer? [1 2 3]))
@@ -103,7 +103,7 @@
   ))
 
 (define (real?-test)
-  (&&
+  (and
     (not (real? '(1 2 3)))
     (not (real? '()))
     (not (real? [1 2 3]))
@@ -122,7 +122,7 @@
   ))
 
 (define (cons?-test)
-  (&&
+  (and
     (cons? '(1 2 3))
     (not (cons? '()))
     (not (cons? [1 2 3]))
@@ -141,7 +141,7 @@
   ))
 
 (define (func?-test)
-  (&&
+  (and
     (not (func? '(1 2 3)))
     (not (func? '()))
     (not (func? [1 2 3]))
@@ -160,7 +160,7 @@
   ))
 
 (define (bool?-test)
-  (&&
+  (and
     (not (bool? '(1 2 3)))
     (not (bool? '()))
     (not (bool? [1 2 3]))
@@ -179,7 +179,7 @@
   ))
 
 (define (box?-test)
-  (&&
+  (and
     (not (box? '(1 2 3)))
     (not (box? '()))
     (not (box? [1 2 3]))
@@ -198,7 +198,7 @@
   ))
 
 (define (list?-test)
-  (&&
+  (and
     (list? '(1 2 3))
     (not (list? '()))
     (not (list? [1 2 3]))
@@ -217,7 +217,7 @@
   ))
 
 (define (vector?-test)
-  (&&
+  (and
     (not (vector? '(1 2 3)))
     (not (vector? '()))
     (vector? [1 2 3])
@@ -238,7 +238,7 @@
 ; Test eq? function
   
 (define (eq?-list-test)
-  (&&
+  (and
     (eq? '(1 2 3) '(1 2 3))
     (not (eq? '(1 2 3) '()))
     (not (eq? '(1 2 3) [1 2 3]))
@@ -257,7 +257,7 @@
   ))
 
 (define (eq?-nil-test)
-  (&&
+  (and
     (not (eq? '() '(1 2 3)))
     (eq? '() '())
     (not (eq? '() [1 2 3]))
@@ -276,7 +276,7 @@
   ))
 
 (define (eq?-vector-test)
-  (&&
+  (and
     (not (eq? [1 2 3] '(1 2 3)))
     (not (eq? [1 2 3] '()))
     (eq? [1 2 3] [1 2 3])
@@ -310,7 +310,7 @@
   ))
 
 (define (eq?-integer-test)
-  (&&
+  (and
     (not (eq? 629 '(1 2 3)))
     (not (eq? 629 '()))
     (not (eq? 629 [1 2 3]))
@@ -329,7 +329,7 @@
   ))
 
 (define (eq?-real-test)
-  (&&
+  (and
     (not (eq? 62.9 '(1 2 3)))
     (not (eq? 62.9 '()))
     (not (eq? 62.9 [1 2 3]))
@@ -348,7 +348,7 @@
   ))
 
 (define (eq?-string-test)
-  (&&
+  (and
     (not (eq? "629" '(1 2 3)))
     (not (eq? "629" '()))
     (not (eq? "629" [1 2 3]))
@@ -367,7 +367,7 @@
   ))
 
 (define (eq?-char-test)
-  (&&
+  (and
     (not (eq? #\a '(1 2 3)))
     (not (eq? #\a '()))
     (not (eq? #\a [1 2 3]))
@@ -386,7 +386,7 @@
   ))
 
 (define (eq?-box-test)
-  (&&
+  (and
     (not (eq? (box '()) '(1 2 3)))
     (not (eq? (box '()) '()))
     (not (eq? (box '()) [1 2 3]))
@@ -405,7 +405,7 @@
   ))
 
 (define (eq?-symbol-test)
-  (&&
+  (and
     (not (eq? 'sym '(1 2 3)))
     (not (eq? 'sym '()))
     (not (eq? 'sym [1 2 3]))
@@ -424,7 +424,7 @@
   ))
 
 (define (eq?-function-test)
-  (&&
+  (and
     (not (eq? id '(1 2 3)))
     (not (eq? id '()))
     (not (eq? id [1 2 3]))
@@ -443,7 +443,7 @@
   ))
 
 (define (eq?-boolean-test)
-  (&&
+  (and
     (not (eq? #t '(1 2 3)))
     (not (eq? #t '()))
     (not (eq? #t [1 2 3]))
@@ -477,7 +477,7 @@
 ; Test collection functions
 
 (define (first-list-test)
-  (&&
+  (and
     (eq? '() (first '()))
     (eq? 1 (first (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? '() (first (list '() '() '())))
@@ -492,7 +492,7 @@
   ))
 
 (define (first-vector-test)
-  (&&
+  (and
     (eq? '() (first []))
     (eq? 1 (first [1 2 3 4 5 6 7 8 9 10]))
     (eq? '() (first ['() '() '()]))
@@ -507,7 +507,7 @@
   ))
 
 (define (second-list-test)
-  (&&
+  (and
     (eq? '() (second '()))
     (eq? 2 (second (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? '() (second (list '() '() '())))
@@ -522,7 +522,7 @@
   ))
 
 (define (second-vector-test)
-  (&&
+  (and
     (eq? '() (second []))
     (eq? 2 (second [1 2 3 4 5 6 7 8 9 10]))
     (eq? '() (second ['() '() '()]))
@@ -537,7 +537,7 @@
   ))
 
 (define (third-list-test)
-  (&&
+  (and
     (eq? '() (third '()))
     (eq? 3 (third (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? '() (third (list '() '() '())))
@@ -552,7 +552,7 @@
   ))
 
 (define (third-vector-test)
-  (&&
+  (and
     (eq? '() (third []))
     (eq? 3 (third [1 2 3 4 5 6 7 8 9 10]))
     (eq? '() (third ['() '() '()]))
@@ -567,7 +567,7 @@
   ))
 
 (define (rest-list-test)
-  (&&
+  (and
     (eq? '() (rest '()))
     (eq? (list 2 3 4 5 6 7 8 9 10) (rest (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list '() '()) (rest (list '() '() '())))
@@ -582,7 +582,7 @@
   ))
 
 (define (rest-vector-test)
-  (&&
+  (and
     (eq? [] (rest []))
     (eq? [2 3 4 5 6 7 8 9 10] (rest [1 2 3 4 5 6 7 8 9 10]))
     (eq? ['() '()] (rest ['() '() '()]))
@@ -597,7 +597,7 @@
   ))
 
 (define (nth-list-test)
-  (&&
+  (and
     (eq? '() (nth '() 0))
     (eq? 1 (nth (list 1 2 3 4 5 6 7 8 9 10) 0))
     (eq? '() (nth (list '() '() '()) 0))
@@ -636,7 +636,7 @@
   ))
 
 (define (nth-vector-test)
-  (&&
+  (and
     (eq? '() (nth [] 0))
     (eq? 1 (nth [1 2 3 4 5 6 7 8 9 10] 0))
     (eq? '() (nth ['() '() '()] 0))
@@ -675,7 +675,7 @@
   ))
 
 (define (empty?-list-test)
-  (&&
+  (and
     (empty? '())
     (not (empty? '(1 2 3 4 5 6 7 8 9 10)))
     (not (empty? '('() '() '())))
@@ -690,7 +690,7 @@
   ))
 
 (define (empty?-vector-test)
-  (&&
+  (and
     (empty? [])
     (not (empty? [1 2 3 4 5 6 7 8 9 10]))
     (not (empty? ['() '() '()]))
@@ -706,7 +706,7 @@
 
 (define (foldl-list-test)
   (let* (helper (lambda (xs) (foldl (lambda (x y) (cons y x)) '() xs)))
-  (&&
+  (and
     (eq? 0 (foldl + 0 '()))
     (eq? 1 (foldl + 1 '()))
     (eq? 6 (foldl + 5 (list 1)))
@@ -728,7 +728,7 @@
 
 (define (foldl-vector-test)
   (let* (helper (lambda (xs) (foldl (lambda (x y) (cons y x)) '() xs)))
-    (&&
+    (and
       (eq? 0 (foldl + 0 []))
       (eq? 1 (foldl + 1 []))
       (eq? 6 (foldl + 5 [1]))
@@ -749,7 +749,7 @@
     )))
 
 (define (map-list-test)
-  (&&
+  (and
     (eq? '(1 4 9 16 25 36 49 64 81 100) (map (lambda (n) (* n n)) '(1 2 3 4 5 6 7 8 9 10)))
     (eq? '() (map string '()))
     (eq? (list "1" "2" "3" "4" "5" "6" "7" "8" "9" "10") (map string (list 1 2 3 4 5 6 7 8 9 10)))
@@ -764,7 +764,7 @@
   ))
 
 (define (map-vector-test)
-  (&&
+  (and
     (eq? [1 4 9 16 25 36 49 64 81 100] (map (lambda (n) (* n n)) [1 2 3 4 5 6 7 8 9 10]))
     (eq? [] (map string []))
     (eq? ["1" "2" "3" "4" "5" "6" "7" "8" "9" "10"] (map string [1 2 3 4 5 6 7 8 9 10]))
@@ -780,7 +780,7 @@
 
 (define (filter-list-test)
   (let* (v (list 1 2 3 4 5 6 7 8 9 10 '() '() '() [] [] [] "a" "b" "c" 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1 + - * / % id 'x 'y 'z 'abc 'def #\x #\y #\z #\space #\newline '(1 2 3) '(2 3 4) '(3 4 5) [1 2 3] [2 3 4] [3 4 5]))
-    (&&
+    (and
       (eq? (list 'x 'y 'z 'abc 'def) (filter symbol? v))
       (eq? (list [] [] [] [1 2 3] [2 3 4] [3 4 5]) (filter vector? v))
       (eq? (list '(1 2 3) '(2 3 4) '(3 4 5)) (filter list? v))
@@ -795,7 +795,7 @@
 
 (define (filter-vector-test)
   (let* (v [1 2 3 4 5 6 7 8 9 10 '() '() '() [] [] [] "a" "b" "c" 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1 + - * / % id 'x 'y 'z 'abc 'def #\x #\y #\z #\space #\newline '(1 2 3) '(2 3 4) '(3 4 5) [1 2 3] [2 3 4] [3 4 5]])
-    (&&
+    (and
       (eq? (vector 'x 'y 'z 'abc 'def) (filter symbol? v))
       (eq? (vector [] [] [] [1 2 3] [2 3 4] [3 4 5]) (filter vector? v))
       (eq? (vector '(1 2 3) '(2 3 4) '(3 4 5)) (filter list? v))
@@ -809,7 +809,7 @@
   )))
 
 (define (append-list-nil-test)
-  (&&
+  (and
     (eq? (list 1 2 3 4 5 6 7 8 9 10) (append '() (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list 1 2 3 4 5 6 7 8 9 10) (append (list 1 2 3 4 5 6 7 8 9 10) '()))
     (eq? (list '() '() '()) (append '() (list '() '() '())))
@@ -841,7 +841,7 @@
   ))
 
 (define (append-list-test)
-  (&&
+  (and
     (eq? (list 1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10)
         (append (list 1 2 3 4 5 6 7 8 9 10) (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list '() '() '() '() '() '())
@@ -865,7 +865,7 @@
   ))
 
 (define (append-vector-empty-test)
-  (&&
+  (and
     (eq? (vector 1 2 3 4 5 6 7 8 9 10) (append [] (vector 1 2 3 4 5 6 7 8 9 10)))
     (eq? (vector 1 2 3 4 5 6 7 8 9 10) (append (vector 1 2 3 4 5 6 7 8 9 10) []))
     (eq? (vector '() '() '()) (append [] (vector '() '() '())))
@@ -897,7 +897,7 @@
   ))
 
 (define (append-vector-test)
-  (&&
+  (and
     (eq? (vector 1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10)
         (append (vector 1 2 3 4 5 6 7 8 9 10) (vector 1 2 3 4 5 6 7 8 9 10)))
     (eq? (vector '() '() '() '() '() '())
@@ -922,7 +922,7 @@
 
 (define (find-first-list-test)
   (let* (v (list 1 2 3 4 5 6 7 8 9 10 '() '() '() [] [] [] "a" "b" "c" 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1 + - * / % id 'x 'y 'z 'abc 'def #\x #\y #\z #\space #\newline '(1 2 3) '(2 3 4) '(3 4 5) [1 2 3] [2 3 4] [3 4 5]))
-    (&&
+    (and
       (eq? 'x (find-first symbol? v))
       (eq? [] (find-first vector? v))
       (eq? '(1 2 3) (find-first list? v))
@@ -936,7 +936,7 @@
 
 (define (find-first-vector-test)
   (let* (v [1 2 3 4 5 6 7 8 9 10 '() '() '() [] [] [] "a" "b" "c" 1.1 2.2 3.3 4.4 5.5 6.6 7.7 8.8 9.9 10.1 + - * / % id 'x 'y 'z 'abc 'def #\x #\y #\z #\space #\newline '(1 2 3) '(2 3 4) '(3 4 5) [1 2 3] [2 3 4] [3 4 5]])
-    (&&
+    (and
       (eq? 'x (find-first symbol? v))
       (eq? [] (find-first vector? v))
       (eq? '(1 2 3) (find-first list? v))
@@ -950,7 +950,7 @@
 
  
 (define (->vector-list-test)
-  (&&
+  (and
     (eq? [] (->vector '()))
     (eq? [1 2 3 4 5 6 7 8 9 10] (->vector (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? ['() '() '()] (->vector (list '() '() '())))
@@ -965,7 +965,7 @@
   ))
 
 (define (->vector-vector-test)
-  (&&
+  (and
     (eq? [] (->vector []))
     (eq? [1 2 3 4 5 6 7 8 9 10] (->vector [1 2 3 4 5 6 7 8 9 10]))
     (eq? ['() '() '()] (->vector ['() '() '()]))
@@ -980,7 +980,7 @@
   ))
 
 (define (->list-list-test)
-  (&&
+  (and
     (eq? '() (->list '()))
     (eq? (list 1 2 3 4 5 6 7 8 9 10) (->list (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list '() '() '()) (->list (list '() '() '())))
@@ -995,7 +995,7 @@
   ))
 
 (define (->list-vector-test)
-  (&&
+  (and
     (eq? '() (->list []))
     (eq? (list 1 2 3 4 5 6 7 8 9 10) (->list [1 2 3 4 5 6 7 8 9 10]))
     (eq? (list '() '() '()) (->list ['() '() '()]))
@@ -1010,7 +1010,7 @@
   ))
 
 (define (copy-list-test)
-  (&&
+  (and
     (eq? '() (copy '()))
     (eq? (list 1 2 3 4 5 6 7 8 9 10) (copy (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list '() '() '()) (copy (list '() '() '())))
@@ -1025,7 +1025,7 @@
   ))
 
 (define (copy-vector-test)
-  (&&
+  (and
     (eq? [] (copy []))
     (eq? [1 2 3 4 5 6 7 8 9 10] (copy [1 2 3 4 5 6 7 8 9 10]))
     (eq? ['() '() '()] (copy ['() '() '()]))
@@ -1040,7 +1040,7 @@
   ))
 
 (define (but-last-list-test)
-  (&&
+  (and
     (eq? '() (but-last '()))
     (eq? (list 1 2 3 4 5 6 7 8 9) (but-last (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list '() '()) (but-last (list '() '() '())))
@@ -1055,7 +1055,7 @@
   ))
 
 (define (but-last-vector-test)
-  (&&
+  (and
     (eq? [] (but-last []))
     (eq? [1 2 3 4 5 6 7 8 9] (but-last [1 2 3 4 5 6 7 8 9 10]))
     (eq? ['() '()] (but-last ['() '() '()]))
@@ -1070,7 +1070,7 @@
   ))
 
 (define (reverse-list-test)
-  (&&
+  (and
     (eq? '() (reverse (list)))
     (eq? (list 10 9 8 7 6 5 4 3 2 1) (reverse (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list '() '() '()) (reverse (list '() '() '())))
@@ -1085,7 +1085,7 @@
   ))
 
 (define (reverse-vector-test)
-  (&&
+  (and
     (eq? [] (reverse []))
     (eq? (vector 10 9 8 7 6 5 4 3 2 1) (reverse [1 2 3 4 5 6 7 8 9 10]))
     (eq? (vector '() '() '()) (reverse ['() '() '()]))
@@ -1100,7 +1100,7 @@
   ))
 
 (define (map-while-list-test)
-  (&&
+  (and
     (eq? '() (map-while string odd? '()))
     (eq? (list 1 4 9 16) (map-while (lambda (n) (* n n)) (lambda (n) (< n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list "1" "4" "9" "16") (map-while (lambda (n) (string (* n n))) (lambda (n) (< n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
@@ -1110,7 +1110,7 @@
   ))
 
 (define (map-while-vector-test)
-  (&&
+  (and
     (eq? [] (map-while string odd? []))
     (eq? (vector 1 4 9 16) (map-while (lambda (n) (* n n)) (lambda (n) (< n 5)) [1 2 3 4 5 6 7 8 9 10]))
     (eq? (vector "1" "4" "9" "16") (map-while (lambda (n) (string (* n n))) (lambda (n) (< n 5)) [1 2 3 4 5 6 7 8 9 10]))
@@ -1120,7 +1120,7 @@
   ))
 
 (define (map-until-list-test)
-  (&&
+  (and
     (eq? (list 1 4 9 16 25) (map-until (lambda (n) (* n n)) (lambda (n) (> n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list "1" "4" "9" "16" "25") (map-until (lambda (n) (string (* n n))) (lambda (n) (> n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list 2 3 4 5 6) (map-until inc (lambda (n) (> n 5)) (list 1 2 3 4 5 6 7 8 9 10)))
@@ -1129,7 +1129,7 @@
   ))
 
 (define (map-until-vector-test)
-  (&&
+  (and
     (eq? [] (map-until string odd? []))
     (eq? (vector 1 4 9 16 25) (map-until (lambda (n) (* n n)) (lambda (n) (> n 5)) [1 2 3 4 5 6 7 8 9 10]))
     (eq? (vector "1" "4" "9" "16" "25") (map-until (lambda (n) (string (* n n))) (lambda (n) (> n 5)) [1 2 3 4 5 6 7 8 9 10]))
@@ -1139,7 +1139,7 @@
   ))
 
 (define (take-list-test)
-  (&&
+  (and
     (eq? '() (take 0 (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? '() (take 0 (list '() '() '())))
     (eq? '() (take 0 (list [] [] [])))
@@ -1175,7 +1175,7 @@
   ))
 
 (define (take-vector-test)
-  (&&
+  (and
     (eq? [] (take 0 [1 2 3 4 5 6 7 8 9 10]))
     (eq? [] (take 0 ['() '() '()]))
     (eq? [] (take 0 [[] [] []]))
@@ -1211,7 +1211,7 @@
   ))
 
 (define (take-while-list-test)
-  (&&
+  (and
     (eq? '() (take-while always-true '() ))
     (eq? (list 1 2 3 4 5 6 7 8 9 10) (take-while always-true (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? '()  (take-while always-false (list 1 2 3 4 5 6 7 8 9 10)))
@@ -1220,7 +1220,7 @@
   ))
 
 (define (take-while-vector-test)
-  (&&
+  (and
     (eq? [] (take-while always-true []))
     (eq? [1 2 3 4 5 6 7 8 9 10] (take-while always-true [1 2 3 4 5 6 7 8 9 10]))
     (eq? [] (take-while always-false [1 2 3 4 5 6 7 8 9 10]))
@@ -1229,7 +1229,7 @@
   ))
 
 (define (take-until-list-test)
-  (&&
+  (and
     (eq? '() (take-until always-true '() ))
     (eq? '() (take-until always-true (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list 1 2 3 4 5 6 7 8 9 10)  (take-until always-false (list 1 2 3 4 5 6 7 8 9 10)))
@@ -1238,7 +1238,7 @@
   ))
 
 (define (take-until-vector-test)
-  (&&
+  (and
     (eq? [] (take-until always-true []))
     (eq? [] (take-until always-true [1 2 3 4 5 6 7 8 9 10]))
     (eq? [1 2 3 4 5 6 7 8 9 10] (take-until always-false [1 2 3 4 5 6 7 8 9 10]))
@@ -1247,7 +1247,7 @@
   ))
 
 (define (drop-while-list-test)
-  (&&
+  (and
     (eq? '() (drop-while always-true '() ))
     (eq? '() (drop-while always-true (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? (list 1 2 3 4 5 6 7 8 9 10)  (drop-while always-false (list 1 2 3 4 5 6 7 8 9 10)))
@@ -1256,7 +1256,7 @@
   ))
 
 (define (drop-while-vector-test)
-  (&&
+  (and
     (eq? [] (drop-while always-true []))
     (eq? [] (drop-while always-true [1 2 3 4 5 6 7 8 9 10]))
     (eq? [1 2 3 4 5 6 7 8 9 10] (drop-while always-false [1 2 3 4 5 6 7 8 9 10]))
@@ -1265,7 +1265,7 @@
   ))
 
 (define (drop-until-list-test)
-  (&&
+  (and
     (eq? '() (drop-until always-true '() ))
     (eq? (list 1 2 3 4 5 6 7 8 9 10) (drop-until always-true (list 1 2 3 4 5 6 7 8 9 10)))
     (eq? '()  (drop-until always-false (list 1 2 3 4 5 6 7 8 9 10)))
@@ -1274,7 +1274,7 @@
   ))
 
 (define (drop-until-vector-test)
-  (&&
+  (and
     (eq? [] (drop-until always-true []))
     (eq? [1 2 3 4 5 6 7 8 9 10] (drop-until always-true [1 2 3 4 5 6 7 8 9 10]))
     (eq? [] (drop-until always-false [1 2 3 4 5 6 7 8 9 10]))
@@ -1283,7 +1283,7 @@
   ))
 
 (define (zip-list-test)
-  (&&
+  (and
     (eq? '() (zip '() '()))
     (eq? '() (zip '() (list 1 2 3 4 5)))
     (eq? '() (zip (list 1 2 3 4 5) '()))
@@ -1293,7 +1293,7 @@
   ))
 
 (define (zip-vector-test)
-  (&&
+  (and
     (eq? [] (zip [] []))
     (eq? [] (zip [] [1 2 3 4 5]))
     (eq? [] (zip [1 2 3 4 5] []))

@@ -163,7 +163,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
 (add-type-fn! vector-pair-id 'eq?
   (lambda (v0 v1)
     (if (vector-pair? v1)
-      (&& (eq? (vector-pair-x v0) (vector-pair-x v1))
+      (and (eq? (vector-pair-x v0) (vector-pair-x v1))
           (eq? (vector-pair-y v0) (vector-pair-y v1)))
       (eq? (->vector v0) v1))))
 
@@ -218,7 +218,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
 (add-type-fns! vector-pair-id
   (list
     (list 'size vector-size)
-    (list 'empty? (lambda (vp) (&& (empty? (vector-pair-x vp)) (empty? (vector-pair-y vp)))))
+    (list 'empty? (lambda (vp) (and (empty? (vector-pair-x vp)) (empty? (vector-pair-y vp)))))
     (list 'copy ->vector)
     (list 'list? always-false)
     (list 'vector? always-true)
@@ -257,7 +257,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
         ((= (vector-size v0) (vector-size v1))
           (vector-iterate v0 #t
             (lambda (acc e i)
-              (if (&& acc (eq? e (nth v1 i))) #t #f))))
+              (if (and acc (eq? e (nth v1 i))) #t #f))))
         (#t #f)))
 
 (define (vector-foldl f x v)
