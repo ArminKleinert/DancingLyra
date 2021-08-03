@@ -7,12 +7,13 @@ import std.range.primitives;
 import types;
 import std.conv;
 
+// "[\s,]*([\[\]()'`]|" ~ `"` ~ `(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)"
 const auto RE = ctRegex!(
-        r"[\s,]*([\[\]()'`]|" ~ `"` ~ `(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"` ~ r"`,;)]*)");
+        r"[\s,]*([\[\]()'`]|\.\?|" ~ `"` ~ `(?:\\.|[^\\"])*"?|;.*|([^\s\[\]{}('"` ~ r"`,;)](\.\?)?)*)");
 
 class Reader {
     private int pos = 0;
-    private const string[] _tokens;
+    const string[] _tokens;
 
     this(string[] tokens) {
         _tokens = tokens.dup;
@@ -64,6 +65,10 @@ char parse_char(string token) {
     }
 }
 
+Cons surroundWithUnwrapCall(LyraObj o) {
+return list(symbol("unwrap"), o);
+}
+
 auto integer_regex = ctRegex!(r"^-?[0-9]+$");
 auto float_regex = ctRegex!(r"^-?[0-9]+\.[0-9]+$");
 auto string_regex = ctRegex!(`^"(?:\\.|[^\\"])*"$`);
@@ -98,19 +103,39 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
         case "#f":
             root ~= LyraObj.makeBoolean(false);
             break;
+        case ".?":
+            if (root.length == 0) {
+              root ~= LyraObj.makeSymbol("unwrap");
+            } else {
+            auto last = root[root.length-1];
+            root[root.length-1] = surroundWithUnwrapCall(last);}
+            break;
         default:
+            import std.algorithm.searching : endsWith;
+            
+            LyraObj o = null;
+            bool unwrap = token.endsWith(".?");
+            
+            if (unwrap){
+              token = token[0 .. $-2];}
+            
             //auto captures = matchFirst(token, integer_regex);
             if (!matchFirst(token, integer_regex).empty()) {
-                root ~= LyraObj.makeFixnum(to!fixnum(token));
+                o= LyraObj.makeFixnum(to!fixnum(token));
             } else if (!matchFirst(token, float_regex).empty()) {
-                root ~= LyraObj.makeReal(to!floating(token));
+                o= LyraObj.makeReal(to!floating(token));
             } else if (!matchFirst(token, string_regex).empty()) {
-                root ~= LyraObj.makeString(parse_string(token));
+                o= LyraObj.makeString(parse_string(token));
             } else if (token.length > 2 && token[0 .. 2] == "#\\") {
-                root ~= LyraObj.makeChar(parse_char(token[2 .. $]));
+                o= LyraObj.makeChar(parse_char(token[2 .. $]));
             } else {
-                root ~= LyraObj.makeSymbol(token);
+                o= LyraObj.makeSymbol(token);
             }
+            
+            if (unwrap)
+            o = surroundWithUnwrapCall(o);
+            
+            root ~= o;
             break;
         }
         if (stop_after_1) {
@@ -118,5 +143,7 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
         }
     }
 
+    
+    
     return list(root);
 }

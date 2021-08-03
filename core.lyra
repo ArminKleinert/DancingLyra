@@ -7,10 +7,6 @@
 
 (define (id e) e)
 
-(def-macro (or x y) (list 'if x #t y))
-(def-macro (and x y) (list 'if x y #f))
-(def-macro (not x) (list 'if x #f #t))
-
 (define (inc x) (+ x 1))
 (define (dec x) (- x 1))
 
@@ -21,118 +17,26 @@
 (define car _car)
 (define cdr _cdr)
 
+(def-macro (not x) (list 'if x #f #t))
+
+(def-macro (or & xs)
+  (if (null? (cdr xs))
+    (car xs)
+    (list
+      'if (car xs)
+        #t
+        (cons or (cdr xs)))))
+
+(def-macro (and & xs)
+  (if (null? (cdr xs))
+    (car xs)
+    (list
+      'if (car xs)
+        (cons and (cdr xs))
+        #f)))
+
 (define (always-true e) #t)
 (define (always-false e) #f)
-
-(define _types (box []))
-(define (box-swap! b f)(box-set! b (f (unbox b))))
-
-(define (add-type!)
-  (box-swap! _types (lambda (x) (_vector-append x '())))
-  (- (_vector-size (unbox _types)) 1))
-
-(define (associated xs sym)
-  (if (null? xs)
-    '()
-    (if (= (car (car xs)) sym) (car (cdr (car xs))) (associated (cdr xs) sym))))
-
-(define (find-type-fn x sym)
-  (associated
-    (_vector-get (unbox _types) (lyra-type-id x))
-    sym))
-
-(let* (vector-set (lambda (v idx xyz)
-  (_vector-iterate v []
-    (lambda (acc e i)
-      (if (= i idx) (_vector-append acc xyz) (_vector-append acc e))))))
-
-  (define (add-type-fn! type sym f)
-    (let* (v (unbox _types))
-      (box-set! _types
-        (vector-set
-          v type
-          (cons
-            (list sym f)
-            (_vector-get v type))))
-      type))
-
-  (define (add-type-fns! type sym-to-f-list)
-    (let* (list-append1
-            (lambda (l0 l1)
-              (if (null? l0)
-                l1
-                (cons (car l0) (list-append1 (cdr l0) l1)))))
-      (let* (v (unbox _types))
-        (box-set! _types
-          (vector-set
-            v type
-            (list-append1
-              sym-to-f-list
-              (_vector-get v type))))
-        type)))
-)
-
-(define nil-id    (add-type!))
-(define symbol-id (add-type!))
-(define string-id (add-type!))
-(define char-id   (add-type!))
-(define fixnum-id (add-type!))
-(define real-id   (add-type!))
-(define cons-id   (add-type!))
-(define func-id   (add-type!))
-(define bool-id   (add-type!))
-(define vector-id (add-type!))
-(define box-id    (add-type!))
-(define _unused-id (add-type!))
-
-(define (null? x) (= (lyra-type-id x) nil-id))
-(define (symbol? x) (= (lyra-type-id x) symbol-id))
-(define (string? x) (= (lyra-type-id x) string-id))
-(define (char? x) (= (lyra-type-id x) char-id))
-(define (integer? x) (= (lyra-type-id x) fixnum-id))
-(define (real? x) (= (lyra-type-id x) real-id))
-(define (cons? x) (= (lyra-type-id x) cons-id))
-(define (func? x) (= (lyra-type-id x) func-id))
-(define (bool? x) (= (lyra-type-id x) bool-id))
-(define (box? x) (= (lyra-type-id x) box-id))
-(define (number? x) (let* (f (find-type-fn x 'number?)) (if f (f x) (or (integer? x) (real? x)))))
-
-(define (list? x) (let* (f (find-type-fn x 'list?)) (if f (f x) #f)))
-(define (vector? x) (let* (f (find-type-fn x 'vector?)) (if f (f x) #f)))
-
-(define (first x) ((find-type-fn x 'first) x))
-(define (second x) ((find-type-fn x 'second) x))
-(define (third x) ((find-type-fn x 'third) x))
-(define (rest x) ((find-type-fn x 'rest) x))
-(define (set-at x i e) ((find-type-fn x 'set-at) x i e))
-
-(define (size x) (let* (f (find-type-fn x 'size)) (if f (f x) '())))
-(define (empty? x) (let* (f (find-type-fn x 'empty?)) (if f (f x) #f)))
-(define (eql? x y) (let* (f (find-type-fn x 'eql?)) (if f (f x y) (= x y))))
-(define (eq? x y) (let* (f (find-type-fn x 'eq?)) (if f (f x y) (= x y)))) ; TODO: Make this the default name!
-(define (nth x i)  (let* (f (find-type-fn x 'nth)) (if f (f x i) '())))
-(define (foldl f s x) ((find-type-fn x 'foldl) f s x))
-(define (map f x) ((find-type-fn x 'map) f x))
-(define (filter p x) ((find-type-fn x 'filter) p x))
-(define (append x y) ((find-type-fn x 'append) x y))
-(define (find-first p x) ((find-type-fn x 'find-first) p x))
-(define (->string x)
-  (let* (f (find-type-fn x '->string))
-    (if f (f x) (_string x))))
-(define (->vector x) ((find-type-fn x '->vector) x))
-(define (->list x) ((find-type-fn x '->list) x))
-(define (copy x) ((find-type-fn x 'copy) x))
-(define (but-last x) ((find-type-fn x 'but-last) x))
-(define (reverse x) ((find-type-fn x 'reverse) x))
-(define (map-while f p x) ((find-type-fn x 'map-while) f p x))
-(define (map-until f p x) ((find-type-fn x 'map-until) f p x))
-(define (take n x) ((find-type-fn x 'take) n x))
-(define (drop n x) ((find-type-fn x 'drop) n x))
-(define (take-while p x) ((find-type-fn x 'take-while) p x))
-(define (take-until p x) ((find-type-fn x 'take-until) p x))
-(define (drop-while p x) ((find-type-fn x 'drop-while) p x))
-(define (drop-until p x) ((find-type-fn x 'drop-until) p x))
-(define (zip x y) ((find-type-fn x 'zip) x y))
 
 (def-macro (begin & xs)
   (if (null? (cdr xs))
@@ -153,10 +57,30 @@
 (define (println! x)
   (_println! (->string x)))
 
+(load! "typed.lyra")
+(load! "collections.lyra")
 (load! "list.lyra")
 (load! "vector.lyra")
 
 (comment
+
+(println! (or #f #f #f))
+(println! (or #f #f #t))
+(println! (or #f #t #f))
+(println! (or #f #t #t))
+(println! (or #t #f #f))
+(println! (or #t #f #t))
+(println! (or #t #t #f))
+(println! (or #t #t #t))
+(println! "")
+(println! (and #f #f #f))
+(println! (and #f #f #t))
+(println! (and #f #t #f))
+(println! (and #f #t #t))
+(println! (and #t #f #f))
+(println! (and #t #f #t))
+(println! (and #t #t #f))
+(println! (and #t #t #t))
 
 (when #t (println! 1))
 (when #t (println! 1) (println! 2))

@@ -1,0 +1,82 @@
+
+
+(define _types (box []))
+(define (box-swap! b f)(box-set! b (f (unbox b))))
+
+(define (add-type!)
+  (box-swap! _types (lambda (x) (_vector-append x '())))
+  (- (_vector-size (unbox _types)) 1))
+
+(define (associated xs sym)
+  (if (null? xs)
+    '()
+    (if (= (car (car xs)) sym) (car (cdr (car xs))) (associated (cdr xs) sym))))
+
+(define (find-type-fn x sym)
+  (associated
+    (_vector-get (unbox _types) (lyra-type-id x))
+    sym))
+
+(let* (vector-set (lambda (v idx xyz)
+  (_vector-iterate v []
+    (lambda (acc e i)
+      (if (= i idx) (_vector-append acc xyz) (_vector-append acc e))))))
+
+  (define (add-type-fn! type sym f)
+    (let* (v (unbox _types))
+      (box-set! _types
+        (vector-set
+          v type
+          (cons
+            (list sym f)
+            (_vector-get v type))))
+      type))
+
+  (define (add-type-fns! type sym-to-f-list)
+    (let* (list-append1
+            (lambda (l0 l1)
+              (if (null? l0)
+                l1
+                (cons (car l0) (list-append1 (cdr l0) l1)))))
+      (let* (v (unbox _types))
+        (box-set! _types
+          (vector-set
+            v type
+            (list-append1
+              sym-to-f-list
+              (_vector-get v type))))
+        type)))
+)
+
+(define nil-id    (add-type!))
+(define symbol-id (add-type!))
+(define string-id (add-type!))
+(define char-id   (add-type!))
+(define fixnum-id (add-type!))
+(define real-id   (add-type!))
+(define cons-id   (add-type!))
+(define func-id   (add-type!))
+(define bool-id   (add-type!))
+(define vector-id (add-type!))
+(define box-id    (add-type!))
+(define _unused-id (add-type!))
+
+; Type checkers
+(define (null? x) (= (lyra-type-id x) nil-id))
+(define (symbol? x) (= (lyra-type-id x) symbol-id))
+(define (string? x) (= (lyra-type-id x) string-id))
+(define (char? x) (= (lyra-type-id x) char-id))
+(define (integer? x) (= (lyra-type-id x) fixnum-id))
+(define (real? x) (= (lyra-type-id x) real-id))
+(define (cons? x) (= (lyra-type-id x) cons-id))
+(define (func? x) (= (lyra-type-id x) func-id))
+(define (bool? x) (= (lyra-type-id x) bool-id))
+(define boolean? bool?)
+(define (box? x) (= (lyra-type-id x) box-id))
+
+; Special type checkers
+(define (number? x) (let* (f (find-type-fn x 'number?)) (if f (f x) (or (integer? x) (real? x)))))
+(define (list? x) (let* (f (find-type-fn x 'list?)) (if f (f x) #f)))
+(define (vector? x) (let* (f (find-type-fn x 'vector?)) (if f (f x) #f)))
+
+(define (unwrap x) ((find-type-fn x 'unwrap) x))
