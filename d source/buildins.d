@@ -278,7 +278,8 @@ void initializeGlobalEnv(Env env) {
             throw new LyraError("define-record: type id not in range 0 .. 2**32-1", callStack());
         }
 
-        LyraRecord.create(cast(uint) type, typename.symbol_val, Env.globalEnv(), members);
+        //LyraRecord.create(cast(uint) type, typename.symbol_val, Env.globalEnv(), members);
+        LyraRecord.create(cast(uint) type, typename.symbol_val, env, members);
 
         //writeln(Env.globalEnv().toStringWithoutParents());
 

@@ -5,11 +5,12 @@
 (let ((maybe-id (register-type!))
       (nothing-id (register-type!)))
   (define-record maybe-id maybe inner)
-  (define (maybe x) (make-maybe x))
+  (define maybe make-maybe)
 
-  (define-record nothing-id nothing)
-  (define Nothing (make-maybe (make-nothing)))
-  (define (nothing & x) Nothing)
+  (define-record nothing-id _nothing)
+  (define _nothing (make-maybe (make-_nothing)))
+  (define (nothing & x) _nothing)
+  (define (nothing? x) (if (_nothing? x) #t (if (maybe? x) (_nothing? x.?) #f))) 
 
   (add-type-fn! maybe-id 'unwrap maybe-inner)
   (add-type-fn! maybe-id '->string (lambda (m) (string "(maybe " (->string m.?) ")")))
