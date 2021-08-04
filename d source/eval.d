@@ -5,6 +5,7 @@ import types;
 import lyrafunction;
 
 private CallStack _callStack = [null];
+private Symbol[] importedModules = [];
 
 private bool allowRedefine = false;
 private bool globalDisallowTailRecursion = false;
@@ -97,7 +98,12 @@ LyraObj evModule(Cons expr) {
     LyraObj moduleName = expr.cdr.car;
     if (moduleName.type != symbol_id)
         throw new LyraSyntaxError("Module name must be a symbol.", _callStack);
-    Env moduleEnv = Env.createModuleEnv(moduleName.symbol_val);
+    
+    Symbol moduleNameSymbol=moduleName.symbol_val;
+    foreach (m; importedModules) {
+        if (m == moduleNameSymbol) return moduleName;}
+    
+    Env moduleEnv = Env.createModuleEnv(moduleNameSymbol);
     LyraObj exportBindings = expr.cdr.cdr.car;
     if (exportBindings.type != vector_id)
         throw new LyraSyntaxError("Module export bindings must be a vector.", _callStack);

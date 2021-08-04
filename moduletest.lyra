@@ -1,6 +1,7 @@
 (module moduletest
 [[abf bound]]
-(define (bound i) (+ i 2))
+(define (bound1 i) (+ i 2))
+(define (bound i) (bound1 2))
 )
 
 (println! (abf 2))
