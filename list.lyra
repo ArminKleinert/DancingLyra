@@ -158,10 +158,6 @@
 
 (add-type-fns! cons-id
   (list
-    (list 'first car)
-    (list 'second cadr)
-    (list 'third caddr)
-    (list 'rest cdr)
 ;;     (list 'empty? always-false)
 ;;     (list 'eq? list-eq?)
 ;;     (list 'nth list-nth)
@@ -195,7 +191,7 @@
     (list 'rest nothing)
     (list 'empty? always-true)
     (list 'eq? (lambda (l0 l1) (null? l1)))
-    (list 'nth list-nth)
+    (list 'nth nothing)
     (list 'foldl list-foldl)
     (list 'map list-map)
     (list 'filter list-filter)
