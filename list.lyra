@@ -105,7 +105,7 @@
         (#t (list-find-first f (cdr xs)))))
 
 (def-method cons-id ->vector (list->vector xs)
-  (foldl (lambda (v x) (_vector-append v x))
+  (foldl (lambda (v x) (_vector-add v x))
          (vector) xs))
 
 (def-method cons-id but-last (list-but-last xs)

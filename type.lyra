@@ -47,16 +47,16 @@
           (_vector-iterate v []
             (lambda (acc e i)
               (if (= i idx)
-                (_vector-append acc xyz)
-                (_vector-append acc e))))))
+                (_vector-add acc xyz)
+                (_vector-add acc e))))))
       (list-append1
-            (lambda (l0 l1)
-              (if (null? l0)
-                l1
-                (cons (car l0) (list-append1 (cdr l0) l1))))))
+        (lambda (l0 l1)
+          (if (null? l0)
+            l1
+            (cons (car l0) (list-append1 (cdr l0) l1))))))
 
 (define (register-type!)
-  (box-swap! _types (lambda (x) (_vector-append x '())))
+  (box-swap! _types (lambda (x) (_vector-add x '())))
   (- (_vector-size (unbox _types)) 1))
 
 (define (find-type-fn x sym)

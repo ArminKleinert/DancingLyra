@@ -108,7 +108,7 @@ void initializeGlobalEnv(Env env) {
         return vector(listToVector(xs));
     });
 
-    addFn("_vector-append", 2, false, true, false, (xs, env) {
+    addFn("_vector-add", 2, false, true, false, (xs, env) {
         if (xs.car.type != vector_id) {
             throw new LyraError("_vector-append: Expected vector.", callStack());
         }

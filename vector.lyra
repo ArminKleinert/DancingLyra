@@ -4,16 +4,15 @@
   [offset-vector? offset-vector?]
   [vector-pair? vector-pair?]]
 
-
 (def-generic x (vector-size x) _vector-size)
 (def-generic x (vector-get x i) nothing)
-(def-generic x (vector-append x y) _vector-append)
+(def-generic x (vector-add x y) _vector-add)
+;; (def-generic x (vector-append x y) nothing)
 (def-generic x (vector-iterate x acc fn) _vector-iterate)
 (def-generic x (vector-set x i e) nothing)
 
-
 (comment "Functions provided for every vector-type:"
-  vector-size size vector-append append ->vector but-last foldl map reverse ->string find-first eq? vector-get nth filter take drop vector-set set-at vector-iterate empty? list? vector? ->list map-while map-until take-while take-until drop-while drop-until zip
+  vector-size size vector-add vector-append append ->vector but-last foldl map reverse ->string find-first eq? vector-get nth filter take drop vector-set set-at vector-iterate empty? list? vector? ->list map-while map-until take-while take-until drop-while drop-until zip
 )
 
 
@@ -25,7 +24,7 @@
 (define (offset-vector vec start length) (make-offset-vector vec start length))
 
 (comment
-vector-size size vector-append append ->vector but-last foldl map reverse ->string find-first eq? vector-get nth filter take drop vector-set set-at vector-iterate empty? list? vector? ->list map-while map-until take-while take-until drop-while drop-until zip
+vector-size size vector-add append ->vector but-last foldl map reverse ->string find-first eq? vector-get nth filter take drop vector-set set-at vector-iterate empty? list? vector? ->list map-while map-until take-while take-until drop-while drop-until zip
 )
 
 (define (offset-vector-iterate ov x f)
@@ -46,7 +45,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
 
 (define (offset-vector->vector ov)
   (offset-vector-iterate ov []
-    (lambda (acc e i)  (vector-append acc e))))
+    (lambda (acc e i)  (vector-add acc e))))
 
 (define (offset-vector->string ov)
   (->string (offset-vector->vector ov)))
@@ -55,7 +54,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
   (list
     (list 'vector-get offset-vector-get)
     (list 'vectord-iterate offset-vector-iterate)
-    (list 'vector-append (lambda (v x) (append (->vector v) x)))
+    (list 'vector-add (lambda (v x) (vector-add (->vector v) x)))
     (list 'eq? (lambda (v x) (eq? (->vector v) x)))
     (list 'foldl (lambda (f e v) (foldl f e (->vector v))))
     (list 'map (lambda (f v) (map f (->vector v))))
@@ -100,11 +99,10 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
   (lambda (vp)
     (+ (_vector-size (vector-pair-x vp)) (_vector-size (vector-pair-y vp)))))
 
-(add-type-fn! vector-pair-id 'vector-append
+(add-type-fn! vector-pair-id 'vector-add
   (lambda (vp e)
-    (make-vector-pair (vector-pair-x vp) (vector-append (vector-pair-y vp) e))))
+    (make-vector-pair (vector-pair-x vp) (vector-add (vector-pair-y vp) e))))
 
-; TODO Needs optimization
 (add-type-fn! vector-pair-id 'append
   (lambda (vp v1)
     (if (empty? v1)
@@ -114,7 +112,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
 (add-type-fn! vector-pair-id '->vector
   (lambda (vp)
     (vector-iterate (vector-pair-y vp) (vector-pair-x vp)
-      (lambda (acc e i) (_vector-append acc e)))))
+      (lambda (acc e i) (vector-add acc e)))))
 
 (add-type-fn! vector-pair-id 'but-last
   (lambda (vp) 
@@ -204,12 +202,13 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
 (add-type-fns! vector-pair-id
   (list
     (list 'size vector-size)
-    (list 'empty? (lambda (vp) (and (empty? (vector-pair-x vp)) (empty? (vector-pair-y vp)))))
+    (list 'empty? (lambda (vp) (and (empty? (vector-pair-x vp))
+                                    (empty? (vector-pair-y vp)))))
     (list 'copy ->vector)
     (list 'list? always-false)
     (list 'vector? always-true)
     (list '->list (lambda (vp) (append (->list (vector-pair-x vp))
-                                      (->list (vector-pair-y vp)))))
+                                       (->list (vector-pair-y vp)))))
     
     ; TODO All need proper implementation (Especially vector-get and nth !!!)
     (list 'map-while (lambda (f p vp) (map-while f p (->vector vp)))) ; TODO
@@ -241,7 +240,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
 (define (_vector-set v idx element)
   (vector-iterate v []
     (lambda (acc e i)
-      (if (= i idx) (vector-append acc element) (vector-append acc e)))))
+      (if (= i idx) (vector-add acc element) (vector-add acc e)))))
 
 (define (vector-eq? v0 v1)
   (cond ((not (vector? v1)) #f)
@@ -255,14 +254,14 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
   (vector-iterate v x (lambda (acc e i) (f acc e))))
 
 (define (vector-map f v)
-  (vector-iterate v [] (lambda (acc e i) (vector-append acc (f e)))))
+  (vector-iterate v [] (lambda (acc e i) (vector-add acc (f e)))))
 
 (define (vector-filter p v)
   (vector-iterate v []
     (lambda (acc e i)
-      (if (p e) (vector-append acc e) acc))))
+      (if (p e) (vector-add acc e) acc))))
 
-(define (vector-concat v v1)
+(define (vector-append v v1)
 (cond ((empty? v) v1)
       ((empty? v1) v)
       (#t (make-vector-pair v (->vector v1)))))
@@ -286,13 +285,13 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
 (define (vector-but-last v)
   (let* (last-idx (- (_vector-size v) 1))
     (vector-iterate v []
-      (lambda (acc e i) (if (<= last-idx i) acc (vector-append acc e))))))
+      (lambda (acc e i) (if (<= last-idx i) acc (vector-add acc e))))))
 
 (define (vector-reverse v)
   (let* (vlen (- (_vector-size v) 1))
     (vector-iterate v []
       (lambda (acc e i)
-        (vector-append acc (vector-get v (- vlen i)).?)))))
+        (vector-add acc (vector-get v (- vlen i)).?)))))
 
 (define (vector-take n v)
   (if (>= n (vector-size v))
@@ -301,7 +300,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
       (lambda (acc e i)
         (if (>= i n)
           acc
-          (vector-append acc e))))))
+          (vector-add acc e))))))
 
 (define (vector-drop n v)
   (cond
@@ -311,7 +310,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
             (lambda (acc e i)
               (if (> n i)
                 acc
-                (vector-append acc e)))))))
+                (vector-add acc e)))))))
 
 (define (vector-map-while f p v)
   (car
@@ -320,7 +319,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
         (if (car (cdr acc))
           acc
           (if (p e)
-            (list (vector-append (car acc) (f e)) #f)
+            (list (vector-add (car acc) (f e)) #f)
             (list (car acc) #t)))))))
 
 (define (vector-map-until f p v)
@@ -333,7 +332,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
         (if (car (cdr acc))
           acc
           (if (p e)
-            (list (vector-append (car acc) e) #f)
+            (list (vector-add (car acc) e) #f)
             (list (car acc) #t)))))))
 
 (define (vector-take-until p v)
@@ -345,7 +344,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
       (lambda (acc e i)
         (if (and (car (cdr acc)) (p e))
           acc
-          (list (vector-append (car acc) e) #f)
+          (list (vector-add (car acc) e) #f)
           )))))
 
 (define (vector-drop-until p v)
@@ -356,7 +355,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
     (vector-iterate v0 []
       (lambda (acc e i)
         (if (< i v1size)
-          (vector-append acc (vector e (vector-get v1 i).?))
+          (vector-add acc (vector e (vector-get v1 i).?))
           acc)))))
 
 (define (vector-empty? v)
@@ -366,12 +365,12 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
   (list
 ;;     (list 'vector-get _vector-get)
     (list 'vectord-iterate _vector-iterate)
-    (list 'vector-append _vector-append)
+    (list 'vector-add _vector-add)
     (list 'eq? vector-eq?)
     (list 'foldl vector-foldl)
     (list 'map vector-map)
     (list 'filter vector-filter)
-    (list 'append vector-concat)
+    (list 'append vector-append)
     (list 'find-first vector-find-first)
     (list '->list vector->list)
     (list 'but-last vector-but-last)
