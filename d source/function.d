@@ -51,7 +51,7 @@ class NonNativeLyraFunc : LyraFunc {
     }
 
     override LyraObj call(Cons args, Env callEnv) {
-        Env env = new Env(definitionEnv, callEnv);
+        Env env = new Env(getName(), definitionEnv, definitionEnv, callEnv);
         LyraObj result;
         Cons argNames1;
         uint argcGiven;

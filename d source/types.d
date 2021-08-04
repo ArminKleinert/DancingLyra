@@ -4,6 +4,32 @@ import std.conv : to;
 import std.stdio;
 import std.string;
 
+alias CallStack = LyraFunc[];
+
+class LyraError : Exception {
+    this(string msg, CallStack callStack, string file = __FILE__, size_t line = __LINE__) {
+        import std.string;
+
+        super(format("Error! " ~ msg ~ "\nInternal callstack: %s", callStack), file, line);
+    }
+}
+
+class LyraStackOverflow : Exception {
+    this(CallStack callStack, string file = __FILE__, size_t line = __LINE__) {
+        import std.string;
+
+        super(format("StackOverflow! Internal callstack: %s", callStack), file, line);
+    }
+}
+
+class LyraSyntaxError : Exception {
+    this(string msg, CallStack callStack, string file = __FILE__, size_t line = __LINE__) {
+        import std.string;
+
+        super(format("SyntaxError! " ~ msg ~ "\nInternal callstack: %s", callStack), file, line);
+    }
+}
+
 alias fixnum = long;
 alias floating = double;
 alias Vector = LyraObj[];
@@ -99,19 +125,30 @@ abstract class LyraFunc : LyraObj {
 class Env {
     private static Env _globalEnv;
 
+    private Env nextModuleEnv;
     private Env[2] parents;
     private LyraObj[Symbol] inner;
+    private Symbol _moduleName;
 
     alias inner this;
 
-    nothrow this(Env parent1, Env parent2 = null) {
+    nothrow this(Symbol moduleName, Env modEnv, Env parent1, Env parent2 = null) {
+        nextModuleEnv = modEnv;
         parents[0] = parent1;
         parents[1] = parent2;
+        this._moduleName = moduleName;
+    }
+
+    nothrow static Env createModuleEnv(Symbol moduleName) {
+        Env e = new Env(moduleName, null, globalEnv());
+        e.nextModuleEnv = e;
+        return e;
     }
 
     nothrow static Env globalEnv() {
         if (_globalEnv is null) {
-            _globalEnv = new Env(null, null);
+            _globalEnv = new Env("global", null, null);
+            _globalEnv.nextModuleEnv = _globalEnv;
         }
         return _globalEnv;
     }
@@ -132,6 +169,8 @@ class Env {
         if (v is null && parents[1]!is null) {
             v = parents[1].safeFind(sym);
         }
+        if (v is null && this !is moduleEnv)
+            v = moduleEnv.safeFind(sym);
         if (v is null)
             return null;
         return cast(LyraObj) v;
@@ -149,9 +188,11 @@ class Env {
 
         if (v !is null)
             envs ~= this;
-        if (parents[0]!is null)
+        if (parents[0] !is null)
             envs = parents[0].getContainingEnvs(sym, envs);
-        if (parents[1]!is null)
+        if (this !is moduleEnv)
+            envs = moduleEnv.getContainingEnvs(sym, envs);
+        if (parents[1] !is null)
             envs = parents[1].getContainingEnvs(sym, envs);
 
         return envs;
@@ -172,6 +213,8 @@ class Env {
         if (v is null && parents[1]!is null) {
             v = parents[1].safeFind(sym);
         }
+        if (v is null && this !is moduleEnv)
+            v = moduleEnv.safeFind(sym);
         if (v is null) {
             throw new Exception("No value found for symbol " ~ sym);
         }
@@ -194,6 +237,18 @@ class Env {
         foreach (k; inner.byKey())
             s ~= k ~ ": " ~ inner[k].toString() ~ ";\n";
         return s;
+    }
+
+    Symbol moduleName() {
+        return _moduleName;
+    }
+
+    Env moduleEnv() {
+        return nextModuleEnv;
+    }
+
+    bool isGlobalEnv() {
+        return this is _globalEnv;
     }
 }
 

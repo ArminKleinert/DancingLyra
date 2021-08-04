@@ -100,7 +100,7 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
             if (level == 0 || expected != "]") {
                 throw new Exception("Unexpected ']'");
             }
-            return list([LyraObj.makeSymbol("vector")] ~ root);
+            return vector(root);
         case "#t":
             root ~= LyraObj.makeBoolean(true);
             break;
@@ -136,7 +136,7 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
                 force = true;
                 token = token[0 .. $ - 2];
             }
-            
+
             //auto captures = matchFirst(token, integer_regex);
             if (!matchFirst(token, integer_regex).empty()) {
                 o = LyraObj.makeFixnum(to!fixnum(token));
@@ -163,8 +163,9 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
             return root[0];
         }
     }
-    
-    if (level > 0) throw new Exception("Unclosed token. Expected "~expected ~ "!");
+
+    if (level > 0)
+        throw new Exception("Unclosed token. Expected " ~ expected ~ "!");
 
     return list(root);
 }

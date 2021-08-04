@@ -4,7 +4,6 @@ import std.stdio;
 import types;
 import lyrafunction;
 
-alias CallStack = LyraFunc[];
 private CallStack _callStack = [null];
 
 private bool allowRedefine = false;
@@ -27,36 +26,12 @@ void eval_DoOptimize() {
     optimize = true;
 }
 
-class LyraError : Exception {
-    this(string msg, CallStack callStack, string file = __FILE__, size_t line = __LINE__) {
-        import std.string;
-
-        super(format("Error! " ~ msg ~ "\nInternal callstack: %s", callStack), file, line);
-    }
-}
-
-class LyraStackOverflow : Exception {
-    this(CallStack callStack, string file = __FILE__, size_t line = __LINE__) {
-        import std.string;
-
-        super(format("StackOverflow! Internal callstack: %s", callStack), file, line);
-    }
-}
-
-class LyraSyntaxError : Exception {
-    this(string msg, CallStack callStack, string file = __FILE__, size_t line = __LINE__) {
-        import std.string;
-
-        super(format("SyntaxError! " ~ msg ~ "\nInternal callstack: %s", callStack), file, line);
-    }
-}
-
-void checkForGlobalRedefinition(Symbol sym) {
+void checkForRedefinition(Symbol sym, Env env) {
     if (allowRedefine) {
         return;
     }
-    if (Env.globalEnv.safeFind(sym) !is null) {
-        throw new Exception("Redefinition of symbol is not allowed! " ~ sym);
+    if (env.moduleEnv.safeFind(sym) !is null) {
+        throw new LyraSyntaxError("Redefinition of symbol is not allowed! " ~ sym, callStack);
     }
 }
 
@@ -118,6 +93,37 @@ LyraObj evalVector(LyraObj expr, Env env) {
     return vector(v);
 }
 
+LyraObj evModule(Cons expr) {
+    LyraObj moduleName = expr.cdr.car;
+    if (moduleName.type != symbol_id)
+        throw new LyraSyntaxError("Module name must be a symbol.", _callStack);
+    Env moduleEnv = Env.createModuleEnv(moduleName.symbol_val);
+    LyraObj exportBindings = expr.cdr.cdr.car;
+    if (exportBindings.type != vector_id)
+        throw new LyraSyntaxError("Module export bindings must be a vector.", _callStack);
+    Cons forms = expr.cdr.cdr.next();
+
+    evalKeepLast(forms, moduleEnv);
+
+    Vector bindings = exportBindings.vector_val;
+    foreach (binding; bindings) {
+        if (binding.type != vector_id || binding.vector_val.length != 2) {
+            throw new LyraSyntaxError("Module binding must be a vector of 2 elements.", _callStack);
+        }
+
+        Vector bindingv = binding.vector_val;
+
+        if (bindingv[0].type != symbol_id) {
+            throw new LyraSyntaxError("Module binding export name must be a symbol.", _callStack);
+        }
+
+        checkForRedefinition(bindingv[0].symbol_val, Env.globalEnv());
+        Env.globalEnv().set(bindingv[0].symbol_val, eval(bindingv[1], moduleEnv));
+    }
+
+    return moduleName;
+}
+
 LyraObj evalKeepLast(LyraObj exprList, Env env, bool disableTailCall = false) {
     if (exprList.isNil()) {
         return exprList;
@@ -158,8 +164,8 @@ LyraObj evDefine(LyraObj expr, Env env, bool isMacro) {
             throw new LyraSyntaxError("define with name can take only 2 arguments (name and single expression).",
                     _callStack);
         auto variable = eval(expr.car, env);
-        checkForGlobalRedefinition(name.symbol_val);
-        Env.globalEnv.set(name, variable);
+        checkForRedefinition(name.symbol_val, env);
+        env.moduleEnv.set(name, variable);
         return variable;
     } else if (expr.car.type == cons_id) {
         auto name = expr.car.car;
@@ -169,11 +175,11 @@ LyraObj evDefine(LyraObj expr, Env env, bool isMacro) {
                     _callStack);
         }
 
-        checkForGlobalRedefinition(name.symbol_val);
+        checkForRedefinition(name.symbol_val, env);
 
         expr = Cons.create(expr.car.cdr, expr.cdr); // Remove name
         auto func = evLambda(expr, env, name.symbol_val, isMacro);
-        Env.globalEnv.set(name, func);
+        env.moduleEnv.set(name, func);
         return func;
     } else {
         throw new LyraSyntaxError(
@@ -221,7 +227,11 @@ LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
     if (expr.type == cons_id) {
         if (expr.car.type == symbol_id) {
             switch (expr.car.symbol_val) {
+            case "module":
+                return evModule(expr.cons_val);
             case "quote":
+                if (expr.cdr.isNil())
+                    return Cons.nil();
                 return expr.cdr.car;
             case "define":
                 return evDefine(expr.cdr, env, false);
@@ -230,7 +240,7 @@ LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
             case "let":
                 expr = expr.cdr;
                 LyraObj bindings = expr.car;
-                env = new Env(env);
+                env = new Env("", env.moduleEnv, env);
                 while (!bindings.isNil) {
                     LyraObj sym = bindings.car.car;
                     if (sym.type() != symbol_id) {
@@ -254,7 +264,7 @@ LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
             case "let*":
                 expr = expr.cdr;
                 LyraObj binding = expr.car;
-                env = new Env(env);
+                env = new Env("", env.moduleEnv, env);
                 if (binding.car.type() != symbol_id) {
                     throw new LyraSyntaxError("Invalid form for bindings for let. Name must be symbol.",
                             callStack);
@@ -389,6 +399,7 @@ LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
     } else if (expr.type == symbol_id) {
         auto found = env.safeFind(expr.value.symbol_val);
         if (found is null) {
+             writeln(env.toStringWithoutParents());
             throw new LyraSyntaxError("Unresolved symbol: " ~ expr.toString(), callStack);
         }
         return found;

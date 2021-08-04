@@ -273,17 +273,15 @@ void initializeGlobalEnv(Env env) {
         return LyraObj.makeSymbol(xs.car.toString());
     });
 
-    /*
     addFn("char->fixnum", 1, false, true, false, (xs, env) {
         if (xs.car.type != char_id)
-            throw new LyraError("char->fixnum: Expected char.",callStack());
+            throw new LyraError("char->fixnum: Expected char.", callStack());
         return LyraObj.makeFixnum(cast(fixnum) xs.car.char_val);
     });
 
     addFn("fixnum->char", 1, false, true, false, (xs, env) {
         if (xs.car.type != fixnum_id)
-            throw new LyraError("fixnum->char: Expected fixnum.",callStack());
+            throw new LyraError("fixnum->char: Expected fixnum.", callStack());
         return LyraObj.makeFixnum(cast(char) xs.car.fixnum_val);
     });
-    */
 }
