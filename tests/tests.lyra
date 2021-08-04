@@ -1,7 +1,77 @@
-
-(when (not (defined? 'lyra-core-tests-loaded))
-
-(define lyra-core-tests-loaded #t)
+(module core-tests
+ [[null?-test null?-test]
+  [symbol?-test symbol?-test]
+  [string?-test string?-test]
+  [char?-test char?-test]
+  [integer?-test integer?-test]
+  [real?-test real?-test]
+  [cons?-test cons?-test]
+  [func?-test func?-test]
+  [boolean?-test boolean?-test]
+  [box?-test box?-test]
+  [list?-test list?-test]
+  [vector?-test vector?-test]
+  [eq?-list-test eq?-list-test]
+  [eq?-nil-test eq?-nil-test]
+  [eq?-vector-test eq?-vector-test]
+  [eq?-integer-test eq?-integer-test]
+  [eq?-real-test eq?-real-test]
+  [eq?-string-test eq?-string-test]
+  [eq?-char-test eq?-char-test]
+  [eq?-box-test eq?-box-test]
+  [eq?-symbol-test eq?-symbol-test]
+  [eq?-function-test eq?-function-test]
+  [eq?-boolean-test eq?-boolean-test]
+  [first-list-test first-list-test]
+  [first-vector-test first-vector-test]
+  [second-list-test second-list-test]
+  [second-vector-test second-vector-test]
+  [third-list-test third-list-test]
+  [third-vector-test third-vector-test]
+  [rest-list-test rest-list-test]
+  [rest-vector-test rest-vector-test]
+  [nth-list-test nth-list-test]
+  [nth-vector-test nth-vector-test]
+  [empty?-list-test empty?-list-test]
+  [empty?-vector-test empty?-vector-test]
+  [foldl-list-test foldl-list-test]
+  [foldl-vector-test foldl-vector-test]
+  [map-list-test map-list-test]
+  [map-vector-test map-vector-test]
+  [filter-list-test filter-list-test]
+  [filter-vector-test filter-vector-test]
+  [append-list-nil-test append-list-nil-test]
+  [append-list-test append-list-test]
+  [append-vector-empty-test append-vector-empty-test]
+  [append-vector-test append-vector-test]
+  [find-first-list-test find-first-list-test]
+  [find-first-vector-test find-first-vector-test]
+  [->vector-list-test ->vector-list-test]
+  [->vector-vector-test ->vector-vector-test]
+  [->list-list-test ->list-list-test]
+  [->list-vector-test ->list-vector-test]
+  [copy-list-test copy-list-test]
+  [copy-vector-test copy-vector-test]
+  [but-last-list-test but-last-list-test]
+  [but-last-vector-test but-last-vector-test]
+  [reverse-list-test reverse-list-test]
+  [reverse-vector-test reverse-vector-test]
+  [map-while-list-test map-while-list-test]
+  [map-while-vector-test map-while-vector-test]
+  [map-until-list-test map-until-list-test]
+  [map-until-vector-test map-until-vector-test]
+  [take-list-test take-list-test]
+  [take-vector-test take-vector-test]
+  [take-while-list-test take-while-list-test]
+  [take-while-vector-test take-while-vector-test]
+  [take-until-list-test take-until-list-test]
+  [take-until-vector-test take-until-vector-test]
+  [drop-while-list-test drop-while-list-test]
+  [drop-while-vector-test drop-while-vector-test]
+  [drop-until-list-test drop-until-list-test]
+  [drop-until-vector-test drop-until-vector-test]
+  [zip-list-test zip-list-test]
+  [zip-vector-test zip-vector-test]]
 
 (define TODO #f)
 
@@ -1301,8 +1371,6 @@
     (eq? [[1 6] [2 7]] (zip [1 2 3 4 5] [6 7]))
     (eq? [[1 6] [2 7] [3 8] [4 9] [5 10]] (zip [1 2 3 4 5] [6 7 8 9 10]))
   ))
-
-
 )
 
 (begin
@@ -1394,6 +1462,4 @@
     ;(eq? [[1 6] [2 7]] (zip [1 2 3 4 5] [6 7]))
     ;(eq? [[1 6] [2 7] [3 8] [4 9] [5 10]] (zip [1 2 3 4 5] [6 7 8 9 10]))
 ])
-
-'lyra-core-tests-loaded
 

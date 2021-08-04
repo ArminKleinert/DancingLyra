@@ -48,7 +48,8 @@ bool checkFulfillsPredsForValueInline(LyraObj sym, Env env) {
         }
         
         return true;
-    }
+    } else {
+    return false;}
 }
 
 void inlineValueIntoCarIfPossible(LyraObj checkValue, LyraObj exprList, LyraObj val, Env env) {
