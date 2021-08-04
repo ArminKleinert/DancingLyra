@@ -10,7 +10,7 @@
   (define-record nothing-id _nothing)
   (define _nothing (make-maybe (make-_nothing)))
   (define (nothing & x) _nothing)
-  (define (nothing? x) (if (_nothing? x) #t (if (maybe? x) (_nothing? x.?) #f))) 
+  (define (nothing? x) (if (_nothing? x) #t (if (maybe? x) (_nothing? x.?) #f)))
 
   (add-type-fn! maybe-id 'unwrap maybe-inner)
   (add-type-fn! maybe-id '->string (lambda (m) (string "(maybe " (->string m.?) ")")))
