@@ -136,6 +136,26 @@
         (#t (cons (list (car c0) (first c1))
                   (list-zip (cdr c0) (rest c1))))))
 
+(def-method cons-id first (list-first xs)
+  (if (null? xs)
+    (nothing)
+    (maybe (car xs))))
+
+(def-method cons-id second (list-second xs)
+  (if (or (null? xs) (null? (cdr xs)))
+    (nothing)
+    (maybe (cadr xs))))
+
+(def-method cons-id third (list-third xs)
+  (if (or (null? xs) (null? (cdr xs)) (null? (cddr xs)))
+    (nothing)
+    (maybe (caddr xs))))
+
+(def-method cons-id rest (list-rest xs)
+  (if (null? xs)
+    (nothing)
+    (maybe (cdr xs))))
+
 (add-type-fns! cons-id
   (list
     (list 'first car)
@@ -169,10 +189,10 @@
   
 (add-type-fns! nil-id
   (list
-    (list 'first id)
-    (list 'second id)
-    (list 'third id)
-    (list 'rest id)
+    (list 'first nothing)
+    (list 'second nothing)
+    (list 'third nothing)
+    (list 'rest nothing)
     (list 'empty? always-true)
     (list 'eq? (lambda (l0 l1) (null? l1)))
     (list 'nth list-nth)
