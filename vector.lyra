@@ -388,7 +388,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
     (list 'first (lambda (v) (vector-get v 0)))
     (list 'second (lambda (v) (vector-get v 1)))
     (list 'third (lambda (v) (vector-get v 2)))
-    (list 'rest (lambda (v) (drop 1 v)))
+    (list 'rest (lambda (v) (if (empty? v) (nothing) (drop 1 v))))
     (list 'vector-size (lambda (v) (_vector-size v)))
     (list 'empty? vector-empty?)
     (list 'nth (lambda (v idx) (vector-get v idx)))

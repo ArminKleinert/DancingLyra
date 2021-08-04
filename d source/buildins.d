@@ -85,26 +85,6 @@ void initializeGlobalEnv(Env env) {
     addFn("<=", 2, false, true, false, (xs, env) { mixin(comparator("<=")); });
     addFn(">=", 2, false, true, false, (xs, env) { mixin(comparator(">=")); });
 
-    addFn("&&", 2, true, true, true, (xs, env) {
-        while (!xs.isNil()) {
-            if (eval(xs.car, env).isFalsy()) {
-                return LyraObj.makeBoolean(false);
-            }
-            xs = xs.next();
-        }
-        return LyraObj.makeBoolean(true);
-    });
-
-    addFn("||", 2, true, true, true, (xs, env) {
-        while (!xs.isNil()) {
-            if (!eval(xs.car, env).isFalsy()) {
-                return LyraObj.makeBoolean(true);
-            }
-            xs = xs.next();
-        }
-        return LyraObj.makeBoolean(false);
-    });
-
     addFn("cons", 2, false, true, false, (xs, env) {
         if (!isConsOrNil(xs.cdr.car)) {
             throw new LyraError("cons: cdr must be another cons or nil.", callStack);

@@ -1388,7 +1388,6 @@
 (println! (string "(zip-vector-test):........... " (zip-vector-test)))
 
 (println! [
-    
 ])
 
 'lyra-core-tests-loaded
