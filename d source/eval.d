@@ -102,6 +102,7 @@ LyraObj evModule(Cons expr) {
     Symbol moduleNameSymbol=moduleName.symbol_val;
     foreach (m; importedModules) {
         if (m == moduleNameSymbol) return moduleName;}
+    importedModules ~= moduleNameSymbol;
     
     Env moduleEnv = Env.createModuleEnv(moduleNameSymbol);
     LyraObj exportBindings = expr.cdr.cdr.car;
