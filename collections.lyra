@@ -30,18 +30,11 @@
 (define (set-at x i e) ((find-type-fn x 'set-at) x i e))
 
 (def-generic x (first x) nothing)
-(def-generic x (second x) nothing)
-(def-generic x (third x) nothing)
 (def-generic x (rest x) nothing)
 
-(def-generic x (size x) always-null)
-(def-generic x (empty? x) always-false)
-
 (def-generic x (nth x i) nothing)
-(def-generic x (foldl f s x) nothing)
 (def-generic x (map f x) nothing)
 (def-generic x (filter p x) nothing)
-(def-generic x (remove p x) (lambda (p x) (filter (negate p) x)))
 (def-generic x (append x y) nothing)
 (def-generic x (find-first p x) nothing)
 (def-generic x (->vector x) nothing)
@@ -49,15 +42,48 @@
 (def-generic x (but-last x) nothing)
 (def-generic x (reverse x) nothing)
 
-(def-generic x (map-while f p x) (lambda (f p x) (map f (take-while p x))))
-(def-generic x (map-until f p x) (lambda (f p x) (map f (drop-while p x))))
-
 (def-generic x (take n x) nothing)
 (def-generic x (drop n x) nothing)
 (def-generic x (take-while p x) nothing)
-(def-generic x (take-until p x) nothing)
 (def-generic x (drop-while p x) nothing)
-(def-generic x (drop-until p x) nothing)
 
-(def-generic x (zip x y) nothing)
+(define (default-size xs)
+  (if (nothing? (rest xs))
+    0
+    (inc (default-size (rest xs)))))
+(def-generic x (size x) default-size)
+
+(def-generic x (second x) (lambda (x) (first (rest x))))
+(def-generic x (third x) (lambda (x) (first (rest (rest x)))))
+
+(def-generic x (empty? x)
+  (lambda (x) (nothing? (first x))))
+
+(def-generic x (remove p x) (lambda (p x) (filter (negate p) x)))
+(def-generic x (map-while f p x) (lambda (f p x) (map f (take-while p x))))
+(def-generic x (map-until f p x) (lambda (f p x) (map f (drop-while p x))))
+(def-generic x (drop-until p x) (lambda (p x) (drop-while (negate p) x)))
+(def-generic x (take-until p x) (lambda (p x) (take-while (negate p) x)))
+
+(define (default-foldl f s xs)
+  (if (empty? xs) s
+    (default-foldl f (f s (first xs)) (rest xs))))
+(def-generic x (foldl f s x) nothing)
+
+(define (default-zip c0 c1)
+  (cond ((empty? c0) '())
+        ((or (empty? c1) (nothing? c1)) '())
+        (#t (cons (list (first c0).? (first c1).?)
+                  (default-zip (second c0).? (rest c1).?)))))
+(def-generic x (zip x y) default-zip)
+
+(define (default-foldl1 f xs)
+  (cond ((empty? xs) (nothing))
+        ((empty? (rest xs)) (first xs))
+        (#t (foldl f (first xs) (rest xs)))))
+(def-generic x (foldl1 f xs) default-foldl1)
+
+(def-generic x (any? p x) (lambda (p x) (not (nothing? (find-first p x)))))
+(def-generic x (all? p x) (lambda (p x) (empty? (drop-while p x))))
+(def-generic x (none? p x) (lambda (p x) (nothing? (find-first p x))))
 )

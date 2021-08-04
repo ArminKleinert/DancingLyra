@@ -11,6 +11,9 @@
 (define (even? x) (= (% x 2) 0))
 (define (odd? x) (= (% x 2) 1))
 
+(define (min x y) (if (< x y) x y))
+(define (max x y) (if (> x y) x y))
+
 (define (list & xs) xs)
 (define car _car)
 (define cdr _cdr)

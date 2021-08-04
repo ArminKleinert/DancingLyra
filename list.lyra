@@ -100,8 +100,8 @@
     (cons (car c0) (list-append (cdr c0) c1))))
 
 (def-method cons-id find-first (list-find-first f xs)
-  (cond ((list-empty? xs) '())
-        ((f (car xs)) (car xs))
+  (cond ((list-empty? xs) (nothing))
+        ((f (car xs)) (maybe (car xs)))
         (#t (list-find-first f (cdr xs)))))
 
 (def-method cons-id ->vector (list->vector xs)
