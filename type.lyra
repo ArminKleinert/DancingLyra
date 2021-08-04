@@ -1,6 +1,39 @@
-(when (not (defined? 'lyra-core-typed-loaded))
-
-(define lyra-core-typed-loaded #t)
+(module core-typed
+ [[register-type! register-type!]
+  [find-type-fn find-type-fn]
+  [add-type-fn! add-type-fn!]
+  [add-type-fns! add-type-fns!]
+  [def-generic def-generic]
+  [def-method def-method]
+  [null? null?] 
+  [symbol? symbol?] 
+  [string? string?] 
+  [char? char?] 
+  [integer? integer?]
+  [real? real?]
+  [cons? cons?]
+  [func? func?]
+  [boolean? boolean?]
+  [box? box?]
+  [unwrap unwrap]
+  [list? list?]
+  [vector? vector?]
+  [number? number?]
+  [eq? eq?]
+  [force-eval force-eval]
+  [->string ->string]
+  [copy copy]
+  [nil-id nil-id]
+  [symbol-id symbol-id]
+  [string-id string-id]
+  [char-id char-id]
+  [fixnum-id fixnum-id]
+  [real-id real-id]
+  [cons-id cons-id]
+  [func-id func-id]
+  [bool-id bool-id]
+  [vector-id vector-id]
+  [box-id box-id]]
 
 (let ((_types (box []))
       (associated (lambda (xs sym)
@@ -105,9 +138,9 @@
 (def-generic x (number? x) (lambda (n) (or (integer? n) (real? n))))
 (def-generic x (eq? x y) =)
 
+(def-generic x (copy x) id)
+
 (def-generic x (force-eval x) id) ; TODO
 
 (def-generic x (->string x) _string)
 ))
-
-'lyra-core-typed-loaded

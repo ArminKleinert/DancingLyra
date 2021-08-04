@@ -259,7 +259,7 @@ void initializeGlobalEnv(Env env) {
         }
 
         //LyraRecord.create(cast(uint) type, typename.symbol_val, Env.globalEnv(), members);
-        LyraRecord.create(cast(uint) type, typename.symbol_val, env, members);
+        LyraRecord.create(cast(uint) type, typename.symbol_val, env.moduleEnv, members);
 
         //writeln(Env.globalEnv().toStringWithoutParents());
 

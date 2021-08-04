@@ -159,23 +159,23 @@
     (not (func? #f))
   ))
 
-(define (bool?-test)
+(define (boolean?-test)
   (and
-    (not (bool? '(1 2 3)))
-    (not (bool? '()))
-    (not (bool? [1 2 3]))
-    (not (bool? []))
-    (not (bool? (offset-vector [1 2 3] 0 3)))
-    (not (bool? (offset-vector [] 0 0)))
-    (not (bool? 629))
-    (not (bool? 62.9))
-    (not (bool? "629"))
-    (not (bool? #\a))
-    (not (bool? (box '())))
-    (not (bool? 'sym))
-    (not (bool? id))
-    (bool? #t)
-    (bool? #f)
+    (not (boolean? '(1 2 3)))
+    (not (boolean? '()))
+    (not (boolean? [1 2 3]))
+    (not (boolean? []))
+    (not (boolean? (offset-vector [1 2 3] 0 3)))
+    (not (boolean? (offset-vector [] 0 0)))
+    (not (boolean? 629))
+    (not (boolean? 62.9))
+    (not (boolean? "629"))
+    (not (boolean? #\a))
+    (not (boolean? (box '())))
+    (not (boolean? 'sym))
+    (not (boolean? id))
+    (boolean? #t)
+    (boolean? #f)
   ))
 
 (define (box?-test)
@@ -1305,6 +1305,7 @@
 
 )
 
+(begin
 (println! (string "(null?-test): ............... " (null?-test)))
 (println! (string "(symbol?-test): ............. " (symbol?-test)))
 (println! (string "(string?-test): ............. " (string?-test)))
@@ -1313,7 +1314,7 @@
 (println! (string "(real?-test): ............... " (real?-test)))
 (println! (string "(cons?-test): ............... " (cons?-test)))
 (println! (string "(func?-test): ............... " (func?-test)))
-(println! (string "(bool?-test): ............... " (bool?-test)))
+(println! (string "(boolean?-test): ............ " (boolean?-test)))
 (println! (string "(box?-test): ................ " (box?-test)))
 (println! (string "(list?-test): ............... " (list?-test)))
 (println! (string "(vector?-test): ............. " (vector?-test)))
@@ -1386,8 +1387,12 @@
 (println! "")
 (println! (string "(zip-list-test): ............ " (zip-list-test)))
 (println! (string "(zip-vector-test):........... " (zip-vector-test)))
+)
 
 (println! [
+    ;(eq? [[1 6] [2 7]] (zip [1 2] [6 7 8 9 10]))
+    ;(eq? [[1 6] [2 7]] (zip [1 2 3 4 5] [6 7]))
+    ;(eq? [[1 6] [2 7] [3 8] [4 9] [5 10]] (zip [1 2 3 4 5] [6 7 8 9 10]))
 ])
 
 'lyra-core-tests-loaded

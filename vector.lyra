@@ -1,6 +1,9 @@
-(when (not (defined? 'lyra-core-vector-loaded))
+(module core-vector
+ [[offset-vector make-offset-vector]
+  [vector-pair make-vector-pair]
+  [offset-vector? offset-vector?]
+  [vector-pair? vector-pair?]]
 
-(define lyra-core-vector-loaded #t)
 
 (def-generic x (vector-size x) _vector-size)
 (def-generic x (vector-get x i) nothing)
@@ -353,7 +356,7 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
     (vector-iterate v0 []
       (lambda (acc e i)
         (if (< i v1size)
-          (vector-append acc [e (nth v1 i).?])
+          (vector-append acc (vector e (vector-get v1 i).?))
           acc)))))
 
 (define (vector-empty? v)
@@ -398,5 +401,3 @@ vector-size size vector-append append ->vector but-last foldl map reverse ->stri
     (list 'vector? always-true)
     (list '->string vector->string)))
 )
-
-'lyra-core-vector-loaded

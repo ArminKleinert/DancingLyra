@@ -1,6 +1,31 @@
-(when (not (defined? 'lyra-core-collections-loaded))
-
-(define lyra-core-collections-loaded #t)
+(module core-collections
+ [[set-at set-at]
+  [first first]
+  [second second]
+  [third third]
+  [rest rest]
+  [size size]
+  [empty? empty?]
+  [nth nth]
+  [foldl foldl]
+  [map map]
+  [filter filter]
+  [remove remove]
+  [append append]
+  [find-first find-first]
+  [->vector ->vector]
+  [->list ->list]
+  [but-last but-last]
+  [reverse reverse]
+  [map-while map-while]
+  [map-until map-until]
+  [take take]
+  [drop drop]
+  [take-while take-while]
+  [take-until take-until]
+  [drop-while drop-while]
+  [drop-until drop-until]
+  [zip zip]]
 
 (define (set-at x i e) ((find-type-fn x 'set-at) x i e))
 
@@ -21,7 +46,6 @@
 (def-generic x (find-first p x) nothing)
 (def-generic x (->vector x) nothing)
 (def-generic x (->list x) nothing)
-(def-generic x (copy x) id)
 (def-generic x (but-last x) nothing)
 (def-generic x (reverse x) nothing)
 

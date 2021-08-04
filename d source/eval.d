@@ -40,16 +40,14 @@ bool checkFulfillsPredsForValueInline(LyraObj sym, Env env) {
     if (!allowRedefine && (sym.type == symbol_id)) {
         //&& (Env.globalEnv.safeFind(sym.symbol_val) !is null)
         auto containingEnvs = env.getContainingEnvs(sym);
-        auto onlyInGlobal = true;
+        if (containingEnvs.length == 0) return false;
 
         foreach (found; containingEnvs) {
             //writeln(found.toStringWithoutParents);
-            onlyInGlobal = onlyInGlobal && (found == Env.globalEnv);
+            if (found != Env.globalEnv)return false;
         }
-
-        return onlyInGlobal;
-    } else {
-        return false;
+        
+        return true;
     }
 }
 
@@ -76,7 +74,7 @@ LyraObj macroExpand(LyraFunc f, Cons args, Env env) {
     return res;
 }
 
-Cons evalList(LyraObj exprList, Env env) {
+Cons evalList(LyraObj exprList, Env env, bool allowInlineIfEnabled = true) {
     Vector v = [];
     while (!exprList.isNil) {
         auto temp = eval(exprList.car, env, true);
@@ -406,7 +404,6 @@ LyraObj eval(LyraObj expr, Env env, bool disableTailCall = false) {
     } else if (expr.type == symbol_id) {
         auto found = env.safeFind(expr.value.symbol_val);
         if (found is null) {
-             writeln(env.toStringWithoutParents());
             throw new LyraSyntaxError("Unresolved symbol: " ~ expr.toString(), callStack);
         }
         return found;
