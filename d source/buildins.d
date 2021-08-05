@@ -163,37 +163,79 @@ void initializeGlobalEnv(Env env) {
         return Cons.nil();
     });
 
-    addFn("file-exists?", 1, false, false, false, (xs, env) { 
-    import std.file ; if (xs.car.type != string_id) {return Cons.nil();
-   } return LyraObj.makeBoolean(exists(xs.car.string_val)); });
-    addFn("file-dir?", 1, false, false, false, (xs, env) {
-    import std.file ; 
-    if (xs.car.type != string_id) {return Cons.nil();}
-    return LyraObj.makeBoolean(isDir(xs.car.string_val)); });
-    addFn("file-remove!", 1, false, false, false, (xs, env) {
-    import std.file ;if (xs.car.type != string_id){ return Cons.nil();}
-    try {
-    remove(xs.car.string_val); return LyraObj.makeBoolean(true);}catch(FileException fe) {return LyraObj.makeBoolean(false);}});
-    addFn("file-append!", 2, false, false, false, (xs, env) {
-    import std.file ; if (xs.car.type != string_id|| xs.cdr.car.type != string_id){ return Cons.nil();}
-    try {
-    append(xs.car.string_val,xs.cdr.car.string_val); return LyraObj.makeBoolean(true);}catch(FileException fe) {return LyraObj.makeBoolean(false);}});
-    addFn("file-write!", 2, false, false, false, (xs, env) {
-    import std.file ;if (xs.car.type != string_id|| xs.cdr.car.type != string_id){ return Cons.nil();}
-    try {
-    write(xs.car.string_val,xs.cdr.car.string_val); return LyraObj.makeBoolean(true);}catch(FileException fe) {return LyraObj.makeBoolean(false);}});
-    addFn("file-read!", 1, false, false, false, (xs, env) { 
-    import std.file ;
-    if (xs.car.type != string_id){ return Cons.nil();}
-    try {
-    return LyraObj.makeString(readText(xs.car.value.string_val));
-    } catch(FileException fe) {return Cons.nil();}});
-    
-    
-    addFn("readln!", 0, false, false, false, (xs, env) { 
-    import std.stdio;
-    return LyraObj.makeString(readln()); });
+    addFn("file-exists?", 1, false, false, false, (xs, env) {
+        import std.file;
 
+        if (xs.car.type != string_id) {
+            return Cons.nil();
+        }
+        return LyraObj.makeBoolean(exists(xs.car.string_val));
+    });
+    addFn("file-dir?", 1, false, false, false, (xs, env) {
+        import std.file;
+
+        if (xs.car.type != string_id) {
+            return Cons.nil();
+        }
+        return LyraObj.makeBoolean(isDir(xs.car.string_val));
+    });
+    addFn("file-remove!", 1, false, false, false, (xs, env) {
+        import std.file;
+
+        if (xs.car.type != string_id) {
+            return Cons.nil();
+        }
+        try {
+            remove(xs.car.string_val);
+            return LyraObj.makeBoolean(true);
+        } catch (FileException fe) {
+            return LyraObj.makeBoolean(false);
+        }
+    });
+    addFn("file-append!", 2, false, false, false, (xs, env) {
+        import std.file;
+
+        if (xs.car.type != string_id || xs.cdr.car.type != string_id) {
+            return Cons.nil();
+        }
+        try {
+            append(xs.car.string_val, xs.cdr.car.string_val);
+            return LyraObj.makeBoolean(true);
+        } catch (FileException fe) {
+            return LyraObj.makeBoolean(false);
+        }
+    });
+    addFn("file-write!", 2, false, false, false, (xs, env) {
+        import std.file;
+
+        if (xs.car.type != string_id || xs.cdr.car.type != string_id) {
+            return Cons.nil();
+        }
+        try {
+            write(xs.car.string_val, xs.cdr.car.string_val);
+            return LyraObj.makeBoolean(true);
+        } catch (FileException fe) {
+            return LyraObj.makeBoolean(false);
+        }
+    });
+    addFn("file-read!", 1, false, false, false, (xs, env) {
+        import std.file;
+
+        if (xs.car.type != string_id) {
+            return Cons.nil();
+        }
+        try {
+            return LyraObj.makeString(readText(xs.car.value.string_val));
+        } catch (FileException fe) {
+            return Cons.nil();
+        }
+    });
+
+    addFn("readln!", 0, false, false, false, (xs, env) {
+        import std.stdio;
+
+        return LyraObj.makeString(readln());
+    });
 
     addFn("box", 1, false, false, false, (xs, env) { return box(xs.car); });
     addFn("unbox", 1, false, false, false, (xs, env) { return unbox(xs.car); });

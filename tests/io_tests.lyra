@@ -1,0 +1,72 @@
+(module core-io-tests
+ [[test-read test-read]
+  [test-write test-write]
+  [test-append test-append]
+  [test-is-dir test-is-dir]
+  [test-remove-and-exists test-remove-and-exists]]
+
+(define (test-read)
+  (and
+    (null? (file-read! 123))
+    (null? (file-read! "thisfiledoesnotexistinthetestdirectory"))
+    (file-write! "./tests/testfile" "testtext") ; Reset the file
+    (= "testtext" (file-read! "./tests/testfile"))
+  ))
+
+(define (test-write)
+  (and 
+    (null? (file-write! 123 456)) ; Fails because of wrong argument type
+    (null? (file-write! "./tests/testfile" 456)) ; Fails because of wrong argument type
+    (null? (file-write! 123 "testtext")) ; Fails because of wrong argument type
+    (not (file-write! "" "testtext")) ; Illegal file name
+    (file-write! "./tests/testfile" "testtext")
+    (= "testtext" (file-read! "./tests/testfile"))
+  ))
+
+(define (test-append)
+  (and 
+    (null? (file-append! 123 456)) ; Fails because of wrong argument type
+    (null? (file-append! "./tests/testfile" 456)) ; Fails because of wrong argument type
+    (null? (file-append! 123 "testtext1")) ; Fails because of wrong argument type
+    (not (file-append! "" "testtext1")) ; Illegal file name
+    (file-write! "./tests/testfile" "testtext") ; Fill with text. This fail if (test-write) also failed.
+    (file-append! "./tests/testfile" "testtext")
+    (= "testtexttesttext" (file-read! "./tests/testfile"))
+    (file-write! "./tests/testfile" "testtext") ; Reset the file
+  ))
+
+(define (test-is-dir)
+  (and 
+    (null? (file-dir? 456)) ; Fails because of wrong argument type
+    (not (file-dir? "./tests/testfile"))
+    (file-dir? "./tests")
+    (file-dir? ".")
+    (file-dir? "..")
+  ))
+
+(define (test-remove-and-exists)
+  (and 
+    (null? (file-remove! 456)) ; Fails because of wrong argument type
+    (not (file-remove! "thisfiledoesnotexistinthetestdirectory"))
+    (file-exists? "./tests/testfile")
+    (file-write! "./tests/testfile" "testtext") ; Reset the file
+    (file-exists? "./tests/testfile")
+    (file-remove! "./tests/testfile")
+    (not (file-remove! "./tests/testfile"))
+    (not (file-exists? "./tests/testfile"))
+  ))
+)
+
+(begin
+(file-write! "./tests/testfile" "testtext") ; Reset the file
+(println! (string "(test-read): ................ " (test-read)))
+(println! (string "(test-write): ............... " (test-write)))
+(println! (string "(test-append): .............. " (test-append)))
+(println! (string "(test-is-dir): .............. " (test-is-dir)))
+(println! (string "(test-remove-and-exists): ... " (test-remove-and-exists)))
+(println! "")
+(file-remove! "./tests/testfile")
+)
+
+(println! [
+])

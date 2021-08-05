@@ -40,16 +40,19 @@ bool checkFulfillsPredsForValueInline(LyraObj sym, Env env) {
     if (!allowRedefine && (sym.type == symbol_id)) {
         //&& (Env.globalEnv.safeFind(sym.symbol_val) !is null)
         auto containingEnvs = env.getContainingEnvs(sym);
-        if (containingEnvs.length == 0) return false;
+        if (containingEnvs.length == 0)
+            return false;
 
         foreach (found; containingEnvs) {
             //writeln(found.toStringWithoutParents);
-            if (found != Env.globalEnv)return false;
+            if (found != Env.globalEnv)
+                return false;
         }
-        
+
         return true;
     } else {
-    return false;}
+        return false;
+    }
 }
 
 void inlineValueIntoCarIfPossible(LyraObj checkValue, LyraObj exprList, LyraObj val, Env env) {
@@ -97,12 +100,14 @@ LyraObj evModule(Cons expr) {
     LyraObj moduleName = expr.cdr.car;
     if (moduleName.type != symbol_id)
         throw new LyraSyntaxError("Module name must be a symbol.", _callStack);
-    
-    Symbol moduleNameSymbol=moduleName.symbol_val;
+
+    Symbol moduleNameSymbol = moduleName.symbol_val;
     foreach (m; importedModules) {
-        if (m == moduleNameSymbol) return moduleName;}
+        if (m == moduleNameSymbol)
+            return moduleName;
+    }
     importedModules ~= moduleNameSymbol;
-    
+
     Env moduleEnv = Env.createModuleEnv(moduleNameSymbol);
     LyraObj exportBindings = expr.cdr.cdr.car;
     if (exportBindings.type != vector_id)

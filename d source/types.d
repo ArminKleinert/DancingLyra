@@ -186,11 +186,11 @@ class Env {
 
         if (v !is null)
             envs ~= this;
-        if (parents[0] !is null)
+        if (parents[0]!is null)
             envs = parents[0].getContainingEnvs(sym, envs);
         if (this !is moduleEnv)
             envs = moduleEnv.getContainingEnvs(sym, envs);
-        if (parents[1] !is null)
+        if (parents[1]!is null)
             envs = parents[1].getContainingEnvs(sym, envs);
 
         return envs;
