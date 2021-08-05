@@ -32,6 +32,8 @@ It started as a port of a language written in Ruby, but became its own thing by 
   - Support for different types of vectors
   - Support for a maybe type
   - Easy macros for defining new types
+  - Now supports very limited modules
+  - Basic file-IO (read/write/append/remove/exists?) and console-input (readln!) added
 
 ## Usage
 
@@ -190,6 +192,10 @@ take-until     | 3     |
 drop-while     | 3     | 
 drop-until     | 3     | 
 zip            | 2     | 
+               |       | 
+any?           | 2     | 
+all?           | 2     | 
+none?          | 2     | 
                |       | 
 maybe          | 1     | 
 nothing        | -     | 
