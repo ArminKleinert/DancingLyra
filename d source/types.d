@@ -46,7 +46,6 @@ union Val {
     bool bool_val;
     Vector vector_val;
     LyraObj boxed_val;
-    Cons lazy_args_val;
     LyraObj[] record_val;
 }
 
@@ -62,7 +61,6 @@ enum : uint {
     bool_id = 8,
     vector_id = 9,
     box_id = 10,
-    lazy_id = 11,
 
     unknown_id = uint.max
 }
@@ -315,13 +313,6 @@ class LyraObj {
         Val v = {vector_val: e};
         return new LyraObj(v, vector_id);
     }
-
-    /*
-    nothrow public static LyraObj makeBuffer(byte[] e) {
-        Val v = {buffer_val: e};
-        return new LyraObj(v, buffer_id);
-    }
-    */
 
     nothrow public static LyraObj makeEmpty() {
         return Cons.nil();
