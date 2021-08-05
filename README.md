@@ -251,6 +251,7 @@ Here is a sample definition for `load!` and `foldl`.
 ## Different functions on different types
 
 To create a function which can have different behaviours on different types, Lyra provides `def-generic`. The function needs to be implemented using `def-method`:
+
 ```
 ; Creates a new function available in the calling module.
 ; Its inner behaviour performs a lookup depending on the type of the object. 
@@ -262,12 +263,14 @@ To create a function which can have different behaviours on different types, Lyr
 ; def-generic for this function.
 ; (def-method type-id global-name (signature) &body)
 
+; Example:
+
 ; Template for a function which gets the first element from an object x.
 ; If the type of x does not have an implementation for `first`, 
 ; (nothing x) is called instead, returning an empty `maybe` object.
 (def-generic x (first x) nothing)
 
-; An actual implementation of first, specialized for the list-type.
+; Actual implementations of first for the lists and vectors.
 (def-method cons-id first (list-first x) (maybe (car x)))
 (def-method vector-id first (vector-first x) (vector-get x 0))
 
@@ -277,32 +280,61 @@ To create a function which can have different behaviours on different types, Lyr
 ; cannot know this without being told this once.
 (def-generic x (foldl f e x)
   ...)
+ 
+; To use existing functions, add-type-fns! can be used.
+; This way, no additional functions are created.
+(add-type-fns! cons-id
+  (list (list 'first car)
+        (list '->list id)))
 ```
+
+Attention: NEVER USE ANY OF THESE INSIDE A LOOP!  
+This would lead to a lot of overhead and may lead to other problems.
+
+If possible, you should prefer specialized functions right away. 
+The lookup takes time and a lot of it. It is much quicker to use a 
+specialized version, but generic function are pretty to read at least.
+This is one of the areas where a lot of potential for optimization waits...  
+
+In short: For performance, you should use `vector-get` rather than `nth`.
+
+Another possible way that generic function help is in hiding specific types. 
+Internally, there might be dozens of versions of vectors, but to the
+user, all of them should just be "vector". For example, appending vectors
+would be slow, so an instance of `vector-pair` is created. Taking only the 
+first n-5 elements of a vector would be slow, so Lyra creates an `offset-vector`
+instead. To the user though, all of them can use `vector-get`, `vector-iterate`
+and so on, even though their implementations may be different.  
+By using `add-type-fns!`, the function which do not need a new implementation
+can just be copied:
+
+`(add-type-fns! vector-pair-id (list (list 'copy id) (list 'vector always-true)))`
 
 ## User-defined types
 
-### Section outdated!
+For the creation of new types, Lyra provides `register-type!` and `define-record`:
 
-To define a new type, Lyra provides the functions `add-type!`, `define-record`, `add-type-fn!` and `find-type-fn`.  
 ```
-(define offset-vector-id (add-type!)) ; add-type! returns a new id
-
-; This automatically generates the functions (make-offset-vector start end vec), (offset-vector? e), (offset-vector-start e), (offset-vector-end e) and (offset-vector-vec e)
-(define-record offset-vector-id offset-vector start end vec)
-
-; Example:
-(let* (ov (make-offset-vector 1 3 [1 2 3 4 5 6]))
-  (offset-vector? ov) ; -> #t
-  (offset-vector-start ov) ; -> 1
-  (offset-vector-end ov) ; -> 3
-  (offset-vector-vec ov) ; -> [1 2 3 4 5 6]
-  )
-
-; Now we can define some new functions for this type:
-(add-type-fn! offset-vector-id 'vector? (lambda (ov) #t)) ; An offset-vector is a vector
-
-(add-type-fn! offset-vector-id 'empty?
-  (lambda (ov) (and (= (offset-vector-start ov) 0) (= (offset-vector-end ov) 0))))
-
-...
+(let ((pair-id (register-type!)) ; pair-id now holds the id of a new type.
+  ; Creates a type called "pair" with the id saved in pair-id with 2 members: x and y
+  (define-record pair-id pair x y)
+  
+  ; 3 new functions are now created using an implicit define:
+  ; (make-pair x y)
+  ; (pair-x p)
+  ; (pair-y p)
+  
+  (let ((p (make-pair 8 '()))
+    (println! (pair-x p)) ; -> 8
+    (println! (pair-y p))) ; -> ()
+  
+  ; No ->string function is created, but can be easily implemented:
+  (def-method pair-id ->string (pair-to-string p)
+    (string "(" (pair-x p) ", " (pair-y) ")"))
+  
+  (println! (make-pair 9 1)) ; -> (9, 1)
+)
 ```
+
+Attention: NEVER CREATE A TYPE INSIDE A LOOP OR FUNCTION!  
+This would lead to lots of types being created. The system can only handle so many until it collapses.
