@@ -67,6 +67,3 @@
 (println! "")
 (file-remove! "./tests/testfile")
 )
-
-(println! [
-])

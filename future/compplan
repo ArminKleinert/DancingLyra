@@ -1,0 +1,5 @@
+- Read file
+- Tokenize
+- Tokens -> Lyra types
+- Find operations and native functions and replace with op-codes
+- 

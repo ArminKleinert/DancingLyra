@@ -35,6 +35,27 @@
   [vector-id vector-id]
   [box-id box-id]]
 
+
+; Structure of each node.
+; [function-name function left right]
+
+(define (type-tree-insert top name fn)
+  (if (null? top)
+    [name fn '() '()]
+    (let* (top-name (_vector-get top 0))
+      (cond ((= top-name name) [top-name fn (_vector-get top 2) (_vector-get top 3)])
+            ((< top-name name) [top-name (_vector-get top 1) (_vector-get top 2) (type-tree-insert (_vector-get top 3) name fn)])
+            (#t [top-name (_vector-get top 1) (type-tree-insert (_vector-get top 2) name fn) (_vector-get top 3)])))))
+
+(define (get-fn top name)
+  (if (null? top)
+    '()
+    (let* (top-name (_vector-get top 0))
+      (cond ((= top-name name) (_vector-get top 1))
+            ((< top-name name) (get-fn (_vector-get top 2) name))
+            (#t (get-fn (_vector-get top 3) name))))))
+
+
 (let ((_types (box []))
       (associated (lambda (xs sym)
                     (if (null? xs)
