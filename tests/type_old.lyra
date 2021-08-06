@@ -35,30 +35,6 @@
   [vector-id vector-id]
   [box-id box-id]]
 
-
-; Structure of each node.
-; [function-name function left right]
-
-(define (type-tree-insert top name fn)
-  (if (not top)
-    (vector name fn '() '())
-    (let* (top-name (_vector-get top 0))
-      (cond ((= top-name name)
-              (vector top-name fn (_vector-get top 2) (_vector-get top 3)))
-            ((< top-name name)
-              (vector top-name (_vector-get top 1) (_vector-get top 2) (type-tree-insert (_vector-get top 3) name fn)))
-            (#t
-              (vector top-name (_vector-get top 1) (type-tree-insert (_vector-get top 2) name fn) (_vector-get top 3)))))))
-
-(define (get-fn top name)
-  (if (not top)
-    '()
-    (let* (top-name (_vector-get top 0))
-      (cond ((= top-name name) (_vector-get top 1))
-            ((> top-name name) (get-fn (_vector-get top 2) name))
-            (#t (get-fn (_vector-get top 3) name))))))
-
-
 (let ((_types (box []))
       (associated (lambda (xs sym)
                     (if (null? xs)
@@ -84,7 +60,7 @@
   (- (_vector-size (unbox _types)) 1))
 
 (define (find-type-fn x sym)
-  (get-fn
+  (associated
     (_vector-get (unbox _types) (lyra-type-id x))
     sym))
 
@@ -93,23 +69,20 @@
     (box-set! _types
       (vector-set
         v type
-        (type-tree-insert (_vector-get v type) sym f))))
-  type)
+        (cons
+          (list sym f)
+          (_vector-get v type))))
+    type))
 
 (define (add-type-fns! type sym-to-f-list)
-  (comment let* (v (unbox _types))
-    (box-set! _types
-      (vector-set
-        v type
-        (list-append1
-          sym-to-f-list
-          (_vector-get v type))))
-    type)
-  (if (null? sym-to-f-list)
-    type
-    (begin
-      (add-type-fn! type (car (car sym-to-f-list)) (car (cdr (car sym-to-f-list))))
-      (add-type-fns! type (cdr sym-to-f-list)))))
+    (let* (v (unbox _types))
+      (box-set! _types
+        (vector-set
+          v type
+          (list-append1
+            sym-to-f-list
+            (_vector-get v type))))
+      type))
 
 (def-macro (def-generic obj sig fallback)
   (let ((fn (car sig))
@@ -128,7 +101,7 @@
         (list 'add-type-fn! t-id (list 'quote globalname) fn)
         fn))
     (list 'begin
-      (list 'add-type-fn! t-id (list 'quote globalname) sig)
+      (list 'add-type-fn! t-id globalname sig)
       sig)))
       
 (define (get-functions-for i) (_vector-get (unbox _types) i))

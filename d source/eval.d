@@ -91,9 +91,10 @@ Cons evalList(LyraObj exprList, Env env, bool allowInlineIfEnabled = true) {
 
 LyraObj evalVector(LyraObj expr, Env env) {
     Vector v = vector_val(expr);
+    Vector vnew = [];
     for (auto i = 0; i < v.length; i++)
-        v[i] = eval(v[i], env, true);
-    return vector(v);
+        vnew ~= eval(v[i], env, true);
+    return vector(vnew);
 }
 
 LyraObj evModule(Cons expr) {
