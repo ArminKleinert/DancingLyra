@@ -1,0 +1,12 @@
+(let* (pair-id (register-type!))
+  (define-record pair-id pair x y)
+  
+  (def-method pair-id first (pair-first p)
+    (maybe (pair-x p)))
+  
+  (def-method pair-id second (pair-second p)
+    (maybe (pair-y p)))
+  
+  (def-method pair-id ->string (pair->string p)
+    (string "(" (pair-x p) " " (pair-y p) ")"))
+)

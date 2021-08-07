@@ -60,24 +60,13 @@
 
 
 (let ((_types (box []))
-      (associated (lambda (xs sym)
-                    (if (null? xs)
-                      '()
-                      (if (= (car (car xs)) sym)
-                        (car (cdr (car xs)))
-                        (associated (cdr xs) sym)))))
       (vector-set
         (lambda (v idx xyz)
           (_vector-iterate v []
             (lambda (acc e i)
               (if (= i idx)
                 (_vector-add acc xyz)
-                (_vector-add acc e))))))
-      (list-append1
-        (lambda (l0 l1)
-          (if (null? l0)
-            l1
-            (cons (car l0) (list-append1 (cdr l0) l1))))))
+                (_vector-add acc e)))))))
 
 (define (register-type!)
   (box-swap! _types (lambda (x) (_vector-add x '())))
@@ -97,14 +86,6 @@
   type)
 
 (define (add-type-fns! type sym-to-f-list)
-  (comment let* (v (unbox _types))
-    (box-set! _types
-      (vector-set
-        v type
-        (list-append1
-          sym-to-f-list
-          (_vector-get v type))))
-    type)
   (if (null? sym-to-f-list)
     type
     (begin
@@ -130,9 +111,6 @@
     (list 'begin
       (list 'add-type-fn! t-id (list 'quote globalname) sig)
       sig)))
-      
-(define (get-functions-for i) (_vector-get (unbox _types) i))
-(define (get-functions-for-obj o) (_vector-get (unbox _types) (lyra-type-id o)))
 
 (define nil-id    (register-type!))
 (define symbol-id (register-type!))

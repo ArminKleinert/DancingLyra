@@ -1,53 +1,134 @@
-(when (not (defined? 'lyra-core-map-loaded))
+(module seq-map
+ [[seq-map->list]
+  [seq-map->vector]
+  [seq-map-delete]
+  [seq-map-find]
+  [seq-map-walk]
+  [seq-map-insert]
+  [seq-map-empty?]
+  [seq-map-union]]
 
-(define lyra-core-map-loaded #t)
+(comment
+ [->list ->vector all? any? append but-last drop drop-until drop-while empty? filter find-first first foldl foldl1 get map map-until map-while none? nth remove rest reverse second set-at size take take-until take-while third zip])
 
+(let* (seq-map-id (register-type!))
+(define-record seq-map-id seq-map entries)
 
-(define seq-map-id (register-type!))
-(define-record seq-map-id seq-map keys vals)
+(def-method seq-map-id ->list (seq-map->list m)
+  (->list (map ->list entries)))
 
-(define (get m k) ((find-type-fn m 'get) m k))
+(def-method seq-map-id ->vector (seq-map->vector m)
+  entries)
 
-(let* (seq-map-get
-       (lambda (k keys vals)
-        (cond ((empty? (keys m)) '())
-              ((eql? k (car (keys m))) (car (vals m)))
-              (#t (seq-map-get k (cdr keys) (cdr vals))))))
-  (add-type-fn! seq-map-id 'get
-    (lambda (m k)
-      (seq-map-get k (seq-map-keys m) (seq-map-vals m))))
-)
+(def-method seq-map-id append (seq-map-append m entries)
 
-(add-type-fn! seq-map-id 'add
-  (lambda (m0 k v)
-    (seq-map
-      (cons k (seq-map-keys m))
-      (cons v (seq-map-vals m)))))
+  )
 
-(add-type-fn! seq-map-id 'append
-  (lambda (m0 m1)
-    (make-seq-map
-      (append (seq-map-keys m1) (seq-map-keys m0))
-      (append (seq-map-vals m1) (seq-map-vals m0)))))
+(def-method seq-map-id but-last (seq-map-but-last m)
 
-(define (seq-map->list m)
-  (let* (pairs
-          (lambda (ks vs)
-          (if (empty? ks)
-            '()
-            (cons (list (car ks) (car vs))
-                  (pairs (cdr ks) (cdr vs))))))
-    (pairs (seq-map-keys m) (seq-map-vals m))))
+  )
 
-(add-type-fn! seq-map-id '->list seq-map->list)
+(def-method seq-map-id drop (seq-map-drop m)
 
-(add-type-fn! seq-map-id '->vector
-  (lambda(m) (->vector (seq-map->list m))))
+  )
 
-(add-type-fn! seq-map-id '->string
-  (lambda (m)
-    (->string (seq-map->list m))))
+(def-method seq-map-id drop-until (seq-map-drop-until m)
 
-)
+  )
 
-'lyra-core-map-loaded
+(def-method seq-map-id drop-while (seq-map-drop-while m)
+
+  )
+
+(def-method seq-map-id empty? (seq-map-empty? m)
+
+  )
+
+(def-method seq-map-id filter (seq-map-filter m)
+
+  )
+
+(def-method seq-map-id find-first (seq-map-find-first m)
+
+  )
+
+(def-method seq-map-id first (seq-map-first m)
+
+  )
+
+(def-method seq-map-id foldl (seq-map-foldl m)
+
+  )
+
+(def-method seq-map-id foldl1 (seq-map-foldl1 m)
+
+  )
+
+(def-method seq-map-id get (seq-map-get m)
+
+  )
+
+(def-method seq-map-id map (seq-map-map m)
+
+  )
+
+(def-method seq-map-id map-until (seq-map-map-until m)
+
+  )
+
+(def-method seq-map-id map-while (seq-map-map-while m)
+
+  )
+
+(def-method seq-map-id none? (seq-map-none? m)
+
+  )
+
+(def-method seq-map-id nth (seq-map-nth m)
+
+  )
+
+(def-method seq-map-id remove (seq-map-remove m)
+
+  )
+
+(def-method seq-map-id rest (seq-map-rest m)
+
+  )
+
+(def-method seq-map-id reverse (seq-map-reverse m)
+
+  )
+
+(def-method seq-map-id second (seq-map-second m)
+
+  )
+
+(def-method seq-map-id set-at (seq-map-set-at m)
+
+  )
+
+(def-method seq-map-id size (seq-map-size m)
+
+  )
+
+(def-method seq-map-id take (seq-map-take m)
+
+  )
+
+(def-method seq-map-id take-until (seq-map-take-until m)
+
+  )
+
+(def-method seq-map-id take-while (seq-map-take-while m)
+
+  )
+
+(def-method seq-map-id third (seq-map-third m)
+
+  )
+
+(def-method seq-map-id zip (seq-map-zip m)
+
+  )
+))

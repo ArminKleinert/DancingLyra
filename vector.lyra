@@ -2,7 +2,13 @@
  [[offset-vector make-offset-vector]
   [vector-pair make-vector-pair]
   [offset-vector? offset-vector?]
-  [vector-pair? vector-pair?]]
+  [vector-pair? vector-pair?]
+  [vector-size vector-size]
+  [vector-get vector-get]
+  [vector-add vector-add]
+  [vector-iterate vector-iterate]
+  [vector-set vector-set]
+  [vector-append vector-append]]
 
 (def-generic x (vector-size x) _vector-size)
 (def-generic x (vector-get x i) nothing)

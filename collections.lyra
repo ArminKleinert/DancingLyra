@@ -8,6 +8,7 @@
   [empty? empty?]
   [nth nth]
   [foldl foldl]
+  [foldl1 foldl1]
   [map map]
   [filter filter]
   [remove remove]
@@ -25,9 +26,15 @@
   [take-until take-until]
   [drop-while drop-while]
   [drop-until drop-until]
-  [zip zip]]
+  [zip zip]
+  [get get]
+  [any? any?]
+  [all? all?]
+  [none? none?]
+  [sort sort]
+  [sort-by sort-by]]
 
-(define (set-at x i e) ((find-type-fn x 'set-at) x i e))
+(def-generic x (set-at x i e) (lambda (x i e) x))
 
 (def-generic x (first x) nothing)
 (def-generic x (rest x) nothing)
@@ -47,6 +54,11 @@
 (def-generic x (take-while p x) nothing)
 (def-generic x (drop-while p x) nothing)
 
+(def-generic x (sort x) nothing)
+(def-generic x (sort-by comp x) nothing)
+      
+      
+
 (define (default-size xs)
   (if (nothing? (rest xs))
     0
@@ -59,6 +71,7 @@
 (def-generic x (empty? x)
   (lambda (x) (nothing? (first x))))
 
+(def-generic x (get x i) nth)
 (def-generic x (remove p x) (lambda (p x) (filter (negate p) x)))
 (def-generic x (map-while f p x) (lambda (f p x) (map f (take-while p x))))
 (def-generic x (map-until f p x) (lambda (f p x) (map f (drop-while p x))))

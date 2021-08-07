@@ -181,6 +181,19 @@
     (nothing)
     (maybe (cdr xs))))
 
+(def-method cons-id sort (list-sort xs)
+  (sort-by <= xs))
+
+(let* (sort-insert 
+        (lambda (comp x ys)
+          (cond ((empty? ys) (list x))
+                ((< (comp x (car ys)) 1) (cons x ys))
+                (#t (cons (car ys) (sort-insert comp x (cdr ys)))))))
+  (def-method cons-id sort-by (list-sort-by comp xs)
+    (if (empty? xs)
+      '()
+      (sort-insert comp (car xs) (list-sort-by comp xs)))))
+
 (add-type-fns! cons-id
   (list
 ;;     (list 'empty? always-false)

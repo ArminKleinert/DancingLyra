@@ -71,7 +71,9 @@
   [drop-until-list-test drop-until-list-test]
   [drop-until-vector-test drop-until-vector-test]
   [zip-list-test zip-list-test]
-  [zip-vector-test zip-vector-test]]
+  [zip-vector-test zip-vector-test]
+  [sort-list-test sort-list-test]
+  [sort-vector-test sort-vector-test]]
 
 (define TODO #f)
 
@@ -830,7 +832,7 @@
     (eq? (list "x" "y" "z" "abc" "def") (map string (list 'x 'y 'z 'abc 'def)))
     (eq? (list "x" "y" "z" " " "\n") (map string (list #\x #\y #\z #\space #\newline)))
     (eq? (list "(1 2 3)" "(2 3 4)" "(3 4 5)") (map string (list '(1 2 3) '(2 3 4) '(3 4 5))))
-    (eq? (list "(vector 1 2 3)" "[2 3 4]" "[3 4 5]") (map string (list (vector 1 2 3) [2 3 4] [3 4 5])))
+    (eq? (list "[1 2 3]" "[2 3 4]" "[3 4 5]") (map string (list (vector 1 2 3) [2 3 4] [3 4 5])))
   ))
 
 (define (map-vector-test)
@@ -845,7 +847,7 @@
     (eq? ["x" "y" "z" "abc" "def"] (map string (vector 'x 'y 'z 'abc 'def)))
     (eq? ["x" "y" "z" " " "\n"] (map string [#\x #\y #\z #\space #\newline]))
     (eq? ["(1 2 3)" "(2 3 4)" "(3 4 5)"] (map string ['(1 2 3) '(2 3 4) '(3 4 5)]))
-    (eq? ["(vector 1 2 3)" "[2 3 4]" "[3 4 5]"] (map string (vector (vector 1 2 3) (vector 2 3 4) (vector 3 4 5))))
+    (eq? ["[1 2 3]" "[2 3 4]" "[3 4 5]"] (map string (vector (vector 1 2 3) (vector 2 3 4) (vector 3 4 5))))
   ))
 
 (define (filter-list-test)
@@ -1371,6 +1373,22 @@
     (eq? [[1 6] [2 7]] (zip [1 2 3 4 5] [6 7]))
     (eq? [[1 6] [2 7] [3 8] [4 9] [5 10]] (zip [1 2 3 4 5] [6 7 8 9 10]))
   ))
+
+(define (sort-list-test)
+  (and
+    (eq? '() (sort '()))
+    (eq? '() (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) -1 1))) '()))
+    (eq? (list 1 2 3) (sort (list 3 2 1)))
+    (eq? (list 3 2 1) (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) -1 1))) (list 3 2 1)))
+  ))
+
+(define (sort-vector-test)
+  (and
+    (eq? '() (sort '()))
+    (eq? '() (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) -1 1))) '()))
+    (eq? (vector 1 2 3) (sort (vector 3 2 1)))
+    (eq? (vector 3 2 1) (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) -1 1))) (vector 3 2 1)))
+  ))
 )
 
 (begin
@@ -1455,6 +1473,9 @@
 (println! "")
 (println! (string "(zip-list-test): ............ " (zip-list-test)))
 (println! (string "(zip-vector-test):........... " (zip-vector-test)))
+(println! "")
+(println! (string "(sort-list-test): ........... " (sort-list-test)))
+(println! (string "(sort-vector-test):.......... " (sort-vector-test)))
 )
 
 (println! [
