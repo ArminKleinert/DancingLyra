@@ -330,7 +330,7 @@ For the creation of new types, Lyra provides `register-type!` and `define-record
   
   ; No ->string function is created, but can be easily implemented:
   (def-method pair-id ->string (pair-to-string p)
-    (string "(" (pair-x p) ", " (pair-y) ")"))
+    (string "(" (pair-x p) ", " (pair-y p) ")"))
   
   (println! (make-pair 9 1)) ; -> (9, 1)
 )
