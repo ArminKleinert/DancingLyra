@@ -73,7 +73,9 @@
   [zip-list-test zip-list-test]
   [zip-vector-test zip-vector-test]
   [sort-list-test sort-list-test]
-  [sort-vector-test sort-vector-test]]
+  [sort-vector-test sort-vector-test]
+  [sort-by-list-test sort-by-list-test]
+  [sort-by-vector-test sort-by-vector-test]]
 
 (define TODO #f)
 
@@ -1377,17 +1379,27 @@
 (define (sort-list-test)
   (and
     (eq? '() (sort '()))
-    (eq? '() (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) -1 1))) '()))
     (eq? (list 1 2 3) (sort (list 3 2 1)))
-    (eq? (list 3 2 1) (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) -1 1))) (list 3 2 1)))
+  ))
+
+(define (sort-by-list-test)
+  (and
+    (eq? '() (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) -1 1))) '()))
+    (eq? (list 1 2 3) (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) -1 1))) (list 3 2 1)))
+    (eq? (list 3 2 1) (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) 1 -1))) (list 2 3 1)))
   ))
 
 (define (sort-vector-test)
   (and
     (eq? '() (sort '()))
-    (eq? '() (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) -1 1))) '()))
     (eq? (vector 1 2 3) (sort (vector 3 2 1)))
-    (eq? (vector 3 2 1) (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) -1 1))) (vector 3 2 1)))
+  ))
+
+(define (sort-by-vector-test)
+  (and
+    (eq? [] (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) -1 1))) []))
+    (eq? (vector 1 2 3) (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) -1 1))) (vector 3 2 1)))
+    (eq? (vector 3 2 1) (sort-by (lambda (x y) (if (= x y) 0 (if (< x y) 1 -1))) (vector 2 3 1)))
   ))
 )
 
@@ -1476,6 +1488,8 @@
 (println! "")
 (println! (string "(sort-list-test): ........... " (sort-list-test)))
 (println! (string "(sort-vector-test):.......... " (sort-vector-test)))
+(println! (string "(sort-by-list-test): ........ " (sort-by-list-test)))
+(println! (string "(sort-by-vector-test):....... " (sort-by-vector-test)))
 )
 
 (println! [

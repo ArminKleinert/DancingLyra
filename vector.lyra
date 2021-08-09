@@ -326,6 +326,12 @@
 (define (vector-empty? v)
   (= (vector-size v) 0))
 
+(def-method vector-id sort (vector-insertion-sort coll)
+  (->vector (sort (->list coll))))
+
+(def-method vector-id sort-by (vector-insertion-sort-by comp coll)
+  (->vector (sort-by comp (->list coll))))
+
 ; --------------------------------------------------
 
 (add-type-fns! vector-id

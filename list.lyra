@@ -25,7 +25,8 @@
   [cddaar cddaar]
   [cddadr cddadr]
   [cdddar cdddar]
-  [cddddr cddddr]]
+  [cddddr cddddr]
+  [insertion-sort insertion-sort]]
 
 (define (caar x)    (car (car x)))
 (define (cadr x)    (car (cdr x)))
@@ -181,18 +182,27 @@
     (nothing)
     (maybe (cdr xs))))
 
-(def-method cons-id sort (list-sort xs)
-  (sort-by <= xs))
+(define (isort-acc comp coll acc)
+  (if (null? coll)
+    acc
+    (isort-acc comp (cdr coll) (isort-insert comp (car coll) acc))))
 
-(let* (sort-insert 
-        (lambda (comp x ys)
-          (cond ((empty? ys) (list x))
-                ((< (comp x (car ys)) 1) (cons x ys))
-                (#t (cons (car ys) (sort-insert comp x (cdr ys)))))))
-  (def-method cons-id sort-by (list-sort-by comp xs)
-    (if (empty? xs)
-      '()
-      (sort-insert comp (car xs) (list-sort-by comp xs)))))
+(define (isort-insert comp elem coll)
+  (if (null? coll)
+    (list elem)
+    (if (< (comp elem (car coll)) 0)
+      (cons elem coll)
+      (cons (car coll)
+            (isort-insert comp elem (cdr coll))))))
+
+(def-method cons-id sort (insertion-sort coll)
+  (let* (acc '())
+    (isort-acc (lambda (x y) (if (= x y) 0 (if (< x y) -1 1)))
+      (->list coll) acc)))
+
+(def-method cons-id sort-by (insertion-sort-by comp coll)
+  (let* (acc '())
+    (isort-acc comp (->list coll) acc)))
 
 (add-type-fns! cons-id
   (list
@@ -249,5 +259,7 @@
     (list 'drop-until list-drop-until)
     (list 'zip list-zip)
     (list 'list? always-false)
-    (list 'vector? always-false)))
+    (list 'vector? always-false)
+    (list 'sort insertion-sort)
+    (list 'sort-by insertion-sort-by)))
 )
