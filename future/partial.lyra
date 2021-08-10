@@ -1,0 +1,14 @@
+(module partial
+  [[partial partial]
+   [partial? partial?]
+   [partial-func partial-func]
+   [partial-args partial-args]]
+  
+  (let* (partial-func-id (register-type!))
+    (define-record partial-func-id partial func args)
+    
+    (define (partial f args)
+      (cond ((partial? f) (partial (partial-func f) (append (partial-args f) args)))
+            ((< (size args) (arity f)) (make-partial f args))
+            (#t (apply f args))))
+  ))

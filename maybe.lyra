@@ -14,6 +14,4 @@
 
   (add-type-fn! maybe-id 'unwrap maybe-inner)
   (add-type-fn! maybe-id '->string (lambda (m) (string "(maybe " (->string m.?) ")")))
-  (add-type-fn! nothing-id '->string (lambda (n) "nothing"))
-  )
-)
+  (add-type-fn! nothing-id '->string (lambda (n) "nothing"))))

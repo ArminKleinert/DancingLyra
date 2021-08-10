@@ -1,0 +1,19 @@
+(module lazy
+  [[lazy lazy]
+   [eager eager]]
+
+  (let* (lazy-type-id (register-type!))
+    (define-record lazy-type-id lazy funcs obj)
+    
+    (define (lazy f o)
+      (cond ((lazy? o) (make-lazy (cons f (lazy-funcs o)) (lazy-obj o)))
+            (#t (make-lazy (list f) o))))
+    
+    (define (eager l)
+      (if (lazy? l)
+        (foldr (lambda (x y) (x.? y)) (lazy-obj l) (lazy-funcs l))
+        l))
+    
+    (def-method lazy-type-id ->string (lazy->string l)
+      (->string (list (lazy-funcs l) (lazy-obj l))))
+    ))

@@ -75,5 +75,10 @@
 (load! "collections.lyra")
 (load! "list.lyra")
 (load! "vector.lyra")
+(load! "lazy.lyra")
+
+(comment let* (l (lazy string (lazy inc (lazy inc (lazy dec (lazy id 17))))))
+  (println! l)
+  (println! (eager l)))
 
 'lyra-core-loaded

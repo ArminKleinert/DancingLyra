@@ -1,63 +1,47 @@
 (module seq-map
- [[seq-map->list]
-  [seq-map->vector]
-  [seq-map-delete]
-  [seq-map-find]
-  [seq-map-walk]
-  [seq-map-insert]
-  [seq-map-empty?]
-  [seq-map-union]]
+ [[seq-map->list seq-map->list]
+  [seq-map->vector seq-map->vector]
+  [seq-map-delete seq-map-delete]
+  [seq-map-find seq-map-find]
+  [seq-map-walk seq-map-walk]
+  [seq-map-insert seq-map-insert]
+  [seq-map-empty? seq-map-empty?]
+  [seq-map-union seq-map-union]]
 
 (comment
  [->list ->vector all? any? append but-last drop drop-until drop-while empty? filter find-first first foldl foldl1 get map map-until map-while none? nth remove rest reverse second set-at size take take-until take-while third zip])
 
-(let* (seq-map-id (register-type!))
+(let* (seq-map-id (register-type!)
+       entry-id (register-type!))
 (define-record seq-map-id seq-map entries)
+(define-record entry key value)
 
 (def-method seq-map-id ->list (seq-map->list m)
-  (->list (map ->list entries)))
+  (->list entries))
 
 (def-method seq-map-id ->vector (seq-map->vector m)
   entries)
 
 (def-method seq-map-id append (seq-map-append m entries)
+  (make-seq-map (append (seq-map-entries m) entries)))
 
-  )
+(def-method seq-map-id keys (m)
+  (map entry-key (seq-map-entries m)))
 
-(def-method seq-map-id but-last (seq-map-but-last m)
-
-  )
-
-(def-method seq-map-id drop (seq-map-drop m)
-
-  )
-
-(def-method seq-map-id drop-until (seq-map-drop-until m)
-
-  )
-
-(def-method seq-map-id drop-while (seq-map-drop-while m)
-
-  )
+(def-method seq-map-id values (m)
+  (map entry-value (seq-map-entries m)))
 
 (def-method seq-map-id empty? (seq-map-empty? m)
+  (empty? (seq-map-entries m)))
 
-  )
+(def-method seq-map-id filter (seq-map-filter p m)
+  (filter p (seq-map-entries m)))
 
-(def-method seq-map-id filter (seq-map-filter m)
-
-  )
-
-(def-method seq-map-id find-first (seq-map-find-first m)
-
-  )
-
-(def-method seq-map-id first (seq-map-first m)
-
-  )
+(def-method seq-map-id find-first (seq-map-find-first p m)
+  (filter p (seq-map-entries m)))
 
 (def-method seq-map-id foldl (seq-map-foldl m)
-
+  
   )
 
 (def-method seq-map-id foldl1 (seq-map-foldl1 m)

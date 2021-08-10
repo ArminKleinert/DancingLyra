@@ -32,7 +32,8 @@
   [all? all?]
   [none? none?]
   [sort sort]
-  [sort-by sort-by]]
+  [sort-by sort-by]
+  [foldr foldr]]
 
 (def-generic x (set-at x i e) (lambda (x i e) x))
 
@@ -99,4 +100,10 @@
 (def-generic x (any? p x) (lambda (p x) (not (nothing? (find-first p x)))))
 (def-generic x (all? p x) (lambda (p x) (empty? (drop-while p x))))
 (def-generic x (none? p x) (lambda (p x) (nothing? (find-first p x))))
+
+(def-generic x (foldr f s x)
+  (lambda (f s x)
+    (if (empty? x)
+      s
+      (f (first x).? (foldr f s (rest x).?)))))
 )

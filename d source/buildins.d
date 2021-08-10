@@ -278,7 +278,7 @@ void initializeGlobalEnv(Env env) {
             drs ~= sw.peek().total!"nsecs";
         }
 
-        return LyraObj.makeReal(median(drs) / 1000000000.0);
+        return LyraObj.makeReal(median(drs) / 1000000.0);
     });
 
     addFn("eval!", 1, false, false, false, (xs, env) {
@@ -357,5 +357,11 @@ void initializeGlobalEnv(Env env) {
         if (xs.car.type != fixnum_id)
             throw new LyraError("fixnum->char: Expected fixnum.", callStack());
         return LyraObj.makeFixnum(cast(char) xs.car.fixnum_val);
+    });
+
+    addFn("_arity", 1, false, true, false, (xs, env) {
+        if (xs.car.type != func_id)
+            throw new LyraError("arity: Expected function.", callStack());
+        return LyraObj.makeFixnum(xs.car.func_val.minArgs());
     });
 }
