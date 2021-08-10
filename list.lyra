@@ -74,9 +74,9 @@
 (def-method cons-id nth (list-nth xs index)
   (if xs
     (if (= index 0)
-      (car xs)
+      (maybe (car xs))
       (list-nth (cdr xs) (- index 1)))
-    '()))
+    (nothing)))
 
 (def-method cons-id foldl (list-foldl f start coll)
   (if (list-empty? coll)

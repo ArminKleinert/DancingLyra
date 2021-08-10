@@ -34,6 +34,7 @@ It started as a port of a language written in Ruby, but became its own thing by 
   - Easy macros for defining new types
   - Now supports very limited modules
   - Basic file-IO (read/write/append/remove/exists?) and console-input (readln!) added
+  - Optional lazy evaluation via. lazy type
 
 ## Usage
 
@@ -130,8 +131,8 @@ define-record  | 2     | Define a new type (Explained far below).
 ```
 Name           | Arity | Description
 ---------------+-------+-------------------------------------------------------------
-inc            | 1     |
-dec            | 1     |
+inc            | 1     | Increases a number by 1.
+dec            | 1     | Decreases a number by 1.
                |       | 
 and            | 2     | Logic and
 or             | 2     | Logic or
@@ -149,9 +150,6 @@ cons?          | 1     | Check whether the value is a cons.
 vector?        | 1     | Check whether the value is a vector.
 eq?            | 2     | Check for equality of two objects.
                |       | 
-nth            | 2     | Get the nth element of a collection.
-length         | 1     | Get the length of a collection.
-               |       | 
 begin          | 2     | Run two expressions and return the result of the second.
                |       | 
 empty?         | 1     | Check whether a collection is empty.
@@ -160,30 +158,38 @@ load!          | 1     | Load a Lyra file and execute it.
 require!       | 1     | Alias for load!
 import!        | 1     | Alias for load!
                |       | 
-map            | 2     | Apply a function to each element of a list and return the new
-               |       | list.
+map            | 2     | Apply a function to each element of a list and return the
+               |       | new list.
 foldl          | 3     | 
 foldl1         | 2     | 
-foldr          | 3     | (Not implemented)
+foldr          | 3     | 
 filter         | 2     | Filter a collection by predicate.
+remove         | 2     | Like filter but with the predicate negated.
                |       | 
-first          | 1     | 
-second         | 1     | 
-third          | 1     | 
-rest           | 2     | 
+first          | 1     | Returns the first object of a sequence as a maybe.
+second         | 1     | Returns the second object of a sequence as a maybe.
+third          | 1     | Returns the third object of a sequence as a maybe.
+rest           | 1     | Returns all but the first elements of a sequence.
 set-at         | 2     | 
                |       | 
-size           | 1     | 
-empty?         | 1     | 
-nth            | 2     | 
-append         | 2     | 
-find-first     | 2     | 
+size           | 1     | Returns the size of a collection.
+empty?         | 1     | Checks whether a collection is empty. (Also true for nil)
+nth            | 2     | Returns the nth element of a sequential as a maybe object
+               |       | `(nth '(1 2 3) 1) => 2`
+append         | 2     | Appends two collections. The type of the result is that of 
+               |       | the first operant.
+find-first     | 2     | Find the first element in a collection for which the 
+               |       | predicate p is true. `(find-first odd? '(2 3 4)) => 3`
                |       | 
-->vector       | 1     | 
-->list         | 1     | 
-copy           | 1     | 
-but-last       | 1     | 
-reverse        | 1     | 
+->vector       | 1     | Turns a collection into a vector. Objects for whom `vector?` 
+               |       | returns true are turned into a real vector too. Objects that 
+               |       | cannot be turned into a vector become (maybe nothing)
+->list         | 1     | Turns a collection into a list. The same rules apply as for
+               |       | ->vector, but nil (empty list) is not changed.
+copy           | 1     | Copies an object. The only type for which this does anything 
+               |       | is box.
+but-last       | 1     | Returns the first n-1 elements of a sequential collection.
+reverse        | 1     | Reverses a sequential collection.
 map-while      | 3     | 
 map-until      | 3     | 
 take           | 2     | 
@@ -192,14 +198,39 @@ take-while     | 3     |
 take-until     | 3     | 
 drop-while     | 3     | 
 drop-until     | 3     | 
-zip            | 2     | 
+zip            | 2     | Creates pairs of the entries of 2 sequences: 
+               |       | `(zip '(1 2 3) '(4 5)) => ((1 4) (2 5))`
                |       | 
-any?           | 2     | 
-all?           | 2     | 
-none?          | 2     | 
+any?           | 2     | Checks whether a predicate holds true for any element in 
+               |       | a list. `(any? odd? '(2 3 4)) => #t`
+all?           | 2     | Checks whether a predicate holds true for all in a list.
+none?          | 2     | Same as any? with the predicate negated.
                |       | 
-maybe          | 1     | 
-nothing        | -     | 
+maybe          | 1     | Creates an instance of maybe.
+nothing        | -     | Takes any number of arguments and returns `(maybe nothing)`
+               |       | 
+lazy           | 2     | Takes a function and an object and stores them. Calling
+               |       | lazy on a function and another lazy object stores the
+               |       | function without executing.
+eager          | 1     | Takes a object of the lazy type and executes it.
+               |       | 
+null?          | 1     | Checks for the empty list.
+symbol?        | 1     | 
+string?        | 1     | 
+char?          | 1     | 
+integer?       | 1     | 
+real?          | 1     | 
+cons?          | 1     | 
+list?          | 1     | 
+vector?        | 1     | 
+func?          | 1     | 
+bool?          | 1     | 
+boolean?       | 1     | 
+box?           | 1     | 
+maybe?         | 1     | 
+nothing?       | 1     | 
+lazy?          | 1     | Checks whether an object is an instance of lazy.
+partial?       | 1     | Checks whether an object is a partial function application.
                |       | 
 println!       | 1     | 
 
@@ -248,7 +279,39 @@ Here is a sample definition for `load!` and `foldl`.
   (foldl + 0 xs))
 ```
 
-## Different functions on different types
+### maybe something, maybe nothing
+
+Some functions might return something, some might not. For example, `first` returns the first element of a sequence, but what should it return for an empty sequence? What is the first element of an empty list?  
+That's why all functions that get the nth element of a sequence or access a collection via a key or similar return a maybe. The result can be unpacked using the `unpack` function or the postfix `.?`:  
+```
+(define (head l) (if (null? l) (maybe (car l) (nothing))))
+(head '(1 2 3))              => (maybe 1)
+(head '())                   => (maybe nothing)
+(let* (e (head '(1 2))) e)   => (maybe 1)
+(head '(1 2 3)).?            => 1
+(head '()).?                 => nothing
+(let* (e (head '(1 2))) e.?) => 1
+```
+
+### Lazyness / Selective participation
+
+Lazyness currently has to be done explicitly and can be evaluated using the function `eager` or the postfix `.!`:  
+```
+(lazy inc 1) => (lazy (inc) 1)
+(lazy inc (lazy dec 1)) => (lazy (inc dec) 1)
+(lazy even? (lazy inc (lazy second [1 2 3])))
+  => (lazy (even? inc second) [1 2 3])
+
+(lazy inc 1).! => 2
+
+(lazy even? (lazy inc (lazy second [1 2 3]))).! => #f
+  ; (even? (inc (second [1 2 3])))
+  ; (even? (inc 2))
+  ; (even? 3)
+  ; #f
+```
+
+### Different functions on different types
 
 To create a function which can have different behaviours on different types, Lyra provides `def-generic`. The function needs to be implemented using `def-method`:
 
@@ -308,9 +371,9 @@ and so on, even though their implementations may be different.
 By using `add-type-fns!`, the function which do not need a new implementation
 can just be copied:
 
-`(add-type-fns! vector-pair-id (list (list 'copy id) (list 'vector always-true)))`
+`(add-type-fns! vector-pair-id (list (list 'copy id) (list 'vector? always-true)))`
 
-## User-defined types
+### User-defined types
 
 For the creation of new types, Lyra provides `register-type!` and `define-record`:
 

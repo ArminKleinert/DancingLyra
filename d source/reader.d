@@ -70,7 +70,7 @@ Cons surroundWithUnwrapCall(LyraObj o) {
 }
 
 Cons surroundWithForceEvalCall(LyraObj o) {
-    return list(symbol("force-eval"), o);
+    return list(symbol("eager"), o);
 }
 
 auto integer_regex = ctRegex!(r"^-?[0-9]+$");
@@ -117,7 +117,7 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
             break;
         case ".!":
             if (root.length == 0) {
-                root ~= LyraObj.makeSymbol("force-eval");
+                root ~= LyraObj.makeSymbol("eager");
             } else {
                 auto last = root[root.length - 1];
                 root[root.length - 1] = surroundWithForceEvalCall(last);
@@ -128,12 +128,12 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
 
             LyraObj o = null;
             bool unwrap = false;
-            bool force = false;
+            bool eager = false;
             if (token.endsWith(".?")) {
                 unwrap = true;
                 token = token[0 .. $ - 2];
             } else if (token.endsWith(".!")) {
-                force = true;
+                eager = true;
                 token = token[0 .. $ - 2];
             }
 
@@ -152,7 +152,7 @@ LyraObj make_ast(Reader tokens, int level = 0, string expected = "", bool stop_a
 
             if (unwrap) {
                 o = surroundWithUnwrapCall(o);
-            } else if (force) {
+            } else if (eager) {
                 o = surroundWithForceEvalCall(o);
             }
 
