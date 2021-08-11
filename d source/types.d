@@ -65,7 +65,7 @@ enum : uint {
     unknown_id = uint.max
 }
 
-abstract class LyraFunc : LyraObj {
+abstract class ALyraFunc : LyraObj, LyraFunc {
     protected const Symbol name;
     private const bool _isMacro;
     protected const uint minargs;
@@ -118,6 +118,16 @@ abstract class LyraFunc : LyraObj {
     nothrow override string toString() {
         return (_isMacro ? "<macro " : "<function ") ~ name ~ ">";
     }
+}
+
+interface LyraFunc {
+    nothrow Symbol getName();
+    nothrow bool ispure();
+    nothrow bool isMacro();
+    nothrow uint minArgs();
+    nothrow uint maxArgs();
+    nothrow uint expectedType();
+    LyraObj call(Cons args, Env callEnv);
 }
 
 class Env {

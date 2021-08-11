@@ -18,7 +18,7 @@ private string itos(int e) {
     return to!string(e);
 }
 
-class NativeLyraFunc : LyraFunc {
+class NativeLyraFunc : ALyraFunc {
     private const LyraObj delegate(Cons, Env) fnBody;
     this(string name, uint minargs, uint maxargs, bool variadic, bool ispure,
             bool isMacro, LyraObj delegate(Cons, Env) fnBody) {
@@ -37,7 +37,7 @@ class NativeLyraFunc : LyraFunc {
     }
 }
 
-class NonNativeLyraFunc : LyraFunc {
+class NonNativeLyraFunc : ALyraFunc {
     private Env definitionEnv;
     private Cons argNames;
     private LyraObj bodyExpr;
