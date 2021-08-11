@@ -370,4 +370,42 @@ void initializeGlobalEnv(Env env) {
             throw new LyraError("partial: Expected function.", callStack());
         return PartialFunc.partial(xs.car.func_val, xs.cdr);
     });
+    
+    fixnum hashHelper (LyraObj x){fixnum h=0;
+        switch (x.type) {
+        case symbol_id:
+            foreach(c;x.value.symbol_val) h = h << 2 ^ cast(ushort) c;
+            break;
+        case string_id:
+            foreach(c;x.value.string_val) h = h << 3 ^ cast(ushort) c;
+            break;
+        case char_id:
+            h = (cast(ushort) (x.value.char_val)) << 5 ^ 0xC0FFEE;
+            break;
+        case fixnum_id:
+            h = x.value.fixnum_val;
+            break;
+        case real_id:
+            h = cast(fixnum) (x.value.real_val * 2048);break;
+        case bool_id:
+            h= x.value.bool_val ? 0xEA7C0FFEE : 0x404C0FFEE;break;
+        case nil_id:
+h=0x404;break;
+        case vector_id:
+  foreach (e ; x.value.vector_val) h = h<<1 + hashHelper(e);
+  break;
+  case func_id:
+  h = (cast(Object) x).toHash();
+  break;
+  case cons_id:
+  h = hashHelper(x.car) ^ 0xCAFEBABE;
+  break;
+        default:
+  foreach (e ; x.value.record_val) h = h<<4 + hashHelper(e);
+  break;
+        }return h;}
+    
+    addFn("_hash", 1, false, true, false, (xs, env) {
+        return LyraObj.makeFixnum(hashHelper(xs.car));
+    });
 }

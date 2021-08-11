@@ -1,0 +1,27 @@
+(module set
+  [[insert insert]
+   [set-includes? set-includes?]
+   [set-size set-size]
+   [set->list set->list]
+   [set->vector set->vector]
+   [set-remove set-remove]
+   [set-empty? set-empty?]
+   [set-union set-union]
+   [set-difference set-difference]
+   [powerset powerset] ; All possible subsets of set
+   [set-intersection set-intersection]
+   [set set]
+   [hash-set hash-set]
+   [tree-set tree-set]]
+
+(let ((hash-set-id (register-type!))
+      (hash-bucket-id (register-type!))
+      (tree-set-id (register-type!))
+      (tree-node-id (register-type!)))
+  (define-record hash-set-id hash-set entries)
+  (define-record hash-bucket-id bucket values)
+  (define-record tree-set-id tree-set entries)
+  (define-record tree-node-id node val left right)
+  
+  
+))

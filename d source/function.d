@@ -18,7 +18,7 @@ private string itos(int e) {
     return to!string(e);
 }
 
-class PartialFunc : LyraObj,LyraFunc {
+class PartialFunc : LyraObj, LyraFunc {
     private LyraFunc f;
     private Vector args;
 
@@ -37,7 +37,6 @@ class PartialFunc : LyraObj,LyraFunc {
         }
         return f.call(args1, env);
     }
-    
 
     nothrow Symbol getName() {
         return f.getName();
@@ -52,11 +51,11 @@ class PartialFunc : LyraObj,LyraFunc {
     }
 
     nothrow uint minArgs() {
-        return f.minArgs() - cast(uint)args.length;
+        return f.minArgs() - cast(uint) args.length;
     }
 
     nothrow uint maxArgs() {
-        return f.maxArgs() - cast(uint)args.length;
+        return f.maxArgs() - cast(uint) args.length;
     }
 
     nothrow uint expectedType() {

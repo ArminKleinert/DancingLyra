@@ -148,4 +148,6 @@
 (def-generic x (force-eval x) id) ; TODO
 
 (def-generic x (->string x) _string)
+
+(def-generic x (->hash x) _hash)
 ))

@@ -266,6 +266,7 @@ class LyraObj {
 
     private uint _type = 0;
     Val value = {bool_val: false};
+    private const size_t hashcode = 0;
 
     @nogc nothrow public uint type() {
         return _type;
@@ -399,6 +400,7 @@ class LyraRecord : LyraObj {
                 xs = xs.cdr;
             }
             Val v = {record_val: inner};
+
             auto obj = new LyraObj(v, type_id);
             return obj;
         });
