@@ -364,4 +364,10 @@ void initializeGlobalEnv(Env env) {
             throw new LyraError("arity: Expected function.", callStack());
         return LyraObj.makeFixnum(xs.car.func_val.minArgs());
     });
+
+    addFn("partial", 1, true, true, false, (xs, env) {
+        if (xs.car.type != func_id)
+            throw new LyraError("partial: Expected function.", callStack());
+        return PartialFunc.partial(xs.car.func_val, xs.cdr);
+    });
 }

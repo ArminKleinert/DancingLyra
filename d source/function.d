@@ -18,6 +18,56 @@ private string itos(int e) {
     return to!string(e);
 }
 
+class PartialFunc : LyraObj,LyraFunc {
+    private LyraFunc f;
+    private Vector args;
+
+    static PartialFunc partial(LyraFunc f, Cons args) {
+        return new PartialFunc(f, args);
+    }
+
+    private this(LyraFunc inner, Cons givenArgs) {
+        this.f = inner;
+        this.args = listToVector(givenArgs);
+    }
+
+    override LyraObj call(Cons args1, Env env) {
+        foreach_reverse (x; args) {
+            args1 = Cons.create(x, args1);
+        }
+        return f.call(args1, env);
+    }
+    
+
+    nothrow Symbol getName() {
+        return f.getName();
+    }
+
+    nothrow bool ispure() {
+        return f.ispure();
+    }
+
+    nothrow bool isMacro() {
+        return f.isMacro();
+    }
+
+    nothrow uint minArgs() {
+        return f.minArgs() - cast(uint)args.length;
+    }
+
+    nothrow uint maxArgs() {
+        return f.maxArgs() - cast(uint)args.length;
+    }
+
+    nothrow uint expectedType() {
+        return f.expectedType();
+    }
+
+    nothrow override uint type() {
+        return func_id;
+    }
+}
+
 class NativeLyraFunc : ALyraFunc {
     private const LyraObj delegate(Cons, Env) fnBody;
     this(string name, uint minargs, uint maxargs, bool variadic, bool ispure,

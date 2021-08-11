@@ -116,7 +116,7 @@ abstract class ALyraFunc : LyraObj, LyraFunc {
     }
 
     nothrow override string toString() {
-        return (_isMacro ? "<macro " : "<function ") ~ name ~ ">";
+        return (isMacro() ? "<macro " : "<function ") ~ getName() ~ ">";
     }
 }
 
