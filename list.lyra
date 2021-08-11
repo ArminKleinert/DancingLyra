@@ -204,32 +204,13 @@
   (let* (acc '())
     (isort-acc comp (->list coll) acc)))
 
+; --------------------------------------------------
+
 (add-type-fns! cons-id
   (list
-;;     (list 'empty? always-false)
-;;     (list 'eq? list-eq?)
-;;     (list 'nth list-nth)
-;;     (list 'foldl list-foldl)
-;;     (list 'map list-map)
-;;     (list 'filter list-filter)
-;;     (list 'append list-append)
-;;     (list 'find-first list-find-first)
-;;     (list '->vector list->vector)
-     (list '->list id)
-;;     (list 'copy list-copy)
-;;     (list 'but-last list-but-last)
-;;     (list 'reverse list-reverse)
-;;     (list 'map-while list-map-while)
-;;     (list 'map-until list-map-until)
-;;     (list 'take list-take)
-;;     (list 'take-while list-take-while)
-;;     (list 'take-until list-take-until)
-;;     (list 'drop-while list-drop-while)
-;;     (list 'drop-until list-drop-until)
-;;     (list 'zip list-zip)
+    (list '->list id)
     (list 'list? always-true)
-    (list 'vector? always-false)
-    ))
+    (list 'vector? always-false)))
   
 (add-type-fns! nil-id
   (list

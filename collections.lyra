@@ -33,7 +33,10 @@
   [none? none?]
   [sort sort]
   [sort-by sort-by]
-  [foldr foldr]]
+  [foldr foldr]
+  [includes? includes?]
+  [included? included?]
+  [distinct distinct]]
 
 (def-generic x (set-at x i e) (lambda (x i e) x))
 
@@ -79,6 +82,9 @@
 (def-generic x (drop-until p x) (lambda (p x) (drop-while (negate p) x)))
 (def-generic x (take-until p x) (lambda (p x) (take-while (negate p) x)))
 
+(def-generic x (includes? x e) (lambda (y e) (any? (lambda (a) (eq? e a)) x)))
+(def-generic x (included? e x) (lambda (e x) (includes? x e)))
+
 (define (default-foldl f s xs)
   (if (empty? xs) s
     (default-foldl f (f s (first xs)) (rest xs))))
@@ -93,9 +99,25 @@
 
 (define (default-foldl1 f xs)
   (cond ((empty? xs) (nothing))
-        ((empty? (rest xs)) (first xs))
-        (#t (foldl f (first xs) (rest xs)))))
+        ((empty? (rest xs)) (first xs).?)
+        (#t (foldl f (first xs).? (rest xs)))))
 (def-generic x (foldl1 f xs) default-foldl1)
+
+; TODO HEAVY OPTIMIZATIONS NECESSARY!!!
+;      Use a set in the future here.
+(define (default-uniq-helper seen acc xs)
+  (println! (unbox seen))
+  (println! acc)
+  (println! xs)
+  (println! "")
+  (cond ((empty? xs) acc)
+        ((includes? (unbox seen) (first xs).?) (default-uniq-helper seen acc (rest xs)))
+        (#t (begin
+              (box-set! seen (_vector-add (unbox seen) (first xs).?))
+              (default-uniq-helper seen (_vector-add acc (first xs).?) (rest xs).?)))))
+(define (default-uniq xs)
+  (default-uniq-helper (box []) [] xs))
+(def-generic x (distinct x) default-uniq)
 
 (def-generic x (any? p x) (lambda (p x) (not (nothing? (find-first p x)))))
 (def-generic x (all? p x) (lambda (p x) (empty? (drop-while p x))))

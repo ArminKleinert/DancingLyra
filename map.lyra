@@ -10,11 +10,16 @@
 
 (comment
  [->list ->vector all? any? append but-last drop drop-until drop-while empty? filter find-first first foldl foldl1 get map map-until map-while none? nth remove rest reverse second set-at size take take-until take-while third zip])
+ 
+ (comment [->list ->vector clone key? value? keys values empty? put put-if-absent get get-default size remove eq? ->string])
 
 (let* (seq-map-id (register-type!)
        entry-id (register-type!))
 (define-record seq-map-id seq-map entries)
 (define-record entry key value)
+
+(def-method entry-id ->string (entry->string e)
+  (string "(" (entry-key e) " " (entry-value e) ")"))
 
 (def-method seq-map-id ->list (seq-map->list m)
   (->list entries))
@@ -25,94 +30,56 @@
 (def-method seq-map-id append (seq-map-append m entries)
   (make-seq-map (append (seq-map-entries m) entries)))
 
-(def-method seq-map-id keys (m)
-  (map entry-key (seq-map-entries m)))
+(def-method seq-map-id ->string (seq-map->string m)
+  
+  )
 
-(def-method seq-map-id values (m)
-  (map entry-value (seq-map-entries m)))
+(def-method seq-map-id clone (seq-map-clone m)
+  
+  )
 
 (def-method seq-map-id empty? (seq-map-empty? m)
   (empty? (seq-map-entries m)))
 
-(def-method seq-map-id filter (seq-map-filter p m)
-  (filter p (seq-map-entries m)))
-
-(def-method seq-map-id find-first (seq-map-find-first p m)
-  (filter p (seq-map-entries m)))
-
-(def-method seq-map-id foldl (seq-map-foldl m)
+(def-method seq-map-id eq? (seq-map-eq? m)
   
   )
 
-(def-method seq-map-id foldl1 (seq-map-foldl1 m)
-
-  )
-
 (def-method seq-map-id get (seq-map-get m)
-
+  
   )
 
-(def-method seq-map-id map (seq-map-map m)
-
+(def-method seq-map-id get-default (seq-map-get-default m)
+  
   )
 
-(def-method seq-map-id map-until (seq-map-map-until m)
-
+(def-method seq-map-id key? (seq-map-key? m)
+  
   )
 
-(def-method seq-map-id map-while (seq-map-map-while m)
+(def-method seq-map-id keys (seq-map-keys m)
+  (map entry-key (seq-map-entries m)))
 
+(def-method seq-map-id put (seq-map-put m)
+  
   )
 
-(def-method seq-map-id none? (seq-map-none? m)
-
-  )
-
-(def-method seq-map-id nth (seq-map-nth m)
-
+(def-method seq-map-id put-if-absent (seq-map-put-if-absent m)
+  
   )
 
 (def-method seq-map-id remove (seq-map-remove m)
-
-  )
-
-(def-method seq-map-id rest (seq-map-rest m)
-
-  )
-
-(def-method seq-map-id reverse (seq-map-reverse m)
-
-  )
-
-(def-method seq-map-id second (seq-map-second m)
-
-  )
-
-(def-method seq-map-id set-at (seq-map-set-at m)
-
+  
   )
 
 (def-method seq-map-id size (seq-map-size m)
-
+  
   )
 
-(def-method seq-map-id take (seq-map-take m)
+(def-method seq-map-id value? (seq-map-value? m)
+  (map entry-value (seq-map-entries m)))
 
-  )
-
-(def-method seq-map-id take-until (seq-map-take-until m)
-
-  )
-
-(def-method seq-map-id take-while (seq-map-take-while m)
-
-  )
-
-(def-method seq-map-id third (seq-map-third m)
-
-  )
-
-(def-method seq-map-id zip (seq-map-zip m)
-
+(def-method seq-map-id values (seq-map-values m)
+  
   )
 ))

@@ -71,25 +71,11 @@
 (define (println! x)
   (_println! (->string x)))
 
-
 (load! "type.lyra")
 (load! "maybe.lyra")
 (load! "collections.lyra")
 (load! "list.lyra")
 (load! "vector.lyra")
 (load! "lazy.lyra")
-
-(comment let* (sum1 (partial foldl + 0))
-  (println! (sum1 '(1 2 3 4)))
-  (println! (sum1 [1 2 3 4]))
-  (println! (sum1 (list 1 2 3 4))))
-
-(comment let* (sss (partial string 1 2 3))
-  (println! (sss 6 7 8))
-  (println! (string 1 2 3 '(5 6 7))))
-
-(comment let* (l (lazy string (lazy inc (lazy inc (lazy dec (lazy id 17))))))
-  (println! l)
-  (println! (eager l)))
 
 'lyra-core-loaded

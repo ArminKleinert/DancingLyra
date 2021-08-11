@@ -1,6 +1,5 @@
 (module core-vector
  [[offset-vector make-offset-vector]
-  [vector-pair make-vector-pair]
   [offset-vector? offset-vector?]
   [vector-pair? vector-pair?]
   [vector-size vector-size]
@@ -46,11 +45,11 @@
     '()
     (vector-get (offset-vector-vec ov) (+ i (offset-vector-start ov)))))
 
-(define (offset-vector->vector ov)
+(def-method offset-vector-id ->vector (offset-vector->vector ov)
   (offset-vector-iterate ov []
     (lambda (acc e i) (vector-add acc e))))
 
-(define (offset-vector->string ov)
+(def-method offset-vector-id ->string (offset-vector->string ov)
   (let* (f (lambda (x y) (string x " " y)))
     (string "[" (foldl1 f ov) "]")))
 
@@ -90,61 +89,48 @@
 
 (define-record vector-pair-id vector-pair x y)
 
-(add-type-fn! vector-pair-id 'vector-size
-  (lambda (vp)
-    (+ (vector-size (vector-pair-x vp)) (vector-size (vector-pair-y vp)))))
+(def-method vector-pair-id vector-size(vector-pair-size vp)
+  (+ (vector-size (vector-pair-x vp)) (vector-size (vector-pair-y vp))))
 
-(add-type-fn! vector-pair-id 'vector-add
-  (lambda (vp e)
-    (make-vector-pair (vector-pair-x vp) (vector-add (vector-pair-y vp) e))))
+(def-method vector-pair-id vector-add(vector-pair-add vp e)
+  (make-vector-pair (vector-pair-x vp) (vector-add (vector-pair-y vp) e)))
 
-(add-type-fn! vector-pair-id 'append
-  (lambda (vp v1)
-    (if (empty? v1)
-      vp
-      (append (->vector vp) v1))))
+(def-method vector-pair-id append(vector-pair-append vp v1)
+  (if (empty? v1) vp (make-vector-pair (->vector vp) v1)))
 
-(add-type-fn! vector-pair-id '->vector
-  (lambda (vp)
-    (vector-iterate (vector-pair-y vp) (vector-pair-x vp)
-      (lambda (acc e i) (vector-add acc e)))))
+(def-method vector-pair-id ->vector(vector-pair->vector vp)
+  (vector-iterate (vector-pair-y vp) (vector-pair-x vp)
+    (lambda (acc e i) (vector-add acc e))))
 
-(add-type-fn! vector-pair-id 'but-last
-  (lambda (vp) 
-    (make-vector-pair (vector-pair-x vp) (but-last (vector-pair-y vp)))))
+(def-method vector-pair-id but-last (vector-pair-but-last vp)
+  (make-vector-pair (vector-pair-x vp) (but-last (vector-pair-y vp))))
 
-(add-type-fn! vector-pair-id 'foldl
-  (lambda (f x vp) 
-    (foldl f (foldl f x (vector-pair-x vp)) (vector-pair-y vp))))
+(def-method vector-pair-id foldl (vector-pair-foldl f x vp)
+  (foldl f (foldl f x (vector-pair-x vp)) (vector-pair-y vp)))
 
-(add-type-fn! vector-pair-id 'map
-  (lambda (f vp)
-    (make-vector-pair (map f (vector-pair-x vp)) (map f (vector-pair-y vp)))))
+(def-method vector-pair-id map (vector-pair-map f vp)
+  (make-vector-pair (map f (vector-pair-x vp)) (map f (vector-pair-y vp))))
 
-(add-type-fn! vector-pair-id 'reverse
-  (lambda (f vp)
-    (make-vector-pair (reverse (vector-pair-y vp)) (reverse (vector-pair-x vp)))))
+(def-method vector-pair-id reverse (vector-pair-reverse vp)
+  (make-vector-pair (reverse (vector-pair-y vp)) (reverse (vector-pair-x vp))))
 
-(add-type-fn! vector-pair-id '->string
-  (lambda (vp)
-    (let ((f (lambda (s0 s1) (string s0 " " s1)))
-          (v0-s (foldl f "" (vector-pair-x vp)))
-          (v1-s (foldl f "" (vector-pair-y vp))))
-      (string "[" v0-s v1-s "]"))))
+(def-method vector-pair-id ->string (vector-pair->string vp)
+  (let ((f (lambda (s0 s1) (string s0 " " s1)))
+        (v0-s (foldl f "" (vector-pair-x vp)))
+        (v1-s (foldl f "" (vector-pair-y vp))))
+    (string "[" v0-s v1-s "]")))
 
-(add-type-fn! vector-pair-id 'find-first
-  (lambda (p vp)
-    (let* (res0 (find-first p (vector-pair-x vp)))
-      (if (null? res0)
-        (find-first p (vector-pair-y vp))
-        res0))))
+(def-method vector-pair-id find-first (vector-pair-find-first p vp)
+  (let* (res0 (find-first p (vector-pair-x vp)))
+    (if (null? res0)
+      (find-first p (vector-pair-y vp))
+      res0)))
 
-(add-type-fn! vector-pair-id 'eq?
-  (lambda (v0 v1)
-    (if (vector-pair? v1)
-      (and (eq? (vector-pair-x v0) (vector-pair-x v1))
-          (eq? (vector-pair-y v0) (vector-pair-y v1)))
-      (eq? (->vector v0) v1))))
+(def-method vector-pair-id eq? (vector-pair-eq? v0 v1)
+  (if (vector-pair? v1)
+    (and (eq? (vector-pair-x v0) (vector-pair-x v1))
+        (eq? (vector-pair-y v0) (vector-pair-y v1)))
+    (eq? (->vector v0) v1)))
 
 (let* (vp-get (lambda (vp i)
         (let* (vpxsize (vector-size (vector-pair-x vp)))
@@ -159,23 +145,20 @@
       (list 'nth vp-get)))
   )
 
-(add-type-fn! vector-pair-id 'filter
-  (lambda (p vp)
-    (make-vector-pair (filter p (vector-pair-x vp)) (filter p (vector-pair-y vp)))))
+(def-method vector-pair-id filter (vector-pair-filter p vp)
+  (make-vector-pair (filter p (vector-pair-x vp)) (filter p (vector-pair-y vp))))
 
-(add-type-fn! vector-pair-id 'take
-  (lambda (n vp)
-    (cond ((<= n (vector-size (vector-pair-x vp))) (take n (vector-pair-x vp)))
-          (#t (make-vector-pair (vector-pair-x vp) (take (- n (vector-size (vector-pair-x vp))) (vector-pair-y vp)))))))
+(def-method vector-pair-id take (vector-pair-take n vp)
+  (cond ((<= n (vector-size (vector-pair-x vp))) (take n (vector-pair-x vp)))
+        (#t (make-vector-pair (vector-pair-x vp) (take (- n (vector-size (vector-pair-x vp))) (vector-pair-y vp))))))
 
-(add-type-fn! vector-pair-id 'drop
-  (lambda (n vp)
-    (cond ((= n 0) vp)
-          ((<= n (vector-size vp)) [])
-          ((< n (vector-size (vector-pair-x vp)))
-           (make-vector-pair (drop (- n (vector-size (vector-pair-x vp))) (vector-pair-y vp))
-                              (vector-pair-y vp)))
-          (#t (drop (- n (vector-size (vector-pair-x vp))) (vector-pair-y vp))))))
+(def-method vector-pair-id drop (vector-pair-drop n vp)
+  (cond ((= n 0) vp)
+        ((<= n (vector-size vp)) [])
+        ((< n (vector-size (vector-pair-x vp)))
+          (make-vector-pair (drop (- n (vector-size (vector-pair-x vp))) (vector-pair-y vp))
+                            (vector-pair-y vp)))
+        (#t (drop (- n (vector-size (vector-pair-x vp))) (vector-pair-y vp)))))
 
 (let* (setter (lambda (vp i e)
     (if (< i (vector-pair-x vp))
@@ -185,14 +168,13 @@
         (vector-set (vector-pair-y vp) (- i (vector-size (vector-pair-x vp))) e)))))
   (add-type-fns! vector-pair-id
     (list
-    (list 'vector-set setter)
-    (list 'set-at setter))))
+      (list 'vector-set setter)
+      (list 'set-at setter))))
 
-(add-type-fn! vector-pair-id 'vector-iterate
-  (lambda (vp e fn)
-    (vector-iterate (->vector (vector-pair-y vp))
-      (vector-iterate (->vector (vector-pair-x vp)) e fn)
-        fn)))
+(def-method vector-pair-id vector-iterate (vector-pair-iterate vp e fn)
+  (vector-iterate (->vector (vector-pair-y vp))
+    (vector-iterate (->vector (vector-pair-x vp)) e fn)
+      fn))
 
 ; --------------------------------------------------
 
@@ -201,7 +183,7 @@
     (nothing)
     (maybe (_vector-get v i))))
 
-(define (vector->string v)
+(def-method vector-id ->string (vector->string v)
   (string "["
     (vector-iterate v ""
       (lambda (acc e i)
@@ -240,12 +222,12 @@
       (#t (make-vector-pair v (->vector v1)))))
 
 (define (vector-find-first p v)
-  (car (cdr
-    (vector-iterate v (list #f '())
+  (maybe (car (cdr
+    (vector-iterate v (list #f (nothing).?)
       (lambda (acc e i)
         (cond ((car acc) acc)
               ((p e) (list #t e))
-              (#t acc)))))))
+              (#t acc))))))))
 
 (define (vector->list v)
   (let* (iter (lambda (i nl)
@@ -336,7 +318,6 @@
 
 (add-type-fns! vector-id
   (list
-;;     (list 'vector-get _vector-get)
     (list 'vector-iterate _vector-iterate)
     (list 'vector-add _vector-add)
     (list 'eq? vector-eq?)
@@ -387,10 +368,7 @@
     (list 'append (lambda (v y) (append (->vector v) y)))
     (list 'find-first (lambda (p v) (find-first p (->vector v))))
     (list '->list (lambda (v) (->list (->vector v))))
-;;     (list 'but-last (lambda (v) (but-last (->vector v))))
     (list 'reverse vector-reverse)
-;;     (list 'take (lambda (n v) (take n (->vector v))))
-;;     (list 'drop (lambda (n v) (drop n (->vector v))))
     (list 'map-while (lambda (f p v) (map-while f p (->vector v))))
     (list 'map-until (lambda (f p v) (map-until f p (->vector v))))
     (list 'take-while (lambda (p v) (take-while p (->vector v))))
@@ -404,11 +382,9 @@
     (list 'first (lambda (v) (vector-get v 0)))
     (list 'second (lambda (v) (vector-get v 1)))
     (list 'third (lambda (v) (vector-get v 2)))
-;;     (list 'rest (lambda (v) (drop 1 v)))
     (list 'vector-size offset-vector-size)
     (list 'empty? (lambda (v) (= (vector-size v) 0)))
     (list 'nth offset-vector-get)
-    (list '->vector offset-vector->vector)
     (list 'copy id)
     (list 'list? always-false)
     (list 'vector? always-true)
@@ -417,10 +393,9 @@
 
 (add-type-fns! vector-pair-id
   (list
-    (list 'size vector-size)
     (list 'empty? (lambda (vp) (and (empty? (vector-pair-x vp))
                                     (empty? (vector-pair-y vp)))))
-    (list 'copy ->vector)
+    (list 'copy id)
     (list 'list? always-false)
     (list 'vector? always-true)
     (list '->list (lambda (vp) (append (->list (vector-pair-x vp))

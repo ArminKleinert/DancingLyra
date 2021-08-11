@@ -35,6 +35,8 @@ It started as a port of a language written in Ruby, but became its own thing by 
   - Now supports very limited modules
   - Basic file-IO (read/write/append/remove/exists?) and console-input (readln!) added
   - Optional lazy evaluation via. lazy type
+- 0.0.03
+  - Implemented partial function application via the `partial` function.
 
 ## Usage
 
@@ -124,6 +126,8 @@ eval!          | 1     | Evaluates a piece of lyra using the compiler's internal
 lyra-type-id   | 1     | Returns the type id of its argument.
 measure        | 2     | Measures the median time for n runs of a function f in milliseconds.
 define-record  | 2     | Define a new type (Explained far below).
+               |       | 
+partial        | >= 1  | Takes a function and any number of arguments. Example below.
 ```
 
 ## Core library function
@@ -277,6 +281,15 @@ Here is a sample definition for `load!` and `foldl`.
 ; Example usage of foldl: Sum all the elements of a list.
 (define (sum xs)
   (foldl + 0 xs))
+```
+
+### Partial function application
+
+Partial function application is available using the `partial` function:
+
+```
+(define sum (partial foldl + 0))
+(sum [1 2 3 4]) ; => 10
 ```
 
 ### maybe something, maybe nothing
