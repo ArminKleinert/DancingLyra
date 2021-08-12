@@ -33,7 +33,8 @@
   [func-id func-id]
   [bool-id bool-id]
   [vector-id vector-id]
-  [box-id box-id]]
+  [box-id box-id]
+  [->hash ->hash]]
 
 
 ; Structure of each node.

@@ -1,5 +1,5 @@
-(module set
-  [[insert insert]
+(module core-set
+  [[set-add set-add]
    [set-includes? set-includes?]
    [set-size set-size]
    [set->list set->list]
@@ -10,18 +10,80 @@
    [set-difference set-difference]
    [powerset powerset] ; All possible subsets of set
    [set-intersection set-intersection]
-   [set set]
+   [set hash-set]
    [hash-set hash-set]
-   [tree-set tree-set]]
+   ;[tree-set tree-set]
+   ;[skip-list skip-list]
+   ]
+
+(def-generic s (set-add s e) nothing)
+(def-generic s (set-includes? s e) nothing)
+(def-generic s (set-size s) nothing)
+(def-generic s (set->list s) nothing)
+(def-generic s (set->vector s) nothing)
+(def-generic s (set-remove s e) nothing)
+(def-generic s (set-empty? s e) nothing)
+(def-generic s (set-union s e) nothing)
+(def-generic s (set-difference s e) nothing)
+(def-generic s0 (set-intersection s0 s1) nothing)
+(def-generic s (powerset s) nothing)
+
 
 (let ((hash-set-id (register-type!))
-      (hash-bucket-id (register-type!))
-      (tree-set-id (register-type!))
-      (tree-node-id (register-type!)))
-  (define-record hash-set-id hash-set entries)
-  (define-record hash-bucket-id bucket values)
-  (define-record tree-set-id tree-set entries)
-  (define-record tree-node-id node val left right)
-  
-  
+      ;(tree-set-id (register-type!))
+      ;(tree-node-id (register-type!))
+      ;(skip-list-id (register-type!))
+      ;(skip-list-node-id (register-type!)
+      )
+  (define-record hash-set-id hash-set buckets)
+
+;  (define-record tree-set-id tree-set entries)
+;  (define-record tree-node-id node val left right)
+
+;  (define-record skip-list-id node val left right)
+;  (define-record skip-list-node-id node val)
+
+; --------------------------------------------------
+
+; Size must be at least 1 greater than n to be indexable at n
+(define (increase-bucket-count n buckets)
+  (if (> (vector-size buckets) n)
+    (->vector buckets)
+    (increase-bucket-count n (vector-add buckets []))))
+
+(define (is-in-bucket b e)
+  (vector-iterate b #f
+    (lambda (acc current i)
+      (if (or acc (= current e)) #t acc))))
+
+(define (add-to-bucket bucket e)
+  (if (is-in-bucket bucket e) bucket (vector-add bucket e)))
+
+(define num-buckets 1024)
+(define (hash-set & xs)
+  (foldl hash-set-add (make-hash-set []) xs))
+
+(def-method hash-set-id set-add (hash-set-add s e)
+  (let ((h (% (->hash e) num-buckets))
+        (buckets (increase-bucket-count h (hash-set-buckets s)))
+        (b (add-to-bucket (vector-get buckets h).? e)))
+    (make-hash-set (vector-set buckets h b))))
+
+(def-method hash-set-id set-includes? (hash-set-includes? s e)
+  (let* (h (% (->hash e) num-buckets))
+    (if (>= h (vector-size (hash-set-buckets s)))
+      #f
+      (is-in-bucket (vector-get (hash-set-buckets s) h).? e))))
+
+(def-method hash-set-id set-size (hash-set-size s)
+  (foldl + 0 (map vector-size (hash-set-buckets s))))
+
+(def-method hash-set-id ->string (hash-set->string s)
+  (->string (->vector s)))
+
+(def-method hash-set-id ->vector (hash-set->vector s)
+  (foldl vector-append [] (hash-set-buckets s)))
+
+(def-method hash-set-id ->list (hash-set->list s)
+  (->list (->vector s)))
 ))

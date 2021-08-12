@@ -78,4 +78,15 @@
 (load! "vector.lyra")
 (load! "lazy.lyra")
 
+(load! "set.lyra")
+
+(let ((s (hash-set 1 2 3 4 4 4 4 4 5 99)))
+  ;(println! (set-includes? s 1))
+  ;(println! (set-includes? s 2))
+  ;(println! (set-includes? s0 1))
+  ;(println! (set-includes? s0 2))
+  ;(println! s0)
+  (println! (set-add s 16))
+  )
+
 'lyra-core-loaded

@@ -60,8 +60,8 @@
 
 (def-generic x (sort x) nothing)
 (def-generic x (sort-by comp x) nothing)
-      
-      
+
+
 
 (define (default-size xs)
   (if (nothing? (rest xs))
