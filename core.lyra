@@ -80,6 +80,20 @@
 
 (load! "set.lyra")
 
+(comment
+
+(let* (l (lazy even? (lazy inc (lazy unwrap (lazy first (list 1 2))))))
+  (println! (executed? l))
+  (println! (eager l))
+  (println! (executed? l))
+  (println! (eager l)))
+
+(let* (l (lazy even? (lazy inc (lazy unwrap (lazy first (list 1 2))))))
+  (println! (executed? l))
+  (println! l.!)
+  (println! (executed? l))
+  (println! l.!))
+
 (let ((s (hash-set 1 2 3 4 4 4 4 4 5 99)))
   ;(println! (set-includes? s 1))
   ;(println! (set-includes? s 2))
@@ -88,5 +102,6 @@
   ;(println! s0)
   (println! (set-add s 16))
   )
+)
 
 'lyra-core-loaded

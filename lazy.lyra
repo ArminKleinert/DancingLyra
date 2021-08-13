@@ -1,19 +1,31 @@
 (module lazy
   [[lazy lazy]
-   [eager eager]]
+   [eager eager]
+   [executed? executed?]]
 
   (let* (lazy-type-id (register-type!))
-    (define-record lazy-type-id lazy funcs obj)
-    
+    (define-record lazy-type-id lazy exec? funcs obj)
+
     (define (lazy f o)
-      (cond ((lazy? o) (make-lazy (cons f (lazy-funcs o)) (lazy-obj o)))
-            (#t (make-lazy (list f) o))))
-    
+      (cond ((lazy? o) (make-lazy (box #f) (cons f (lazy-funcs o)) (lazy-obj o)))
+            (#t (make-lazy (box #f) (list f) (box o)))))
+
     (define (eager l)
       (if (lazy? l)
-        (foldr (lambda (x y) (x.? y)) (lazy-obj l) (lazy-funcs l))
-        l))
-    
+        (if (unbox (lazy-exec? l))
+          (unbox (lazy-obj l))
+          (let* (o (foldr (lambda (x y) (x.? y)) (unbox (lazy-obj l)) (lazy-funcs l)))
+            (box-set! (lazy-obj l) o)
+            (box-set! (lazy-exec? l) #t)
+            o))
+        (unbox (lazy-obj l))))
+
+    (define (executed? l)
+      (unbox (lazy-exec? l)))
+
     (def-method lazy-type-id ->string (lazy->string l)
-      (->string (list (lazy-funcs l) (lazy-obj l))))
-    ))
+      (->string (list "lazy" (unbox (lazy-exec? l)) (lazy-funcs l) (unbox (lazy-obj l)))))
+    
+    (def-method lazy-type-id copy (copy-lazy l)
+      (make-lazy (box (unbox (lazy-exec? l))) (lazy-funcs l) (box (unbox (lazy-obj l)))))
+  ))
